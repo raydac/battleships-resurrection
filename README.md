@@ -1,2 +1,1 @@
-# battleships-resurrection
-Attempt to restore gameplay of old demo-game Battleships written for E3 2001
+to get animation working smoothly, add `-Dsun.java2d.opengl=true` if starting JAR
