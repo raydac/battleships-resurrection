@@ -1,0 +1,10 @@
+MIDlet-1: BattleShip, /Icon.png, com.raydac.j2me.midlets.battleship.BattleShip
+MIDlet-Description: Battleships game client
+MIDlet-Data-Size: 20000
+MIDlet-Jar-Size: 105707
+MIDlet-Jar-URL: battleship.jar
+MIDlet-Name: Battleship
+MIDlet-Vendor: Gamefederation
+MIDlet-Version: 1.0
+MicroEdition-Configuration: CLDC-1.0
+MicroEdition-Profile: MIDP-1.0
