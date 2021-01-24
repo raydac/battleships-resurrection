@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.igormaznitsa</groupId>
+        <artifactId>battleships-resurrection</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>gex-playroom-server</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.gamefederation</groupId>
+            <artifactId>gex-api</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${basedir}${file.separator}libs${file.separator}gamefederation-api.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>BSSServer</mainClass>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.gamefederation</groupId>
+                        <artifactId>gex-api</artifactId>
+                        <version>1.0.0-SNAPSHOT</version>
+                        <scope>system</scope>
+                        <systemPath>${basedir}${file.separator}libs${file.separator}gamefederation-api.jar</systemPath>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
