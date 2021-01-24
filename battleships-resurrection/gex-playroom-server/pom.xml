@@ -12,22 +12,17 @@
     <artifactId>gex-playroom-server</artifactId>
     <packaging>jar</packaging>
 
+    <description>quickly written minimalistic HTTP server supports commands of GEX platform (development of
+        Gamefederation AS)
+    </description>
+
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.gamefederation</groupId>
-            <artifactId>gex-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${basedir}${file.separator}libs${file.separator}gamefederation-api.jar</systemPath>
-        </dependency>
-    </dependencies>
-
     <build>
+        <defaultGoal>clean install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -42,15 +37,6 @@
                 <configuration>
                     <mainClass>BSSServer</mainClass>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.gamefederation</groupId>
-                        <artifactId>gex-api</artifactId>
-                        <version>1.0.0-SNAPSHOT</version>
-                        <scope>system</scope>
-                        <systemPath>${basedir}${file.separator}libs${file.separator}gamefederation-api.jar</systemPath>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
