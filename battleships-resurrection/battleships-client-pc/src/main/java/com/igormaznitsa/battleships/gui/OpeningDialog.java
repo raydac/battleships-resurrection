@@ -87,12 +87,12 @@ public class OpeningDialog extends javax.swing.JDialog {
           .setHostPort(hostPort)
           .setHostName(this.textFieldHostName.getText().trim())
           .build();
-      this.setVisible(false);
+      this.dispose();
     });
 
     this.buttonExit.addActionListener(e -> {
       this.result = null;
-      this.setVisible(false);
+      this.dispose();
     });
 
     this.disableMultiplayer();
@@ -133,6 +133,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     textFieldHostName = new JTextField();
     textFieldPort = new JFormattedTextField(new NumberFormatter(new DecimalFormat("####")));
     buttonsPanel = new JPanel();
+    buttonsPanel.setBorder(createEmptyBorder(0, 8, 16, 8));
     buttonGo = new JButton();
     buttonExit = new JButton();
     filler6 =

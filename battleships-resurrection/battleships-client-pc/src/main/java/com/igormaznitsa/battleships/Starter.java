@@ -43,11 +43,9 @@ public class Starter {
       }
 
       final AiBattleshipsSingleSessionBot aiBot = new AiBattleshipsSingleSessionBot().start();
-      try {
-        new BattleshipsFrame(startData, aiBot).setVisible(true);
-      } finally {
-        //aiBot.dispose();
-      }
+      new BattleshipsFrame(startData, aiBot, () -> {
+        aiBot.dispose();
+      }).setVisible(true);
     });
   }
 }

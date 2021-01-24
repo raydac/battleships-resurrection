@@ -187,11 +187,6 @@ public final class AiBattleshipsSingleSessionBot implements BsPlayer {
   @Override
   public void dispose() {
     this.thread.interrupt();
-    try {
-      this.thread.join();
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-    }
   }
 
   private boolean canCellContainEnemyShip(final int x, final int y) {

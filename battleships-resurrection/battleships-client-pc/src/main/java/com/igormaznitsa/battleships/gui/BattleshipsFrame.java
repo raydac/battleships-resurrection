@@ -31,6 +31,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -40,12 +41,16 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   private static final Logger LOGGER = Logger.getLogger(BattleshipsFrame.class.getName());
   private final BsPlayer opponent;
 
-  public BattleshipsFrame(final StartData startData, final BsPlayer opponent) {
+  private final Runnable exitAction;
+
+  public BattleshipsFrame(final StartData startData, final BsPlayer opponent,
+                          final Runnable exitAction) {
     super(startData.getGameTitle().orElse("Battleship"),
         startData.getGraphicsConfiguration().orElse(
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
 
+    this.exitAction = exitAction;
     this.opponent = opponent;
 
     startData.getGameIcon().ifPresent(this::setIconImage);
@@ -54,7 +59,14 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new WindowAdapter() {
       @Override
-      public void windowClosing(WindowEvent e) {
+      public void windowClosing(final WindowEvent e) {
+        if (exitAction != null) {
+          try {
+            exitAction.run();
+          } catch (Throwable ex) {
+            LOGGER.log(Level.SEVERE, "Error during close action", ex);
+          }
+        }
         doCloseWindow();
       }
     });
@@ -91,6 +103,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   }
 
   protected void onExit() {
+
     this.doCloseWindow();
   }
 
@@ -113,7 +126,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   protected void doLoadingCompleted() {
     final GamePanel gamePanel = new GamePanel();
 
-    final Thread commDaemon = new Thread(() -> {
+    final Thread commDaemonThread = new Thread(() -> {
       LOGGER.info("Comm-Daemon started");
       while (Thread.currentThread().isAlive()) {
         try {
@@ -133,8 +146,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       }
       LOGGER.info("Comm-Daemon stopped");
     }, "bs-communication-daemon");
-    commDaemon.setDaemon(true);
-    commDaemon.start();
+    commDaemonThread.setDaemon(true);
+    commDaemonThread.start();
 
     replaceContentPanel(gamePanel);
 
@@ -191,6 +204,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   }
 
   private void doCloseWindow() {
+    LOGGER.info("Closing game");
     try {
       final Container contentPane = this.getContentPane();
       if (contentPane instanceof BasePanel) {
@@ -205,6 +219,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
           a.dispose();
         }
       } finally {
+        LOGGER.info("Disposing main window");
         this.dispose();
       }
     }
