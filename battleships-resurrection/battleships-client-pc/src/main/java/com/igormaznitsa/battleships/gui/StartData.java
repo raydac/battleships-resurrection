@@ -97,7 +97,7 @@ public class StartData {
       return this;
     }
 
-    private Builder setHostName(final String hostName) {
+    public Builder setHostName(final String hostName) {
       this.hostName = Optional.ofNullable(hostName);
       return this;
     }

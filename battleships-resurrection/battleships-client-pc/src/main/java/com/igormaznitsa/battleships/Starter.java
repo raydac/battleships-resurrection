@@ -16,15 +16,32 @@
 package com.igormaznitsa.battleships;
 
 import com.igormaznitsa.battleships.gui.BattleshipsFrame;
+import com.igormaznitsa.battleships.gui.OpeningDialog;
 import com.igormaznitsa.battleships.gui.StartData;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
+import java.util.Optional;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 public class Starter {
 
   public static void main(final String... args) {
     SwingUtilities.invokeLater(() -> {
+      try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      } catch (Exception ex) {
+        // ignoring
+      }
+
       final StartData startData = StartData.newBuilder().build();
+      final OpeningDialog openingDialog = new OpeningDialog(startData);
+      openingDialog.setVisible(true);
+
+      final Optional<StartData> selectedData = openingDialog.getResult();
+      if (selectedData.isEmpty()) {
+        System.exit(0);
+      }
+
       final AiBattleshipsSingleSessionBot aiBot = new AiBattleshipsSingleSessionBot().start();
       try {
         new BattleshipsFrame(startData, aiBot).setVisible(true);
