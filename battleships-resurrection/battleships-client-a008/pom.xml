@@ -12,10 +12,10 @@
 
     <properties>
         <jdk5.home>${user.home}${file.separator}SDK${file.separator}jdk1.5</jdk5.home>
-        <wtk.home>${user.home}${file.separator}SDK${file.separator}WTK2.5.2</wtk.home>
     </properties>
 
     <build>
+        <defaultGoal>clean install</defaultGoal>
         <plugins>
             <plugin>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -31,7 +31,6 @@
                         <configuration>
                             <environmentVariables>
                                 <JDK_HOME>${jdk5.compiler}</JDK_HOME>
-                                <WTK_HOME>${wtk.home}</WTK_HOME>
                             </environmentVariables>
                             <executable>bash</executable>
                             <commandlineArgs>${project.basedir}${file.separator}build_midlet.sh</commandlineArgs>

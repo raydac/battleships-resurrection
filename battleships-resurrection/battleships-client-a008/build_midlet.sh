@@ -15,11 +15,6 @@ then
     echo JDK_HOME not provided, using default one
     JDK_HOME='/home/igorm/SDK/jdk1.5'
 fi
-if [ -z "$WTK_HOME" ]
-then
-    echo WTK_HOME not provided, using default one
-    WTK_HOME='/home/igorm/SDK/WTK2.5.2'
-fi
 
 
 MIDLET_NAME=BattleShip
@@ -29,7 +24,9 @@ MIDLET_CLASSES=$PROJECT_DIR/target/classes
 MIDLET_PROJECT=$PROJECT_DIR/BattleShip
 TARGET_JAR=$PROJECT_DIR/target/$MIDLET_NAME.jar
 TARGET_JAD=$PROJECT_DIR/target/$MIDLET_NAME.jad
-WTK_LIBS=$WTK_HOME/lib
+
+WTK_LIBS=$PROJECT_DIR/libs
+
 
 echo creating folders
 
@@ -51,20 +48,20 @@ fi
 
 echo compiling
 
-$JDK_HOME/bin/javac -source 1.3 -target 1.1 -bootclasspath $WTK_LIBS/midpapi10.jar:$WTK_LIBS/cldcapi10.jar -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/gamefederation/playmaker/client/j2me/*.java
+$JDK_HOME/bin/javac -source 1.3 -target 1.1 -bootclasspath $WTK_LIBS/emptyapi.zip -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/gamefederation/playmaker/client/j2me/*.java
 if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
 
-$JDK_HOME/bin/javac -source 1.3 -target 1.1 -bootclasspath $WTK_LIBS/midpapi10.jar:$WTK_LIBS/cldcapi10.jar -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/raydac/j2me/midlets/battleship/*.java
+$JDK_HOME/bin/javac -source 1.3 -target 1.1 -bootclasspath $WTK_LIBS/emptyapi.zip -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/raydac/j2me/midlets/battleship/*.java
 if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
 echo preverify
 
-$WTK_HOME/bin/preverify -classpath $WTK_LIBS/midpapi10.jar:$WTK_LIBS/cldcapi10.jar:$MIDLET_TMPCLASSES -d $MIDLET_CLASSES $MIDLET_TMPCLASSES
+$PROJECT_DIR/tools/preverify -classpath $WTK_LIBS/emptyapi.zip:$MIDLET_TMPCLASSES -d $MIDLET_CLASSES $MIDLET_TMPCLASSES
 if [[ $? -ne 0 ]] ; then
     exit 1
 fi
