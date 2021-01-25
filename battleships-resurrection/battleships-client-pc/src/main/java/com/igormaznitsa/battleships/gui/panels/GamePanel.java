@@ -79,7 +79,7 @@ import javax.swing.Timer;
 
 public class GamePanel extends BasePanel implements BsPlayer {
 
-  public static final Point PLAYER_VIEW_POSITION = findShipRenderPositionForCell(-1, 10);
+  public static final Point PLAYER_POSITION = new Point(395, 683);
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(70);
   private static final int TICKS_BEFORE_CONTROL_ACTION = 3;
   private static final int GAME_FIELD_CELL_WIDTH = 23;

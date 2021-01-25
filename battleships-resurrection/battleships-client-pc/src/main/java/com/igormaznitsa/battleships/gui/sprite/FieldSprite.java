@@ -15,16 +15,18 @@
 
 package com.igormaznitsa.battleships.gui.sprite;
 
+import static com.igormaznitsa.battleships.gui.panels.GamePanel.PLAYER_POSITION;
 import static com.igormaznitsa.battleships.gui.panels.GamePanel.findShipRenderPositionForCell;
 import static java.util.List.copyOf;
 
 
-import com.igormaznitsa.battleships.gui.panels.GamePanel;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.List;
 
 public abstract class FieldSprite implements Comparable<FieldSprite> {
+  private static final int EXPECTED_SPRITE_SIZE = 192;
+
   protected static final int DEVELOPMENT_LEVELS = 25;
 
   protected final List<Point> cells;
@@ -50,7 +52,8 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
     this.spritePoint.y += Math.abs(delta);
 
     this.distanceFromPlayer =
-        this.spritePoint.distance(GamePanel.PLAYER_VIEW_POSITION) - visibilityWeight;
+        PLAYER_POSITION.distance(new Point(this.spritePoint.x + (EXPECTED_SPRITE_SIZE / 2),
+            this.spritePoint.y + (EXPECTED_SPRITE_SIZE / 2))) - visibilityWeight;
   }
 
   private static boolean isHoriz(final List<Point> cells) {
