@@ -15,10 +15,10 @@
             <outputDirectory>${file.separator}</outputDirectory>
             <excludes>
                 <exclude>
-                    BattleshipsGame.app${file.separator}Contents${file.separator}MacOS${file.separator}battleships
+                    Battleships.app${file.separator}Contents${file.separator}MacOS${file.separator}battleships
                 </exclude>
                 <exclude>
-                    BattleshipsGame.app${file.separator}Contents${file.separator}Resources${file.separator}**${file.separator}*
+                    Battleships.app${file.separator}Contents${file.separator}Resources${file.separator}**${file.separator}*
                 </exclude>
             </excludes>
             <includes>
@@ -30,7 +30,7 @@
             <directory>${project.basedir}${file.separator}src${file.separator}assembly${file.separator}mac</directory>
             <outputDirectory>${file.separator}</outputDirectory>
             <includes>
-                <include>BattleshipsGame.app${file.separator}Contents${file.separator}Resources${file.separator}*
+                <include>Battleships.app${file.separator}Contents${file.separator}Resources${file.separator}*
                 </include>
             </includes>
             <filtered>false</filtered>
@@ -38,7 +38,7 @@
         <fileSet>
             <directory>${project.build.directory}${file.separator}jre_macos</directory>
             <outputDirectory>
-                ${file.separator}BattleshipsGame.app${file.separator}Contents${file.separator}MacOS${file.separator}jre
+                ${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS${file.separator}jre
             </outputDirectory>
             <includes>
                 <include>*/**</include>
@@ -48,17 +48,17 @@
     <files>
         <file>
             <source>
-                ${project.basedir}${file.separator}src${file.separator}assembly${file.separator}mac${file.separator}BattleshipsGame.app${file.separator}Contents${file.separator}MacOS${file.separator}battleships
+                ${project.basedir}${file.separator}src${file.separator}assembly${file.separator}mac${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS${file.separator}battleships
             </source>
-            <destName>battleships-resurrection</destName>
-            <outputDirectory>${file.separator}BattleshipsGame.app${file.separator}Contents${file.separator}MacOS
+            <destName>battleships</destName>
+            <outputDirectory>${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS
             </outputDirectory>
             <fileMode>0755</fileMode>
         </file>
         <file>
             <source>${project.build.directory}${file.separator}${project.build.finalName}.jar</source>
             <destName>battleships-resurrection-${project.version}.jar</destName>
-            <outputDirectory>${file.separator}BattleshipsGame.app${file.separator}Contents${file.separator}MacOS
+            <outputDirectory>${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS
             </outputDirectory>
         </file>
     </files>
