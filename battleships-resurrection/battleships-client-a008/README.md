@@ -37,11 +37,6 @@ the [tools folder](tools). So that, the midlet requires only JDK 1.5 to be built
 The folder contains original sources of 2001, I made only minor reformatting and removed some extra `;` to make them
 compilable. But they presented as I have them among my archives.
 
-## Target
-
-The folder should not be in the repository, but I decided to add it into CVS with prebuilt version of the midlet.
-Because in future it may not be possible to make build version for incompatibility of tools.
-
 ## Tools
 
 The folder contains tools required to build a midlet.
