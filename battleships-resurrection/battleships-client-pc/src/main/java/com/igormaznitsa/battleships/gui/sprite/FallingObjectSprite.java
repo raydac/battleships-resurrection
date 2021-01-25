@@ -20,6 +20,7 @@ import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.Collections;
+import java.util.Optional;
 
 public abstract class FallingObjectSprite extends FieldSprite {
 
@@ -30,17 +31,25 @@ public abstract class FallingObjectSprite extends FieldSprite {
   private int frame;
   private boolean completed;
   private double stepY;
+  private final Point realSpritePoint;
 
-  public FallingObjectSprite(final Animation animation, final Point targetCell, final Sound sound,
+  public FallingObjectSprite(final Animation animation, final Optional<ShipSprite> shipSprite,
+                             final Point targetCell, final Sound sound,
                              final int initialAltitude, final int spriteOffsetY, final int steps) {
     super(Collections.singletonList(targetCell), 1.0d, false);
     this.animation = animation;
     this.maxAllowedY = this.spritePoint.y + spriteOffsetY;
     this.frame = 0;
     this.completed = false;
-    this.drawY = this.getSpritePoint().y - initialAltitude;
+    this.realSpritePoint = shipSprite.map(s -> s.spritePoint).orElseGet(() -> this.spritePoint);
+    this.drawY = this.realSpritePoint.y - initialAltitude;
     this.stepY = (double) initialAltitude / (double) steps;
     sound.getClip().play();
+  }
+
+  @Override
+  public Point getSpritePoint() {
+    return this.realSpritePoint;
   }
 
   @Override
@@ -64,7 +73,7 @@ public abstract class FallingObjectSprite extends FieldSprite {
   @Override
   public void render(final Graphics2D g2d) {
     if (!this.completed) {
-      g2d.drawImage(this.animation.getFrame(this.frame), null, this.spritePoint.x,
+      g2d.drawImage(this.animation.getFrame(this.frame), null, this.realSpritePoint.x,
           Math.min(this.maxAllowedY, (int) Math.round(this.drawY)));
     }
   }

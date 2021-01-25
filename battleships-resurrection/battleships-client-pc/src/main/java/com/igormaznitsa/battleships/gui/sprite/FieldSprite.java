@@ -40,24 +40,24 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
     this.developmentOnStart = developmentOnStart;
 
     this.actionCell = findMiddleCell(cells);
-    this.spritePoint = findRenderPoint(cells);
+    this.spritePoint = findRenderPointInMiddleOfPosition(cells);
 
     final int dx = 9 - cells.stream().mapToInt(c -> c.x).min().getAsInt();
     final int dy = cells.stream().mapToInt(c -> c.y).max().getAsInt();
     final int delta = dy - dx;
 
     this.spritePoint.x += delta;
-    this.spritePoint.y += delta;
+    this.spritePoint.y += Math.abs(delta);
 
     this.distanceFromPlayer =
         this.spritePoint.distance(GamePanel.PLAYER_VIEW_POSITION) - visibilityWeight;
   }
 
   private static boolean isHoriz(final List<Point> cells) {
-    return cells.size() == 1 ? true : cells.get(0).x == cells.get(1).x;
+    return cells.size() == 1 || cells.get(0).x == cells.get(1).x;
   }
 
-  private static Point findRenderPoint(final List<Point> cells) {
+  private static Point findRenderPointInMiddleOfPosition(final List<Point> cells) {
     final int x1 = cells.stream().mapToInt(c -> c.x).min().getAsInt();
     final int y1 = cells.stream().mapToInt(c -> c.y).min().getAsInt();
     final int x2 = cells.stream().mapToInt(c -> c.x).max().getAsInt();

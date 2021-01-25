@@ -16,6 +16,7 @@
 package com.igormaznitsa.battleships.gui.panels;
 
 import com.igormaznitsa.battleships.gui.Animation;
+import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.sound.SoundClip;
 import com.igormaznitsa.battleships.utils.GfxUtils;
@@ -51,6 +52,8 @@ public class LoadingPanel extends BasePanel {
     for (final Sound s : Sound.values()) {
       s.load();
     }
+    LOGGER.info("Loading banners");
+    InfoBanner.loadAll();
   }
 
   @Override

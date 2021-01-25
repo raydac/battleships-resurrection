@@ -20,6 +20,7 @@ import static com.igormaznitsa.battleships.gui.panels.ControlElement.PAUSE;
 
 
 import com.igormaznitsa.battleships.gui.Animation;
+import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.Dimension;
@@ -34,6 +35,7 @@ public class FinalPanel extends BasePanel {
   private final Sound sound;
   private final BufferedImage image;
   private ControlElement selectedControl = ControlElement.NONE;
+  private final InfoBanner infoBanner;
 
   public FinalPanel(final boolean victory) {
     super();
@@ -41,9 +43,11 @@ public class FinalPanel extends BasePanel {
     if (victory) {
       imageResource = "victory.png";
       this.sound = Sound.VICTORY_HORN;
+      this.infoBanner = InfoBanner.VICTORY;
     } else {
       imageResource = "LOSE.png";
       this.sound = Sound.DEFEAT_HORN;
+      this.infoBanner = InfoBanner.LOST;
     }
     this.image = GfxUtils.loadGfxImageAsType(imageResource, BufferedImage.TYPE_INT_RGB);
     final Dimension size = new Dimension(this.image.getWidth(), this.image.getHeight());
@@ -133,5 +137,6 @@ public class FinalPanel extends BasePanel {
       }
       break;
     }
+    this.infoBanner.render(g2d, BANNER_COORD);
   }
 }

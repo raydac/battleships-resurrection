@@ -18,9 +18,10 @@ package com.igormaznitsa.battleships.gui.sprite;
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Point;
+import java.util.Optional;
 
 public final class FallingAirplaneSprite extends FallingObjectSprite {
-  public FallingAirplaneSprite(final Point targetCell) {
-    super(Animation.SAMOL_FALL, targetCell, Sound.AIRPLANE_IN, 500, -49, 17);
+  public FallingAirplaneSprite(final Optional<ShipSprite> hitShip, final Point targetCell) {
+    super(Animation.SAMOL_FALL, hitShip, targetCell, Sound.AIRPLANE_IN, 500, -49, 17);
   }
 }

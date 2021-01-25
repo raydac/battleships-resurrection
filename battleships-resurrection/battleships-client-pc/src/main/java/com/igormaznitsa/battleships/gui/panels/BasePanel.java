@@ -32,6 +32,8 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 public abstract class BasePanel extends JComponent {
+  public static final Point BANNER_COORD = new Point(423, 10);
+
   public static final String SIGNAL_LOADING_COMPLETED = "LOADING_COMPLETED";
   public static final String SIGNAL_ERROR = "ERROR";
   public static final String SIGNAL_EXIT = "EXIT";

@@ -19,13 +19,19 @@ import com.igormaznitsa.battleships.gui.Animation;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.Collections;
+import java.util.Optional;
 
 public final class OneTimeWaterEffectSprite extends FieldSprite {
   private final Animation animation;
   private int frame;
+  private final Point realSpritePoint;
 
-  public OneTimeWaterEffectSprite(final Point cell, final Animation animation) {
+  public OneTimeWaterEffectSprite(final Point cell, final Optional<ShipSprite> hitShip,
+                                  final Animation animation) {
     super(Collections.singletonList(cell), animation == Animation.EXPLODE ? 1000.0d : 1.0d, false);
+    this.realSpritePoint =
+        animation == Animation.EXPLODE ? hitShip.map(s -> s.spritePoint).orElse(this.spritePoint) :
+            this.spritePoint;
     this.animation = animation;
     this.frame = 0;
   }
@@ -50,10 +56,15 @@ public final class OneTimeWaterEffectSprite extends FieldSprite {
   }
 
   @Override
+  public Point getSpritePoint() {
+    return this.realSpritePoint;
+  }
+
+  @Override
   public void render(final Graphics2D g2d) {
     if (!this.isCompleted()) {
-      g2d.drawImage(this.animation.getFrame(this.frame), null, this.spritePoint.x,
-          this.spritePoint.y);
+      g2d.drawImage(this.animation.getFrame(this.frame), null, this.realSpritePoint.x,
+          this.realSpritePoint.y);
     }
   }
 

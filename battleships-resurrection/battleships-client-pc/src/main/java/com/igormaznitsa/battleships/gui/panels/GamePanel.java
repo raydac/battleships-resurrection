@@ -35,6 +35,7 @@ import static java.lang.Math.round;
 
 
 import com.igormaznitsa.battleships.gui.Animation;
+import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.gui.sprite.DecorationSprite;
 import com.igormaznitsa.battleships.gui.sprite.FallingAirplaneSprite;
 import com.igormaznitsa.battleships.gui.sprite.FallingObjectSprite;
@@ -661,12 +662,13 @@ public class GamePanel extends BasePanel implements BsPlayer {
                 final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
                 final Point targetCell = hitShip.map(
                     FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
+
                 if (e.getType() == EVENT_SHOT_AIRCARRIER) {
                   this.activeFallingObjectSprite =
-                      new FallingAirplaneSprite(targetCell);
+                      new FallingAirplaneSprite(hitShip, targetCell);
                 } else {
                   this.activeFallingObjectSprite =
-                      new FallingRocketSprite(targetCell);
+                      new FallingRocketSprite(hitShip, targetCell);
                 }
                 this.animatedSpriteField.add(this.activeFallingObjectSprite);
                 Collections.sort(this.animatedSpriteField);
@@ -689,7 +691,8 @@ public class GamePanel extends BasePanel implements BsPlayer {
               enemyTurnResultEvent = new BsGameEvent(EVENT_MISS, enemyShoot.getX(),
                   enemyShoot.getY());
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
-                  new Point(enemyShoot.getX(), enemyShoot.getY()), Animation.SPLASH);
+                  new Point(enemyShoot.getX(), enemyShoot.getY()), Optional.empty(),
+                  Animation.SPLASH);
               Sound.WATER_SPLASH01.getClip().play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
@@ -712,7 +715,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
                     enemyShoot.getY());
               }
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
-                  hitShip.getActionCell(), Animation.EXPLODE);
+                  hitShip.getActionCell(), Optional.of(hitShip), Animation.EXPLODE);
               Sound.WATER_SPLASH01.EXPLODE01.getClip().play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
@@ -793,8 +796,14 @@ public class GamePanel extends BasePanel implements BsPlayer {
     g2d.drawImage(Animation.DIGIT.getFrame(cell1), null, 8, panelY + 394);
   }
 
-  private void drawShips(final Graphics2D g) {
-    this.animatedSpriteField.forEach(x -> x.render(g));
+  private void drawFish(final Graphics2D g) {
+    this.animatedSpriteField.stream().filter(x -> x instanceof FieldSprite)
+        .forEach(x -> x.render(g));
+  }
+
+  private void drawAllExcludeFish(final Graphics2D g) {
+    this.animatedSpriteField.stream().filter(x -> !(x instanceof FishSprite))
+        .forEach(x -> x.render(g));
   }
 
   @Override
@@ -803,7 +812,8 @@ public class GamePanel extends BasePanel implements BsPlayer {
     if (this.activeDecorationSprite != null) {
       this.activeDecorationSprite.render(g2d);
     }
-    this.drawShips(g2d);
+    this.drawFish(g2d);
+    this.drawAllExcludeFish(g2d);
 
     switch (this.currentStage) {
       case PLACEMENT_START: {
@@ -892,6 +902,8 @@ public class GamePanel extends BasePanel implements BsPlayer {
       }
       break;
     }
+
+    this.currentStage.getBanner().render(g2d, BANNER_COORD);
   }
 
   private void doProcessGameControl(final ControlElement control) {
@@ -904,7 +916,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
       case DONE: {
         this.doSelectControl(ControlElement.NONE);
         this.animatedSpriteField = this.gameField.moveFieldToShipSprites();
-//        this.fillEmptyCellsByFish();
+        //this.fillEmptyCellsByFish();
         this.gameField.reset();
         this.fireEventToOpponent(this.myReadyGameEvent);
         this.initStage(Stage.PLACEMENT_END);
@@ -949,19 +961,28 @@ public class GamePanel extends BasePanel implements BsPlayer {
   }
 
   private enum Stage {
-    PLACEMENT_START,
-    PLACING,
-    PLACEMENT_END,
-    WAIT_FOR_TURN,
-    PANEL_ENTER,
-    TARGET_SELECT,
-    PANEL_EXIT,
-    FIRING,
-    FIRING_RESULT,
-    ENEMY_TURN,
-    ENEMY_FIRING_RESULT,
-    VICTORY,
-    LOST
+    PLACEMENT_START(InfoBanner.NONE),
+    PLACING(InfoBanner.PLACEMENT),
+    PLACEMENT_END(InfoBanner.NONE),
+    WAIT_FOR_TURN(InfoBanner.NONE),
+    PANEL_ENTER(InfoBanner.NONE),
+    TARGET_SELECT(InfoBanner.YOUR_MOVE),
+    PANEL_EXIT(InfoBanner.NONE),
+    FIRING(InfoBanner.NONE),
+    FIRING_RESULT(InfoBanner.NONE),
+    ENEMY_TURN(InfoBanner.OPPONENTS_MOVE),
+    ENEMY_FIRING_RESULT(InfoBanner.OPPONENTS_MOVE),
+    VICTORY(InfoBanner.VICTORY),
+    LOST(InfoBanner.LOST);
+    private final InfoBanner banner;
+
+    Stage(final InfoBanner banner) {
+      this.banner = banner;
+    }
+
+    public InfoBanner getBanner() {
+      return this.banner;
+    }
   }
 
 
