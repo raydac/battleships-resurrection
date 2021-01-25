@@ -78,7 +78,7 @@ import javax.swing.Timer;
 
 public class GamePanel extends BasePanel implements BsPlayer {
 
-  public static final Point PLAYER_VIEW_POSITION = new Point(15, 15);
+  public static final Point PLAYER_VIEW_POSITION = findShipRenderPositionForCell(-1, 10);
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(85);
   private static final int TICKS_BEFORE_CONTROL_ACTION = 3;
   private static final int GAME_FIELD_CELL_WIDTH = 23;
@@ -109,7 +109,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
   private OneTimeWaterEffectSprite fieldWaterEffect = null;
   private long envTicksBeforeBirdSound = ENV_SOUNDS_TICKS_BIRD_SOUND;
   private long envTicksBeforeOtherSound = ENV_SOUNDS_TICKS_OTHER_SOUND;
-  private AtomicReference<Optional<BsGameEvent>> savedGameEvent =
+  private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
       new AtomicReference<>(Optional.empty());
   private List<FieldSprite> animatedSpriteField = Collections.emptyList();
 
@@ -235,7 +235,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
     });
 
     this.timer = new Timer((int) INTER_FRAME_DELAY.toMillis(), e -> {
-      this.tryEnvironmentSounds();
+      this.processEnvironmentSounds();
       this.onTimer();
     });
     this.timer.setRepeats(true);
@@ -258,7 +258,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
         (int) Math.round(baseY + cellY * deltaY));
   }
 
-  private void tryEnvironmentSounds() {
+  private void processEnvironmentSounds() {
     this.envTicksBeforeBirdSound--;
     this.envTicksBeforeOtherSound--;
     if (this.envTicksBeforeBirdSound <= 0) {
@@ -300,7 +300,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
           }
           break;
         default: {
-          if (RND.nextInt(20) > 16) {
+          if (RND.nextInt(20) > 18) {
             sound = Sound.DECK_CREAK;
           }
         }
@@ -904,6 +904,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
       case DONE: {
         this.doSelectControl(ControlElement.NONE);
         this.animatedSpriteField = this.gameField.moveFieldToShipSprites();
+//        this.fillEmptyCellsByFish();
         this.gameField.reset();
         this.fireEventToOpponent(this.myReadyGameEvent);
         this.initStage(Stage.PLACEMENT_END);

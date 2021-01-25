@@ -15,7 +15,6 @@
 
 package com.igormaznitsa.battleships.gui.sprite;
 
-import static com.igormaznitsa.battleships.gui.panels.GameField.FIELD_EDGE;
 import static com.igormaznitsa.battleships.gui.panels.GamePanel.findShipRenderPositionForCell;
 import static java.util.List.copyOf;
 import static java.util.Objects.requireNonNull;
@@ -41,10 +40,10 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
     this.developmentOnStart = developmentOnStart;
     this.renderPoint = findShipRenderPositionForCell(renderCell.x, renderCell.y);
     this.actionCell = requireNonNull(actionCell);
-    this.distanceFromPlayer =
-        allCells.stream().map(c -> new Point(FIELD_EDGE - 1 - c.x, c.y))
-            .mapToDouble(GamePanel.PLAYER_VIEW_POSITION::distance).min()
-            .getAsDouble();
+
+    final int delta = Math.abs(actionCell.y - (9 - actionCell.x));
+
+    this.distanceFromPlayer = this.renderPoint.distance(GamePanel.PLAYER_VIEW_POSITION) - delta;
   }
 
   public Point getActionCell() {
