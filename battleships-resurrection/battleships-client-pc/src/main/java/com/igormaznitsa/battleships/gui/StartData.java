@@ -86,7 +86,7 @@ public class StartData {
             .getDefaultConfiguration());
     private Optional<String> gameTitle = Optional.of("BattleShips");
     private Optional<Image> gameIcon =
-        Optional.of(GfxUtils.loadResImage("icon2.png"));
+        Optional.of(GfxUtils.loadResImage("icon3.png"));
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
     private Optional<String> hostName = Optional.empty();

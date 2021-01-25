@@ -198,7 +198,7 @@
                             <classPath>
                                 <mainClass>com.igormaznitsa.battleships.Starter</mainClass>
                             </classPath>
-                            <icon>appico.ico</icon>
+                            <icon>src/assembly/windows/appico.ico</icon>
                             <jre>
                                 <minVersion>11</minVersion>
                                 <jdkPreference>preferJre</jdkPreference>

@@ -60,6 +60,8 @@ public class OpeningDialog extends javax.swing.JDialog {
     startData.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
 
+    this.setAlwaysOnTop(true);
+
     this.result = null;
     this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
