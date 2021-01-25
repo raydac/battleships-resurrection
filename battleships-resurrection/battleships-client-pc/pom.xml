@@ -200,7 +200,7 @@
                             </classPath>
                             <icon>appico.ico</icon>
                             <jre>
-                                <minVersion>1.8.0</minVersion>
+                                <minVersion>11</minVersion>
                                 <jdkPreference>preferJre</jdkPreference>
                                 <initialHeapSize>512</initialHeapSize>
                                 <maxHeapSize>1024</maxHeapSize>
