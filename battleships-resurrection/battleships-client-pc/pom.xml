@@ -218,14 +218,14 @@
                                 </opts>
                             </jre>
                             <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
-                                <fileDescription>Battleships GEX client</fileDescription>
-                                <copyright>2021 Igor Maznitsa</copyright>
-                                <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>${project.version}</txtProductVersion>
-                                <productName>${project.name}</productName>
-                                <companyName>igormaznitsa.com</companyName>
+                                <fileVersion>0.0.0.7</fileVersion>
+                                <txtFileVersion>0.0.0.7</txtFileVersion>
+                                <fileDescription>battleship</fileDescription>
+                                <copyright>Copyright &#169; 2001</copyright>
+                                <productVersion>0.0.0.7</productVersion>
+                                <txtProductVersion>0.0.0.7</txtProductVersion>
+                                <productName>RuSoft BattleShip game</productName>
+                                <companyName>RuSoft</companyName>
                                 <internalName>${project.name}</internalName>
                                 <originalFilename>battleships_resurrection_${project.version}.exe</originalFilename>
                             </versionInfo>
