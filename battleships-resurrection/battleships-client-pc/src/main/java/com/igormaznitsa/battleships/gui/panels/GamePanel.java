@@ -36,6 +36,7 @@ import static java.lang.Math.round;
 
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
+import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.sprite.DecorationSprite;
 import com.igormaznitsa.battleships.gui.sprite.FallingAirplaneSprite;
 import com.igormaznitsa.battleships.gui.sprite.FallingObjectSprite;
@@ -49,7 +50,6 @@ import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import com.igormaznitsa.battleships.opponent.BsPlayer;
 import com.igormaznitsa.battleships.opponent.GameEventType;
 import com.igormaznitsa.battleships.sound.Sound;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -114,23 +114,20 @@ public class GamePanel extends BasePanel implements BsPlayer {
       new AtomicReference<>(Optional.empty());
   private List<FieldSprite> animatedSpriteField = Collections.emptyList();
 
-  public GamePanel() {
-    super();
+  public GamePanel(final Optional<ScaleFactor> scaleFactor) {
+    super(scaleFactor);
 
     this.gameField = new GameField();
     this.background = Animation.FON.getFrame(0);
-    final Dimension size = new Dimension(this.background.getWidth(), this.background.getHeight());
-    this.setSize(size);
-    this.setPreferredSize(size);
-    this.setMinimumSize(size);
-    this.setMaximumSize(size);
 
     this.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
-      public void mouseDragged(final MouseEvent e) {
+      public void mouseDragged(final MouseEvent mouseEvent) {
         if (currentStage == Stage.PLACING && pressedPlaceShipMouseButton) {
+          final Point preparedMousePoint = scaleFactor.map(sf -> sf.translateMousePoint(mouseEvent))
+              .orElse(mouseEvent.getPoint());
           if (lastPressedEmptyCell == null) {
-            lastPressedEmptyCell = mouse2game(e.getPoint());
+            lastPressedEmptyCell = mouse2game(preparedMousePoint);
             final GameField.CellState cellState =
                 gameField.getState(lastPressedEmptyCell.x, lastPressedEmptyCell.y);
             if (cellState == GameField.CellState.EMPTY) {
@@ -139,7 +136,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
               lastPressedEmptyCell = null;
             }
           } else {
-            final Point cellUnderMouse = mouse2game(e.getPoint());
+            final Point cellUnderMouse = mouse2game(preparedMousePoint);
             gameField.clearPlaceholder();
             gameField.tryMakePlaceholder(lastPressedEmptyCell, cellUnderMouse);
             refreshUi();
@@ -151,7 +148,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
     this.addMouseListener(new MouseAdapter() {
 
       @Override
-      public void mouseReleased(final MouseEvent e) {
+      public void mouseReleased(final MouseEvent mouseEvent) {
         if (currentStage == Stage.PLACING) {
           if (lastPressedEmptyCell != null) {
             Sound.MOUSE_FREE.getClip().play();
@@ -162,8 +159,10 @@ public class GamePanel extends BasePanel implements BsPlayer {
       }
 
       @Override
-      public void mousePressed(final MouseEvent e) {
-        final ControlElement detectedControl = ControlElement.find(e.getPoint());
+      public void mousePressed(final MouseEvent mouseEvent) {
+        final Point preparedMousePoint =
+            scaleFactor.map(sf -> sf.translateMousePoint(mouseEvent)).orElse(mouseEvent.getPoint());
+        final ControlElement detectedControl = ControlElement.find(preparedMousePoint);
         switch (currentStage) {
           case PLACING: {
             if (detectedControl == ControlElement.AUTO || detectedControl == ControlElement.DONE) {
@@ -175,11 +174,11 @@ public class GamePanel extends BasePanel implements BsPlayer {
               } else {
                 detectedControl.getWrongSound().getClip().play();
               }
-            } else if (ACTION_PANEL_AREA.contains(e.getPoint())) {
-              lastPressedEmptyCell = mouse2game(e.getPoint());
+            } else if (ACTION_PANEL_AREA.contains(preparedMousePoint)) {
+              lastPressedEmptyCell = mouse2game(preparedMousePoint);
               final GameField.CellState cellState =
                   gameField.getState(lastPressedEmptyCell.x, lastPressedEmptyCell.y);
-              if (e.isPopupTrigger()) {
+              if (mouseEvent.isPopupTrigger()) {
                 // remove
                 pressedPlaceShipMouseButton = false;
                 if (cellState == GameField.CellState.SHIP) {
@@ -193,7 +192,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
                 }
                 lastPressedEmptyCell = null;
               } else {
-                lastPressedEmptyCell = mouse2game(e.getPoint());
+                lastPressedEmptyCell = mouse2game(preparedMousePoint);
                 // place
                 pressedPlaceShipMouseButton = true;
                 if (cellState == GameField.CellState.EMPTY) {
@@ -208,13 +207,13 @@ public class GamePanel extends BasePanel implements BsPlayer {
           }
           break;
           case TARGET_SELECT: {
-            if (ACTION_PANEL_AREA.contains(e.getPoint())) {
-              final Point cell = mouse2game(e.getPoint());
+            if (ACTION_PANEL_AREA.contains(preparedMousePoint)) {
+              final Point cell = mouse2game(preparedMousePoint);
               if (gameField.tryMarkAsTarget(cell)) {
                 refreshUi();
               }
               Sound.MOUSE_CLICK.getClip().play();
-            } else if (FIRE_BUTTON_AREA.contains(e.getPoint())) {
+            } else if (FIRE_BUTTON_AREA.contains(preparedMousePoint)) {
               Sound.ATTACK_HORN.getClip().play();
               if (gameField.hasTarget()) {
                 initStage(Stage.PANEL_EXIT);

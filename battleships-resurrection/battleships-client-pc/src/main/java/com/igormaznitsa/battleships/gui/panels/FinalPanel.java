@@ -21,13 +21,15 @@ import static com.igormaznitsa.battleships.gui.panels.ControlElement.PAUSE;
 
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
+import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 import javax.swing.Timer;
 
 public class FinalPanel extends BasePanel {
@@ -37,8 +39,8 @@ public class FinalPanel extends BasePanel {
   private ControlElement selectedControl = ControlElement.NONE;
   private final InfoBanner infoBanner;
 
-  public FinalPanel(final boolean victory) {
-    super();
+  public FinalPanel(final Optional<ScaleFactor> scaleFactor, final boolean victory) {
+    super(scaleFactor);
     final String imageResource;
     if (victory) {
       imageResource = "victory.png";
@@ -50,16 +52,13 @@ public class FinalPanel extends BasePanel {
       this.infoBanner = InfoBanner.LOST;
     }
     this.image = GfxUtils.loadGfxImageAsType(imageResource, BufferedImage.TYPE_INT_RGB);
-    final Dimension size = new Dimension(this.image.getWidth(), this.image.getHeight());
-    this.setSize(size);
-    this.setPreferredSize(size);
-    this.setMinimumSize(size);
-    this.setMaximumSize(size);
 
     this.addMouseListener(new MouseAdapter() {
       @Override
-      public void mousePressed(final MouseEvent e) {
-        final ControlElement detectedControl = ControlElement.find(e.getPoint());
+      public void mousePressed(final MouseEvent mouseEvent) {
+        final Point translatedMousePoint =
+            scaleFactor.map(sf -> sf.translateMousePoint(mouseEvent)).orElse(mouseEvent.getPoint());
+        final ControlElement detectedControl = ControlElement.find(translatedMousePoint);
         Sound sound = null;
         switch (detectedControl) {
           case EXIT: {

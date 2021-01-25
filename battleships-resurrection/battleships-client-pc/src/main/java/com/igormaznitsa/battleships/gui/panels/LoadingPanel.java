@@ -17,12 +17,13 @@ package com.igormaznitsa.battleships.gui.panels;
 
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
+import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.sound.SoundClip;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public class LoadingPanel extends BasePanel {
@@ -32,15 +33,10 @@ public class LoadingPanel extends BasePanel {
   private final BufferedImage background;
   private final SoundClip soundClip;
 
-  public LoadingPanel() {
-    super();
+  public LoadingPanel(final Optional<ScaleFactor> scaleFactor) {
+    super(scaleFactor);
     this.soundClip = new SoundClip("fullpart.wav");
     this.background = GfxUtils.loadGfxImageAsType("splash.png", BufferedImage.TYPE_INT_RGB, 1.0d);
-    final Dimension size = new Dimension(this.background.getWidth(), this.background.getHeight());
-    this.setMaximumSize(size);
-    this.setMinimumSize(size);
-    this.setSize(size);
-    this.setPreferredSize(size);
   }
 
   protected void doLoading() {

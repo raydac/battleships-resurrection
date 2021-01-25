@@ -24,8 +24,10 @@ import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import com.igormaznitsa.battleships.opponent.BsPlayer;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Container;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -43,6 +45,9 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private final Runnable exitAction;
 
+  private final Optional<ScaleFactor> scaleFactor;
+
+
   public BattleshipsFrame(final StartData startData, final BsPlayer opponent,
                           final Runnable exitAction) {
     super(startData.getGameTitle().orElse("Battleship"),
@@ -50,11 +55,27 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
 
+    if (startData.isFullScreen()) {
+      this.setResizable(false);
+      this.setAlwaysOnTop(true);
+      this.setUndecorated(true);
+      final Optional<GraphicsConfiguration> gconfig = startData.getGraphicsConfiguration();
+      if (gconfig.isPresent()) {
+        final Rectangle screen = gconfig.get().getBounds();
+        this.scaleFactor = Optional
+            .of(new ScaleFactor(screen.getWidth() / 800.0d, screen.getHeight() / 600.0d));
+        LOGGER.info("Calculated scale factor " + scaleFactor + " for screen: " + gconfig.get());
+      } else {
+        this.scaleFactor = Optional.empty();
+      }
+    } else {
+      this.scaleFactor = Optional.empty();
+    }
+
     this.exitAction = exitAction;
     this.opponent = opponent;
 
     startData.getGameIcon().ifPresent(this::setIconImage);
-
     this.setResizable(false);
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new WindowAdapter() {
@@ -112,10 +133,10 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       }
       return processed;
     });
+  }
 
-
-    final LoadingPanel loadingPanel = new LoadingPanel();
-
+  public void start() {
+    final LoadingPanel loadingPanel = new LoadingPanel(this.scaleFactor);
     this.replaceContentPanel(loadingPanel);
   }
 
@@ -138,10 +159,11 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     SwingUtilities.invokeLater(() -> {
       newPanel.start();
     });
+    newPanel.requestFocus();
   }
 
   protected void doLoadingCompleted() {
-    final GamePanel gamePanel = new GamePanel();
+    final GamePanel gamePanel = new GamePanel(this.scaleFactor);
 
     final Thread commDaemonThread = new Thread(() -> {
       LOGGER.info("Comm-Daemon started");
@@ -205,7 +227,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private void onGameEnd(final boolean victory) {
     LOGGER.info("Game session completed, victory flag=" + victory);
-    this.replaceContentPanel(new FinalPanel(victory));
+    this.replaceContentPanel(new FinalPanel(this.scaleFactor, victory));
   }
 
   private void onGameError() {

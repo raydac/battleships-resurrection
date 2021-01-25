@@ -98,7 +98,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     });
 
     this.disableMultiplayer();
-    this.disableFullScreen();
+//    this.disableFullScreen();
 
     this.getContentPane().doLayout();
     this.pack();
@@ -167,6 +167,10 @@ public class OpeningDialog extends javax.swing.JDialog {
     radioFullScreen.setText("FullScreen");
     modePanel.add(radioFullScreen);
 
+    final ButtonGroup screenTypeGroup = new ButtonGroup();
+    screenTypeGroup.add(radioFullScreen);
+    screenTypeGroup.add(radioWindow);
+
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -185,7 +189,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     networkPanel.add(radioMultiPlayer);
 
     final ButtonGroup gameTypeGroup = new ButtonGroup();
-    gameTypeGroup.add(radioMultiPlayer);
+    gameTypeGroup.add(radioSinglePlayer);
     gameTypeGroup.add(radioMultiPlayer);
 
     labelServerHostName.setText("Server host name:");
