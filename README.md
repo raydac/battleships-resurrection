@@ -27,7 +27,7 @@ The PC client has been totally restored in pure Java 11, I had not any piece of 
 #### Original Windows game screenshot:
 ![Screenshot](assets/original_win_game_screenshot.jpg)
 #### Restored game screenshot:
-![Screenshot](assets/original_win_game_screenshot.jpg)
+![Screenshot](assets/restored_game_screenshot.jpg)
 
 There is not any magic in build PC client. The project formed as regular maven project and can be build with `mvn`, if you want build cross-platform result images then use maven profile `publish`.
 
