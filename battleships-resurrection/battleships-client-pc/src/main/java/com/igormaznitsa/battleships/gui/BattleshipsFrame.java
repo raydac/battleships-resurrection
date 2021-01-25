@@ -82,6 +82,23 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
             processed = true;
           }
           break;
+          case KeyEvent.VK_X: {
+            switch (e.getID()) {
+              case KeyEvent.KEY_PRESSED: {
+                BasePanel.setCreditsVisible(true);
+                this.getContentPane().repaint();
+              }
+              break;
+              case KeyEvent.KEY_RELEASED: {
+                BasePanel.setCreditsVisible(false);
+                this.getContentPane().repaint();
+              }
+              break;
+            }
+            e.consume();
+            processed = true;
+          }
+          break;
           case KeyEvent.VK_SPACE: {
             final Container container = this.getContentPane();
             if (container instanceof BasePanel) {

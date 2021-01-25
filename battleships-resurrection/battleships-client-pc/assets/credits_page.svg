@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:cc="http://creativecommons.org/ns#"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+        xmlns="http://www.w3.org/2000/svg"
+        width="800mm"
+        height="600mm"
+        viewBox="0 0 800 600"
+        version="1.1"
+        id="svg8"
+        inkscape:version="1.0.2 (1.0.2+r75+1)"
+        sodipodi:docname="credits_page.svg"
+        inkscape:export-filename="/home/igorm/Projects/Projects_PET/battleships-resurrection/battleships-resurrection/battleships-client-pc/src/main/resources/assets/gfx/credits.png"
+        inkscape:export-xdpi="25.4"
+        inkscape:export-ydpi="25.4">
+  <defs
+          id="defs2">
+    <rect
+            x="-93.409812"
+            y="-12.393864"
+            width="944.27576"
+            height="759.07081"
+            id="rect928"/>
+  </defs>
+  <sodipodi:namedview
+          id="base"
+          pagecolor="#ffffff"
+          bordercolor="#666666"
+          borderopacity="1.0"
+          inkscape:pageopacity="0.0"
+          inkscape:pageshadow="2"
+          inkscape:zoom="0.92857121"
+          inkscape:cx="900.1257"
+          inkscape:cy="610.69614"
+          inkscape:document-units="mm"
+          inkscape:current-layer="layer1"
+          inkscape:document-rotation="0"
+          showgrid="false"
+          inkscape:window-width="2560"
+          inkscape:window-height="1370"
+          inkscape:window-x="0"
+          inkscape:window-y="33"
+          inkscape:window-maximized="1"/>
+  <metadata
+          id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+              rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+                rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title/>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+          inkscape:label="Layer 1"
+          inkscape:groupmode="layer"
+          id="layer1">
+    <g
+            id="g1093-5"
+            style="fill:#000000;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+            transform="translate(0.57456023,1.0582681)"
+            inkscape:export-filename="/home/igorm/Projects/Projects_PET/battleships-resurrection/battleships-resurrection/battleships-client-pc/src/main/resources/assets/gfx/g1093-5.png"
+            inkscape:export-xdpi="25.4"
+            inkscape:export-ydpi="25.4">
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:13.8859px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+              x="20.960901"
+              y="171.86827"
+              id="text835-0"><tspan
+           sodipodi:role="line"
+           x="20.960901"
+           y="171.86827"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+           id="tspan843-4">Original team of the project in 2001</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="189.22565"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan845-8">============================</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="206.58302"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan855-7">    Producers</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="223.9404"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan859-1">    ----------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="241.29778"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan861-7">    Mark Pinan</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="258.65515"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan863-2">    Alexander Dymov</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="276.01251"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan857-7"/>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="293.3699"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan849-2">    Graphics</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="310.72726"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan851-2">    -------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="328.08466"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan853-6">    Vladimir Chernysh</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="345.44202"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan865-1">    Dmitriy Kholodov</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="362.79938"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan867-0"/>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="380.15677"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan869-6">    Sound</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="397.51413"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan871-1">    ---------------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="414.87152"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan873-5">    I really don't remember name of the great guy :(</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="432.22888"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan875-9"/>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="449.58627"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan877-4">    Programming</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="466.94363"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan879-9">    ---------------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="484.30103"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan895-0">    Sergey Kuligin</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="501.65839"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan885-9">    Christian Andersson</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="519.01575"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan901-1">    Markus Persson</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="536.37311"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan899-7">    Igor Maznitsa</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="553.73053"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan924-7">    a student of Sergey Kuligin</tspan></text>
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:17.9218px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+              x="19.315735"
+              y="57.632633"
+              id="text889-1"><tspan
+           sodipodi:role="line"
+           id="tspan887-1"
+           x="19.315735"
+           y="57.632633"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.9218px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none">BATTLESHIPS (resurrection version)</tspan></text>
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:17.573px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+              x="20.875095"
+              y="105.51471"
+              id="text893-5"><tspan
+           sodipodi:role="line"
+           id="tspan891-9"
+           x="20.875095"
+           y="105.51471"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none">The original game was developed by RuSoft Ltd in 2001 in C++ for E3 2001 </tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.875095"
+                y="127.48096"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan912-7">to demonstrate the GFX-server technology developed by Gamefederation AS. </tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.875095"
+                y="149.4472"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+                id="tspan914-7">(The PC game version has been rewritten in Java by Igor Maznitsa in 2021)</tspan></text>
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:14.97px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+              x="20.763542"
+              y="80.150795"
+              id="text889-9-6"><tspan
+           sodipodi:role="line"
+           id="tspan887-2-7"
+           x="20.763542"
+           y="80.150795"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.97px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none">the project page: <tspan
+              style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+              id="tspan1058-3">https://github.com/raydac/battleships-resurrection</tspan></tspan></text>
+    </g>
+    <text
+            xml:space="preserve"
+            id="text926"
+            style="fill:black;fill-opacity:1;line-height:1.25;stroke:none;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:10.58333333px;white-space:pre;shape-inside:url(#rect928);"/>
+    <g
+            id="g1093"
+            style="stroke:none;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round">
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:13.8859px;line-height:1.25;font-family:sans-serif;fill:#d4a960;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+              x="20.960901"
+              y="171.86827"
+              id="text835"><tspan
+           sodipodi:role="line"
+           x="20.960901"
+           y="171.86827"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+           id="tspan843">Original team of the project in 2001</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="189.22565"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan845">============================</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="206.58302"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan855">    Producers</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="223.9404"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan859">    ----------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="241.29778"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan861">    Mark Pinan</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="258.65515"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan863">    Alexander Dymov</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="276.01251"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan857"/>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="293.3699"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan849">    Graphics</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="310.72726"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan851">    -------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="328.08466"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan853">    Vladimir Chernysh</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="345.44202"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan865">    Dmitriy Kholodov</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="362.79938"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan867"/>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="380.15677"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan869">    Sound</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="397.51413"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan871">    ---------------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="414.87152"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan873">    I really don't remember name of the great guy :(</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="432.22888"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan875"/>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="449.58627"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan877">    Programming</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="466.94363"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan879">    ---------------------</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="484.30103"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan895">    Sergey Kuligin</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="501.65839"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan885">    Christian Andersson</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="519.01575"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan901">    Markus Persson</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="536.37311"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan899">    Igor Maznitsa</tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.960901"
+                y="553.73053"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.9602px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan924">    a student of Sergey Kuligin</tspan></text>
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:17.9218px;line-height:1.25;font-family:sans-serif;fill:#d4a960;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+              x="19.315735"
+              y="57.632633"
+              id="text889"><tspan
+           sodipodi:role="line"
+           id="tspan887"
+           x="19.315735"
+           y="57.632633"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.9218px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round">BATTLESHIPS (resurrection version)</tspan></text>
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:17.573px;line-height:1.25;font-family:sans-serif;fill:#d4a960;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+              x="20.875095"
+              y="105.51471"
+              id="text893"><tspan
+           sodipodi:role="line"
+           id="tspan891"
+           x="20.875095"
+           y="105.51471"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;text-anchor:start;fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round">The original game was developed by RuSoft Ltd in 2001 in C++ for E3 2001 </tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.875095"
+                y="127.48096"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';text-align:start;text-anchor:start;fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan912">to demonstrate the GFX-server technology developed by Gamefederation AS. </tspan>
+        <tspan
+                sodipodi:role="line"
+                x="20.875095"
+                y="149.4472"
+                style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+                id="tspan914">(The PC game version has been rewritten in Java by Igor Maznitsa in 2021)</tspan></text>
+      <text
+              xml:space="preserve"
+              style="font-style:normal;font-weight:normal;font-size:14.97px;line-height:1.25;font-family:sans-serif;fill:#d4a960;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+              x="20.763542"
+              y="80.150795"
+              id="text889-9"><tspan
+           sodipodi:role="line"
+           id="tspan887-2"
+           x="20.763542"
+           y="80.150795"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.97px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#d4a960;fill-opacity:1;stroke-width:0.4;stroke:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round">the project page: <tspan
+              style="fill:#80e5ff;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+              id="tspan1058">https://github.com/raydac/battleships-resurrection</tspan></tspan></text>
+    </g>
+  </g>
+</svg>

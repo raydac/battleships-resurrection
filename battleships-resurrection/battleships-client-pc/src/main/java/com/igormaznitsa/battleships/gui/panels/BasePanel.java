@@ -19,12 +19,14 @@ import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
 import static java.awt.Toolkit.getDefaultToolkit;
 
 
+import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,10 +48,24 @@ public abstract class BasePanel extends JComponent {
   private final AtomicBoolean disposed = new AtomicBoolean();
   private final List<SignalListener> signalListenerList = new CopyOnWriteArrayList<>();
 
+  private static BufferedImage creditsImage;
+
   public BasePanel() {
     super();
     this.setCursor(CURSOR);
   }
+
+  public static void setCreditsVisible(final boolean show) {
+    if (show) {
+      if (creditsImage == null) {
+        creditsImage =
+            GfxUtils.loadGfxImageAsType("credits.png", BufferedImage.TYPE_INT_ARGB);
+      }
+    } else {
+      creditsImage = null;
+    }
+  }
+
 
   public void onGameKeyEvent(final KeyEvent e) {
 
@@ -96,6 +112,10 @@ public abstract class BasePanel extends JComponent {
         RenderingHints.VALUE_COLOR_RENDER_DEFAULT);
 
     this.doPaint(gfx);
+
+    if (creditsImage != null) {
+      gfx.drawImage(creditsImage, null, 0, 0);
+    }
   }
 
   protected void doPaint(final Graphics2D g2d) {
