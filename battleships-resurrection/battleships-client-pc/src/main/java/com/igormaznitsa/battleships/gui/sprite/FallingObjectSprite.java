@@ -33,12 +33,12 @@ public abstract class FallingObjectSprite extends FieldSprite {
 
   public FallingObjectSprite(final Animation animation, final Point targetCell, final Sound sound,
                              final int initialAltitude, final int spriteOffsetY, final int steps) {
-    super(Collections.singletonList(targetCell), targetCell, targetCell, false);
+    super(Collections.singletonList(targetCell), 1.0d, false);
     this.animation = animation;
-    this.maxAllowedY = this.renderPoint.y + spriteOffsetY;
+    this.maxAllowedY = this.spritePoint.y + spriteOffsetY;
     this.frame = 0;
     this.completed = false;
-    this.drawY = this.getRenderPoint().y - initialAltitude;
+    this.drawY = this.getSpritePoint().y - initialAltitude;
     this.stepY = (double) initialAltitude / (double) steps;
     sound.getClip().play();
   }
@@ -64,7 +64,7 @@ public abstract class FallingObjectSprite extends FieldSprite {
   @Override
   public void render(final Graphics2D g2d) {
     if (!this.completed) {
-      g2d.drawImage(this.animation.getFrame(this.frame), null, this.renderPoint.x,
+      g2d.drawImage(this.animation.getFrame(this.frame), null, this.spritePoint.x,
           Math.min(this.maxAllowedY, (int) Math.round(this.drawY)));
     }
   }

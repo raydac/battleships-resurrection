@@ -32,7 +32,7 @@ public class FishSprite extends FieldSprite {
   private int developmentLevel;
 
   public FishSprite(final Point cell) {
-    super(Collections.singletonList(cell), cell, cell, true);
+    super(Collections.singletonList(cell), 1.0d, true);
     this.frame = RND.nextInt(this.animation.getLength());
     this.developmentLevel = DEVELOPMENT_LEVELS;
   }
@@ -56,8 +56,8 @@ public class FishSprite extends FieldSprite {
           (1.0f / DEVELOPMENT_LEVELS) * (DEVELOPMENT_LEVELS - this.developmentLevel));
       g2d.setComposite(alphaComposite);
     }
-    g2d.drawImage(this.animation.getFrame(this.frame), null, this.renderPoint.x,
-        this.renderPoint.y);
+    g2d.drawImage(this.animation.getFrame(this.frame), null, this.spritePoint.x,
+        this.spritePoint.y);
     if (this.developmentLevel > 0) {
       g2d.setComposite(oldComposite);
     }

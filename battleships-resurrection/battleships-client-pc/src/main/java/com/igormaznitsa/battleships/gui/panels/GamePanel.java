@@ -300,7 +300,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
           }
           break;
         default: {
-          if (RND.nextInt(20) > 18) {
+          if (RND.nextInt(20) > 17) {
             sound = Sound.DECK_CREAK;
           }
         }

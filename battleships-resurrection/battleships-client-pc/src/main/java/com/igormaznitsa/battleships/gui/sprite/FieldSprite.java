@@ -17,7 +17,6 @@ package com.igormaznitsa.battleships.gui.sprite;
 
 import static com.igormaznitsa.battleships.gui.panels.GamePanel.findShipRenderPositionForCell;
 import static java.util.List.copyOf;
-import static java.util.Objects.requireNonNull;
 
 
 import com.igormaznitsa.battleships.gui.panels.GamePanel;
@@ -30,20 +29,61 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
 
   protected final List<Point> cells;
   protected final Point actionCell;
-  protected final Point renderPoint;
+  protected final Point spritePoint;
   protected final double distanceFromPlayer;
   protected final boolean developmentOnStart;
 
-  public FieldSprite(final List<Point> allCells, final Point renderCell, final Point actionCell,
+  public FieldSprite(final List<Point> cells,
+                     final double visibilityWeight,
                      final boolean developmentOnStart) {
-    this.cells = copyOf(allCells);
+    this.cells = copyOf(cells);
     this.developmentOnStart = developmentOnStart;
-    this.renderPoint = findShipRenderPositionForCell(renderCell.x, renderCell.y);
-    this.actionCell = requireNonNull(actionCell);
 
-    final int delta = Math.abs(actionCell.y - (9 - actionCell.x));
+    this.actionCell = findMiddleCell(cells);
+    this.spritePoint = findRenderPoint(cells);
 
-    this.distanceFromPlayer = this.renderPoint.distance(GamePanel.PLAYER_VIEW_POSITION) - delta;
+    final int dx = 9 - cells.stream().mapToInt(c -> c.x).min().getAsInt();
+    final int dy = cells.stream().mapToInt(c -> c.y).max().getAsInt();
+    final int delta = dy - dx;
+
+    this.spritePoint.x += delta;
+    this.spritePoint.y += delta;
+
+    this.distanceFromPlayer =
+        this.spritePoint.distance(GamePanel.PLAYER_VIEW_POSITION) - visibilityWeight;
+  }
+
+  private static boolean isHoriz(final List<Point> cells) {
+    return cells.size() == 1 ? true : cells.get(0).x == cells.get(1).x;
+  }
+
+  private static Point findRenderPoint(final List<Point> cells) {
+    final int x1 = cells.stream().mapToInt(c -> c.x).min().getAsInt();
+    final int y1 = cells.stream().mapToInt(c -> c.y).min().getAsInt();
+    final int x2 = cells.stream().mapToInt(c -> c.x).max().getAsInt();
+    final int y2 = cells.stream().mapToInt(c -> c.y).max().getAsInt();
+
+    final Point renderA = findShipRenderPositionForCell(x1, y1);
+    final Point renderB = findShipRenderPositionForCell(x2, y2);
+
+    return new Point(renderA.x + (renderB.x - renderA.x) / 2,
+        renderA.y + (renderB.y - renderA.y) / 2);
+  }
+
+  private static Point findMiddleCell(final List<Point> cells) {
+    final Point nearestPlayerCell = findMinCell(cells);
+    if (isHoriz(cells)) {
+      nearestPlayerCell.y -= cells.size() / 2;
+    } else {
+      nearestPlayerCell.x += cells.size() / 2;
+    }
+    return nearestPlayerCell;
+  }
+
+  private static Point findMinCell(final List<Point> cells) {
+    int x = cells.stream().mapToInt(c -> c.x).min().getAsInt();
+    int y = cells.stream().mapToInt(c -> c.y).min().getAsInt();
+    return new Point(x, y);
   }
 
   public Point getActionCell() {
@@ -54,7 +94,7 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
 
   @Override
   public final int hashCode() {
-    return renderPoint.hashCode();
+    return spritePoint.hashCode();
   }
 
   @Override
@@ -66,13 +106,13 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
       return true;
     }
     if (object.getClass() == this.getClass()) {
-      return this.renderPoint.equals(((FieldSprite) object).renderPoint);
+      return this.spritePoint.equals(((FieldSprite) object).spritePoint);
     }
     return false;
   }
 
   @Override
-  public int compareTo(final FieldSprite that) {
+  public final int compareTo(final FieldSprite that) {
     if (that == this) {
       return 0;
     }
@@ -90,8 +130,8 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
 
   public abstract void render(final Graphics2D g2d);
 
-  public Point getRenderPoint() {
-    return this.renderPoint;
+  public Point getSpritePoint() {
+    return this.spritePoint;
   }
 
   public boolean containsCell(final Point cell) {

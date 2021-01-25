@@ -25,7 +25,7 @@ public final class OneTimeWaterEffectSprite extends FieldSprite {
   private int frame;
 
   public OneTimeWaterEffectSprite(final Point cell, final Animation animation) {
-    super(Collections.singletonList(cell), cell, cell, false);
+    super(Collections.singletonList(cell), animation == Animation.EXPLODE ? 1000.0d : 1.0d, false);
     this.animation = animation;
     this.frame = 0;
   }
@@ -52,17 +52,8 @@ public final class OneTimeWaterEffectSprite extends FieldSprite {
   @Override
   public void render(final Graphics2D g2d) {
     if (!this.isCompleted()) {
-      g2d.drawImage(this.animation.getFrame(this.frame), null, this.renderPoint.x,
-          this.renderPoint.y);
-    }
-  }
-
-  @Override
-  public int compareTo(final FieldSprite that) {
-    if (this.getAnimation() == Animation.EXPLODE) {
-      return 1;
-    } else {
-      return super.compareTo(that);
+      g2d.drawImage(this.animation.getFrame(this.frame), null, this.spritePoint.x,
+          this.spritePoint.y);
     }
   }
 

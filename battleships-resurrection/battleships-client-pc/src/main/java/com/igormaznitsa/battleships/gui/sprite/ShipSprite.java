@@ -89,7 +89,7 @@ public final class ShipSprite extends FieldSprite {
   private int stepY;
 
   public ShipSprite(final List<Point> cells) {
-    super(cells, findBaseRenderCell(cells), findBaseRenderCell(cells), true);
+    super(cells, 1.d, true);
     switch (this.cells.size()) {
       case 1:
         this.shipType = ShipType.U_BOAT;
@@ -199,29 +199,6 @@ public final class ShipSprite extends FieldSprite {
     this.developmentLevel = this.developmentOnStart ? DEVELOPMENT_LEVELS : 0;
   }
 
-  private static Point findBaseRenderCell(final List<Point> cells) {
-    final int x;
-    final int y;
-    if (cells.size() == 1) {
-      x = cells.get(0).x;
-      y = cells.get(0).y;
-    } else {
-      if (cells.get(0).x == cells.get(1).x) {
-        final int minY = cells.stream().mapToInt(c -> c.y).min().getAsInt();
-        final int maxY = cells.stream().mapToInt(c -> c.y).max().getAsInt();
-        x = cells.get(0).x;
-        y = minY + (maxY - minY) / 2;
-      } else {
-        final int minX = cells.stream().mapToInt(c -> c.x).min().getAsInt();
-        final int maxX = cells.stream().mapToInt(c -> c.x).max().getAsInt();
-        x = minX + (maxX - minX) / 2;
-        y = cells.get(0).y;
-      }
-    }
-
-    return new Point(x, y);
-  }
-
   public ShipType getShipType() {
     return this.shipType;
   }
@@ -276,7 +253,7 @@ public final class ShipSprite extends FieldSprite {
           final int startExtendedAnimationFrame =
               this.animationFirePrimary[this.activeCells - 1].getLength() / 2;
           if (this.fireFrame >= startExtendedAnimationFrame) {
-            this.extendedFireAnimationPoint = new Point(this.renderPoint.x, this.renderPoint.y);
+            this.extendedFireAnimationPoint = new Point(this.spritePoint.x, this.spritePoint.y);
             this.firingStage = FiringStage.MAIN_AND_EXTENDED;
           }
         } else {
@@ -289,9 +266,9 @@ public final class ShipSprite extends FieldSprite {
               if (this.shipType == ShipType.U_BOAT) {
                 this.stepY = -12;
                 this.extendedFireAnimationPoint =
-                    new Point(this.renderPoint.x, this.renderPoint.y + this.stepY);
+                    new Point(this.spritePoint.x, this.spritePoint.y + this.stepY);
               } else {
-                this.extendedFireAnimationPoint = new Point(this.renderPoint.x, this.renderPoint.y);
+                this.extendedFireAnimationPoint = new Point(this.spritePoint.x, this.spritePoint.y);
               }
               this.fireFrame = 0;
             }
@@ -381,8 +358,8 @@ public final class ShipSprite extends FieldSprite {
   }
 
   public void render(final Graphics2D g2d) {
-    final int x = this.renderPoint.x;
-    final int y = this.renderPoint.y;
+    final int x = this.spritePoint.x;
+    final int y = this.spritePoint.y;
 
     final Composite oldComposite = g2d.getComposite();
     if (this.developmentLevel > 0) {
