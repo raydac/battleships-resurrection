@@ -23,5 +23,7 @@ public interface BsPlayer {
 
   void pushGameEvent(BsGameEvent event);
 
-  void dispose();
+  BsPlayer startBot();
+
+  void disposeBot();
 }

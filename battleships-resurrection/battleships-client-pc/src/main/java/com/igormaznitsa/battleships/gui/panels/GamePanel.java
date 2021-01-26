@@ -476,12 +476,23 @@ public class GamePanel extends BasePanel implements BsPlayer {
   }
 
   @Override
+  public BsPlayer startBot() {
+    return null;
+  }
+
+  @Override
+  public void disposeBot() {
+
+  }
+
+  @Override
   protected void doStart() {
     this.selectedControl = ControlElement.NONE;
     this.initStage(Stage.PLACEMENT_START);
     this.gameField.reset();
     Sound.WAVES_LOOP.playRepeat();
     this.timer.start();
+    this.startBot();
   }
 
   private ShipType activateShipFire() {
@@ -778,6 +789,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
   protected void doDispose() {
     Sound.stopAll();
     this.timer.stop();
+    this.disposeBot();
   }
 
   private void drawNumberOfShipsOnPanel(final Graphics2D g2d,

@@ -19,6 +19,7 @@ import com.igormaznitsa.battleships.gui.BattleshipsFrame;
 import com.igormaznitsa.battleships.gui.OpeningDialog;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
+import com.igormaznitsa.battleships.opponent.BsPlayer;
 import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -52,7 +53,7 @@ public class Starter {
         System.exit(0);
       }
 
-      final AiBattleshipsSingleSessionBot aiBot = new AiBattleshipsSingleSessionBot().start();
+      final BsPlayer battleshipBot = new AiBattleshipsSingleSessionBot().startBot();
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
           GraphicsConfiguration::getDevice);
       final Optional<DisplayMode> oldDisplayMode = device.map(GraphicsDevice::getDisplayMode);
@@ -63,11 +64,11 @@ public class Starter {
         device.ifPresentOrElse(d -> {
           if (d.isFullScreenSupported()) {
             LOGGER.info("Detected support of full screen: " + d);
-            mainFrameRef.set(new BattleshipsFrame(selectedData, aiBot, () -> {
+            mainFrameRef.set(new BattleshipsFrame(selectedData, battleshipBot, () -> {
               try {
                 d.setFullScreenWindow(null);
               } finally {
-                aiBot.dispose();
+                battleshipBot.disposeBot();
               }
             }));
             final DisplayMode displayMode = new DisplayMode(800, 600, DisplayMode.BIT_DEPTH_MULTI,
@@ -111,7 +112,8 @@ public class Starter {
           System.exit(5);
         });
       } else {
-        mainFrameRef.set(new BattleshipsFrame(selectedData, aiBot, aiBot::dispose));
+        mainFrameRef
+            .set(new BattleshipsFrame(selectedData, battleshipBot, battleshipBot::disposeBot));
       }
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();

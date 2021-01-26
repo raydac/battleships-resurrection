@@ -33,6 +33,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -48,6 +49,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   private final Optional<ScaleFactor> scaleFactor;
   private final StartOptions startOptions;
 
+  private final AtomicReference<Thread> commDaemonThreadRef = new AtomicReference<>();
 
   public BattleshipsFrame(final StartOptions startOptions, final BsPlayer opponent,
                           final Runnable exitAction) {
@@ -165,7 +167,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
     final Thread commDaemonThread = new Thread(() -> {
       LOGGER.info("Comm-Daemon started");
-      while (Thread.currentThread().isAlive()) {
+      while (!Thread.currentThread().isInterrupted()) {
         try {
           Optional<BsGameEvent> event = this.opponent.pollGameEvent(Duration.ofMillis(100));
           event.ifPresent(e -> {
@@ -178,14 +180,16 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
             this.opponent.pushGameEvent(e);
           });
         } catch (InterruptedException ex) {
+          LOGGER.info("Comm-daemon has detected interruption");
           Thread.currentThread().interrupt();
         }
       }
       LOGGER.info("Comm-Daemon stopped");
     }, "bs-communication-daemon");
     commDaemonThread.setDaemon(true);
-    commDaemonThread.start();
-
+    if (this.commDaemonThreadRef.compareAndSet(null, commDaemonThread)) {
+      commDaemonThread.start();
+    }
     replaceContentPanel(gamePanel);
 
     gamePanel.start();
@@ -242,6 +246,19 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private void doCloseWindow() {
     LOGGER.info("Closing game");
+
+    final Thread daemonThread = this.commDaemonThreadRef.getAndSet(null);
+    if (daemonThread != null) {
+      LOGGER.info("Interrupting comm daemon");
+      daemonThread.interrupt();
+      try {
+        daemonThread.join();
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
+      LOGGER.info("Comm daemon has been interrupted");
+    }
+
     try {
       final Container contentPane = this.getContentPane();
       if (contentPane instanceof BasePanel) {

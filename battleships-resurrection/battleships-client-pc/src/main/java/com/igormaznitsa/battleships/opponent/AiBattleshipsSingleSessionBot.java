@@ -67,7 +67,7 @@ public final class AiBattleshipsSingleSessionBot implements BsPlayer {
     this.thread = new Thread(() -> {
       LOGGER.info("Field prepared for game session");
       this.pushIntoOutput(this.myReadyGameEvent);
-      while (Thread.currentThread().isAlive()) {
+      while (!Thread.currentThread().isInterrupted()) {
         try {
           final BsGameEvent nextEvent = this.inQueue.take();
           this.onIncomingGameEvent(nextEvent);
@@ -179,14 +179,24 @@ public final class AiBattleshipsSingleSessionBot implements BsPlayer {
     return buffer.toString();
   }
 
-  public AiBattleshipsSingleSessionBot start() {
+  public void start() {
+
+  }
+
+  @Override
+  public BsPlayer startBot() {
     this.thread.start();
     return this;
   }
 
   @Override
-  public void dispose() {
-    this.thread.interrupt();
+  public void disposeBot() {
+    try {
+      this.thread.interrupt();
+      this.thread.join();
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   private boolean canCellContainEnemyShip(final int x, final int y) {
