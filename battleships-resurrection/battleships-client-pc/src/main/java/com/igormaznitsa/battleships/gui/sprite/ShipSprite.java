@@ -234,7 +234,7 @@ public final class ShipSprite extends FieldSprite {
         this.fire = false;
         this.firingStage = FiringStage.MAIN;
         this.fireFrame = -1;
-        this.firingSound.getClip().play();
+        this.firingSound.play();
       }
     }
 
@@ -456,6 +456,18 @@ public final class ShipSprite extends FieldSprite {
     if (this.developmentLevel > 0) {
       g2d.setComposite(oldComposite);
     }
+
+    // DRAW TECH.INFO FOR SPRITES
+    // --------------------------------------
+    //    g2d.setColor(Color.orange);
+    //    g2d.drawRect(x, y, EXPECTED_SPRITE_SIZE, EXPECTED_SPRITE_SIZE);
+    //    g2d.drawLine(x, y, x + EXPECTED_SPRITE_SIZE, y + EXPECTED_SPRITE_SIZE);
+    //    g2d.drawLine(x, y + EXPECTED_SPRITE_SIZE, x + EXPECTED_SPRITE_SIZE, y);
+    //    g2d.setColor(Color.RED);
+    //    g2d.drawLine(GamePanel.PLAYER_POSITION.x, GamePanel.PLAYER_POSITION.y,
+    //        x + EXPECTED_SPRITE_SIZE / 2, y + EXPECTED_SPRITE_SIZE / 2);
+    //    g2d.setColor(Color.GREEN);
+    //    g2d.drawString(Double.toString(this.distanceFromPlayer), x, y);
   }
 
   private enum FiringStage {

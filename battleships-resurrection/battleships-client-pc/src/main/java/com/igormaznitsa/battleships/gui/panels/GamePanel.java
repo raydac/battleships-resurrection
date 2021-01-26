@@ -37,6 +37,7 @@ import static java.lang.Math.round;
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.gui.ScaleFactor;
+import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.gui.sprite.DecorationSprite;
 import com.igormaznitsa.battleships.gui.sprite.FallingAirplaneSprite;
 import com.igormaznitsa.battleships.gui.sprite.FallingObjectSprite;
@@ -114,8 +115,8 @@ public class GamePanel extends BasePanel implements BsPlayer {
       new AtomicReference<>(Optional.empty());
   private List<FieldSprite> animatedSpriteField = Collections.emptyList();
 
-  public GamePanel(final Optional<ScaleFactor> scaleFactor) {
-    super(scaleFactor);
+  public GamePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor) {
+    super(startOptions, scaleFactor);
 
     this.gameField = new GameField();
     this.background = Animation.FON.getFrame(0);
@@ -151,7 +152,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
       public void mouseReleased(final MouseEvent mouseEvent) {
         if (currentStage == Stage.PLACING) {
           if (lastPressedEmptyCell != null) {
-            Sound.MOUSE_FREE.getClip().play();
+            Sound.MOUSE_FREE.play();
           }
           gameField.fixPlaceholder();
           refreshUi();
@@ -172,7 +173,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
               } else if (detectedControl == ControlElement.DONE && !gameField.hasAnyFreeShip()) {
                 doSelectControl(detectedControl);
               } else {
-                detectedControl.getWrongSound().getClip().play();
+                detectedControl.getWrongSound().play();
               }
             } else if (ACTION_PANEL_AREA.contains(preparedMousePoint)) {
               lastPressedEmptyCell = mouse2game(preparedMousePoint);
@@ -200,7 +201,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
                 } else {
                   lastPressedEmptyCell = null;
                 }
-                Sound.MOUSE_CLICK.getClip().play();
+                Sound.MOUSE_CLICK.play();
               }
               refreshUi();
             }
@@ -212,9 +213,9 @@ public class GamePanel extends BasePanel implements BsPlayer {
               if (gameField.tryMarkAsTarget(cell)) {
                 refreshUi();
               }
-              Sound.MOUSE_CLICK.getClip().play();
+              Sound.MOUSE_CLICK.play();
             } else if (FIRE_BUTTON_AREA.contains(preparedMousePoint)) {
-              Sound.ATTACK_HORN.getClip().play();
+              Sound.ATTACK_HORN.play();
               if (gameField.hasTarget()) {
                 initStage(Stage.PANEL_EXIT);
               }
@@ -280,8 +281,8 @@ public class GamePanel extends BasePanel implements BsPlayer {
         default:
           break;
       }
-      if (sound != null && !sound.getClip().isPlaying()) {
-        sound.getClip().play();
+      if (sound != null && !sound.isPlaying()) {
+        sound.play();
       }
       this.envTicksBeforeBirdSound = ENV_SOUNDS_TICKS_BIRD_SOUND;
     }
@@ -306,8 +307,8 @@ public class GamePanel extends BasePanel implements BsPlayer {
         }
         break;
       }
-      if (sound != null && !sound.getClip().isPlaying()) {
-        sound.getClip().play();
+      if (sound != null && !sound.isPlaying()) {
+        sound.play();
       }
       this.envTicksBeforeOtherSound = ENV_SOUNDS_TICKS_OTHER_SOUND;
     }
@@ -413,7 +414,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
       this.selectedControl = control;
       this.controlTicksCounter = TICKS_BEFORE_CONTROL_ACTION;
       if (control != ControlElement.NONE) {
-        control.getOkSound().getClip().play();
+        control.getOkSound().play();
       }
       this.refreshUi();
     }
@@ -461,16 +462,16 @@ public class GamePanel extends BasePanel implements BsPlayer {
   private void startSoundForStage(final Stage stage) {
     switch (stage) {
       case PLACEMENT_START: {
-        Sound.MENU_SCREEN_IN.getClip().play();
+        Sound.MENU_SCREEN_IN.play();
       }
       break;
       case PANEL_EXIT:
       case PLACEMENT_END: {
-        Sound.MENU_SCREEN_OUT.getClip().play();
+        Sound.MENU_SCREEN_OUT.play();
       }
       break;
       case PANEL_ENTER: {
-        Sound.MENU_IN.getClip().play();
+        Sound.MENU_IN.play();
       }
       break;
     }
@@ -481,7 +482,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
     this.selectedControl = ControlElement.NONE;
     this.initStage(Stage.PLACEMENT_START);
     this.gameField.reset();
-    Sound.WAVES_LOOP.getClip().play(-1);
+    Sound.WAVES_LOOP.playRepeat();
     this.timer.start();
   }
 
@@ -599,7 +600,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
                     new DecorationSprite(HORIZONS_EXPLOSION_COORDS, Animation.EXPLO_GOR,
                         Sound.OUR_EXPLODE_ONLY);
                 if (e.getType() != EVENT_HIT) {
-                  Sound.BUBBLES.getClip().play();
+                  Sound.BUBBLES.play();
                 }
               }
               break;
@@ -692,7 +693,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
                   new Point(enemyShoot.getX(), enemyShoot.getY()), Optional.empty(),
                   Animation.SPLASH);
-              Sound.WATER_SPLASH01.getClip().play();
+              Sound.WATER_SPLASH01.play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
             } else {
@@ -708,14 +709,14 @@ public class GamePanel extends BasePanel implements BsPlayer {
                 enemyTurnResultEvent = new BsGameEvent(resultType,
                     enemyShoot.getX(),
                     enemyShoot.getY());
-                Sound.BUBBLES.getClip().play();
+                Sound.BUBBLES.play();
               } else {
                 enemyTurnResultEvent = new BsGameEvent(EVENT_HIT, enemyShoot.getX(),
                     enemyShoot.getY());
               }
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
                   hitShip.getActionCell(), Optional.of(hitShip), Animation.EXPLODE);
-              Sound.WATER_SPLASH01.EXPLODE01.getClip().play();
+              Sound.WATER_SPLASH01.EXPLODE01.play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
             }

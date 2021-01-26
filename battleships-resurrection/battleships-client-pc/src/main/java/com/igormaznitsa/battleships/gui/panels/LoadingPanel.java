@@ -18,6 +18,7 @@ package com.igormaznitsa.battleships.gui.panels;
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.gui.ScaleFactor;
+import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.sound.SoundClip;
 import com.igormaznitsa.battleships.utils.GfxUtils;
@@ -31,11 +32,12 @@ public class LoadingPanel extends BasePanel {
   private static final Logger LOGGER = Logger.getLogger(LoadingPanel.class.getName());
 
   private final BufferedImage background;
-  private final SoundClip soundClip;
+  private final Optional<SoundClip> soundClip;
 
-  public LoadingPanel(final Optional<ScaleFactor> scaleFactor) {
-    super(scaleFactor);
-    this.soundClip = new SoundClip("fullpart.wav");
+  public LoadingPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor) {
+    super(startOptions, scaleFactor);
+    this.soundClip =
+        startOptions.isWithSound() ? Optional.of(new SoundClip("fullpart.wav")) : Optional.empty();
     this.background = GfxUtils.loadGfxImageAsType("splash.png", BufferedImage.TYPE_INT_RGB, 1.0d);
   }
 
@@ -46,7 +48,7 @@ public class LoadingPanel extends BasePanel {
     }
     LOGGER.info("Loading sounds");
     for (final Sound s : Sound.values()) {
-      s.load();
+      s.load(this.startOptions.isWithSound());
     }
     LOGGER.info("Loading banners");
     InfoBanner.loadAll();
@@ -54,7 +56,7 @@ public class LoadingPanel extends BasePanel {
 
   @Override
   protected void doStart() {
-    this.soundClip.play(Integer.MAX_VALUE);
+    this.soundClip.ifPresent(s -> s.play(-1));
 
     final Thread loadingThread = new Thread(() -> {
       final long startTime = System.currentTimeMillis();
@@ -75,7 +77,7 @@ public class LoadingPanel extends BasePanel {
 
   @Override
   protected void doDispose() {
-    this.soundClip.close();
+    this.soundClip.ifPresent(SoundClip::close);
   }
 
   @Override

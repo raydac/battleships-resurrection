@@ -50,14 +50,14 @@ public class OpeningDialog extends javax.swing.JDialog {
   private JRadioButton radioSinglePlayer;
   private JRadioButton radioMultiPlayer;
 
-  private StartData result = null;
+  private StartOptions result = null;
 
-  public OpeningDialog(final StartData startData) {
-    super((Frame) null, startData.getGameTitle().orElse("Battleship"), true,
-        startData.getGraphicsConfiguration().orElse(
+  public OpeningDialog(final StartOptions startOptions) {
+    super((Frame) null, startOptions.getGameTitle().orElse("Battleship"), true,
+        startOptions.getGraphicsConfiguration().orElse(
             getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
-    startData.getGameIcon().ifPresent(this::setIconImage);
+    startOptions.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
 
     this.setAlwaysOnTop(true);
@@ -67,12 +67,12 @@ public class OpeningDialog extends javax.swing.JDialog {
 
     this.setTitle("Start settings");
 
-    this.radioSinglePlayer.setSelected(!startData.isMultiPlayer());
-    this.radioMultiPlayer.setSelected(startData.isMultiPlayer());
-    this.radioWindow.setSelected(!startData.isFullScreen());
-    this.radioFullScreen.setSelected(startData.isFullScreen());
-    startData.getHostName().ifPresent(x -> this.textFieldHostName.setText(x));
-    startData.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
+    this.radioSinglePlayer.setSelected(!startOptions.isMultiPlayer());
+    this.radioMultiPlayer.setSelected(startOptions.isMultiPlayer());
+    this.radioWindow.setSelected(!startOptions.isFullScreen());
+    this.radioFullScreen.setSelected(startOptions.isFullScreen());
+    startOptions.getHostName().ifPresent(x -> this.textFieldHostName.setText(x));
+    startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
     this.buttonGo.addActionListener(e -> {
       int hostPort = -1;
@@ -81,9 +81,9 @@ public class OpeningDialog extends javax.swing.JDialog {
       } catch (Exception ex) {
         // ignoring
       }
-      this.result = StartData.newBuilder()
-          .setGameTitle(startData.getGameTitle().orElse("Battleships"))
-          .setGameIcon(startData.getGameIcon().orElse(null))
+      this.result = StartOptions.newBuilder()
+          .setGameTitle(startOptions.getGameTitle().orElse("Battleships"))
+          .setGameIcon(startOptions.getGameIcon().orElse(null))
           .setFullScreen(this.radioFullScreen.isSelected())
           .setMultiPlayer(this.radioMultiPlayer.isSelected())
           .setHostPort(hostPort)
@@ -104,7 +104,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     this.pack();
   }
 
-  public Optional<StartData> getResult() {
+  public Optional<StartOptions> getResult() {
     return Optional.ofNullable(this.result);
   }
 

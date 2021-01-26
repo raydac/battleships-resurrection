@@ -22,25 +22,28 @@ import java.awt.Image;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class StartData {
+public class StartOptions {
   private final Optional<GraphicsConfiguration> graphicsConfiguration;
   private final Optional<String> gameTitle;
   private final Optional<Image> gameIcon;
   private final boolean multiPlayer;
   private final boolean fullScreen;
+  private final boolean withSound;
   private final Optional<String> hostName;
   private final OptionalInt hostPort;
 
-  private StartData(final Optional<GraphicsConfiguration> graphicsConfiguration,
-                    final Optional<String> gameTitle,
-                    final Optional<Image> gameIcon,
-                    final boolean multiPlayer,
-                    final boolean fullScreen,
-                    final Optional<String> hostName,
-                    final OptionalInt hostPort
+  private StartOptions(final Optional<GraphicsConfiguration> graphicsConfiguration,
+                       final Optional<String> gameTitle,
+                       final Optional<Image> gameIcon,
+                       final boolean multiPlayer,
+                       final boolean fullScreen,
+                       final boolean withSound,
+                       final Optional<String> hostName,
+                       final OptionalInt hostPort
   ) {
     this.graphicsConfiguration = graphicsConfiguration;
     this.gameTitle = gameTitle;
+    this.withSound = withSound;
     this.gameIcon = gameIcon;
     this.multiPlayer = multiPlayer;
     this.fullScreen = fullScreen;
@@ -50,6 +53,10 @@ public class StartData {
 
   public static Builder newBuilder() {
     return new Builder();
+  }
+
+  public boolean isWithSound() {
+    return this.withSound;
   }
 
   public Optional<GraphicsConfiguration> getGraphicsConfiguration() {
@@ -89,8 +96,14 @@ public class StartData {
         Optional.of(GfxUtils.loadResImage("icon3.png"));
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
+    private boolean withSound = true;
     private Optional<String> hostName = Optional.empty();
     private OptionalInt hostPort = OptionalInt.empty();
+
+    public Builder setWithSound(final boolean value) {
+      this.withSound = value;
+      return this;
+    }
 
     public Builder setHostPort(final int port) {
       this.hostPort = port < 0 ? OptionalInt.empty() : OptionalInt.of(port);
@@ -127,12 +140,13 @@ public class StartData {
       return this;
     }
 
-    public StartData build() {
-      return new StartData(this.graphicsConfiguration,
+    public StartOptions build() {
+      return new StartOptions(this.graphicsConfiguration,
           this.gameTitle,
           this.gameIcon,
           this.multiPlayer,
           this.fullScreen,
+          this.withSound,
           this.hostName,
           this.hostPort);
     }

@@ -61,21 +61,32 @@ public enum Sound {
 
   public static void stopAll() {
     for (final Sound s : Sound.values()) {
-      s.getClip().stop();
+      s.clip.ifPresent(SoundClip::stop);
     }
   }
 
-  public synchronized void load() {
-    this.clip = Optional.of(new SoundClip(this.resource));
+  public synchronized void load(final boolean loadingAllowed) {
+    this.clip = loadingAllowed ? Optional.of(new SoundClip(this.resource)) : Optional.empty();
   }
 
-  public synchronized SoundClip getClip() {
-    return this.clip
-        .orElseThrow(() -> new IllegalStateException("Clip " + this.resource + " is not loaded"));
+  public synchronized void play() {
+    this.clip.ifPresent(SoundClip::play);
+  }
+
+  public synchronized void playRepeat() {
+    this.clip.ifPresent(c -> c.play(-1));
   }
 
   public synchronized void dispose() {
     this.clip.ifPresent(SoundClip::close);
     this.clip = Optional.empty();
+  }
+
+  public synchronized boolean isPlaying() {
+    return this.clip.map(SoundClip::isPlaying).orElse(false);
+  }
+
+  public void stop() {
+    this.clip.ifPresent(SoundClip::stop);
   }
 }

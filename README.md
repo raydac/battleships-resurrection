@@ -11,14 +11,14 @@ I took a part in the project as a Java developer and both the network communicat
 
 Some graphics in the game looks a bit blurry. Initially our designers made very detailed high frame-ratio game and PC client became 120 Mb fat. It was inappropriate for guys from Gamefederation because they were going to load the game client through internet just during presentation (just imagine to load 120 Mb in 2001). So that our C++ team made big work to decrease size of the game, they made scaling of game elements and decreased frame-ratio (I don't remember why they did not change TGA format which was in use to keep graphics but may be there were some problems with Direct3D). In the end they got about 60 Mb distributive which was more or less appropriate one.  
 
-The project can be also recognized as some example - "how to write a casual game in pure Java", because it uses pure Java Swing and Java2D for graphics and JavaSound API for sound and there is not any framework in use. I developed it in Agile style (without planning and thinking) so that sources can contain some specific code or footsteps of experiments but I hope they are more or less readable.
+The project can be also recognized as some example - "how to write a casual game in pure Java", because it uses pure Java Swing and Java2D for graphics and JavaSound API for sound and there is not any framework in use. 
 
 # Requirements to build
 
 ## Mobile client
 The mobile client is most hard part today to be built because it requires Sun WTK 2.5.2 and JDK 1.5, they both can be still found on Oracle site but I am not sure that the picture will be saved next several years. I have restored some Motorola A008 device profile for the WTK and it can be used to get picture of working device. To be honesty I have not eer saw working mobile client on the real device because during development it was absolutely new device with GPRS support and guys in Sweden had to visit the Sweden Motorila laboratory to test the client to write report for me, very long way to debug.
 
-![A008 screenshot](battleships-resurrection/battleships-client-a008/assets/emulator_screenshot.jpg)
+![A008 screenshot](battleships-resurrection/battleships-client-a008/assets/emulator_screeagnshot.jpg)
 
 To build mobile client from project root, you need use maven profile `midlet`. 
 

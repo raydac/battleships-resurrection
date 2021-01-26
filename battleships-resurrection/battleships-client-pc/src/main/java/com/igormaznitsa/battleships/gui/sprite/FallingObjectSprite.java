@@ -44,7 +44,7 @@ public abstract class FallingObjectSprite extends FieldSprite {
     this.realSpritePoint = shipSprite.map(s -> s.spritePoint).orElseGet(() -> this.spritePoint);
     this.drawY = this.realSpritePoint.y - initialAltitude;
     this.stepY = (double) initialAltitude / (double) steps;
-    sound.getClip().play();
+    sound.play();
   }
 
   @Override

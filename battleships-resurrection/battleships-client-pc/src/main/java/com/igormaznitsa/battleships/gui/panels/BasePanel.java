@@ -20,6 +20,7 @@ import static java.awt.Toolkit.getDefaultToolkit;
 
 
 import com.igormaznitsa.battleships.gui.ScaleFactor;
+import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -57,9 +58,11 @@ public abstract class BasePanel extends JComponent {
   protected final Optional<ScaleFactor> scaleFactor;
 
   private final Dimension size;
+  protected final StartOptions startOptions;
 
-  public BasePanel(final Optional<ScaleFactor> scaleFactor) {
+  public BasePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor) {
     super();
+    this.startOptions = startOptions;
     this.scaleFactor = scaleFactor;
     this.setCursor(CURSOR);
     this.size =

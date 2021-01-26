@@ -22,6 +22,7 @@ import static com.igormaznitsa.battleships.gui.panels.ControlElement.PAUSE;
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.gui.ScaleFactor;
+import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.Graphics2D;
@@ -39,8 +40,9 @@ public class FinalPanel extends BasePanel {
   private ControlElement selectedControl = ControlElement.NONE;
   private final InfoBanner infoBanner;
 
-  public FinalPanel(final Optional<ScaleFactor> scaleFactor, final boolean victory) {
-    super(scaleFactor);
+  public FinalPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor,
+                    final boolean victory) {
+    super(startOptions, scaleFactor);
     final String imageResource;
     if (victory) {
       imageResource = "victory.png";
@@ -98,7 +100,7 @@ public class FinalPanel extends BasePanel {
           break;
         }
         if (sound != null) {
-          sound.getClip().play();
+          sound.play();
         }
       }
     });
@@ -106,12 +108,12 @@ public class FinalPanel extends BasePanel {
 
   @Override
   protected void doStart() {
-    this.sound.getClip().play();
+    this.sound.play();
   }
 
   @Override
   protected void doDispose() {
-    this.sound.getClip().stop();
+    this.sound.stop();
   }
 
   @Override

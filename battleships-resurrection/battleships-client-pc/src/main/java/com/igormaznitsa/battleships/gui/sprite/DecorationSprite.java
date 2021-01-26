@@ -29,7 +29,7 @@ public final class DecorationSprite {
     this.renderPoint = renderPoint;
     this.animation = animation;
     this.frame = 0;
-    sound.getClip().play();
+    sound.play();
   }
 
   public void nextFrame() {

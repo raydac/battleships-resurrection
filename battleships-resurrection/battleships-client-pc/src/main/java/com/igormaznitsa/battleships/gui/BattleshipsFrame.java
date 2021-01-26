@@ -46,20 +46,21 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   private final Runnable exitAction;
 
   private final Optional<ScaleFactor> scaleFactor;
+  private final StartOptions startOptions;
 
 
-  public BattleshipsFrame(final StartData startData, final BsPlayer opponent,
+  public BattleshipsFrame(final StartOptions startOptions, final BsPlayer opponent,
                           final Runnable exitAction) {
-    super(startData.getGameTitle().orElse("Battleship"),
-        startData.getGraphicsConfiguration().orElse(
+    super(startOptions.getGameTitle().orElse("Battleship"),
+        startOptions.getGraphicsConfiguration().orElse(
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
-
-    if (startData.isFullScreen()) {
+    this.startOptions = startOptions;
+    if (startOptions.isFullScreen()) {
       this.setResizable(false);
       this.setAlwaysOnTop(true);
       this.setUndecorated(true);
-      final Optional<GraphicsConfiguration> gconfig = startData.getGraphicsConfiguration();
+      final Optional<GraphicsConfiguration> gconfig = startOptions.getGraphicsConfiguration();
       if (gconfig.isPresent()) {
         final Rectangle screen = gconfig.get().getBounds();
         this.scaleFactor = Optional
@@ -75,7 +76,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     this.exitAction = exitAction;
     this.opponent = opponent;
 
-    startData.getGameIcon().ifPresent(this::setIconImage);
+    startOptions.getGameIcon().ifPresent(this::setIconImage);
     this.setResizable(false);
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new WindowAdapter() {
@@ -136,12 +137,11 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   }
 
   public void start() {
-    final LoadingPanel loadingPanel = new LoadingPanel(this.scaleFactor);
+    final LoadingPanel loadingPanel = new LoadingPanel(this.startOptions, this.scaleFactor);
     this.replaceContentPanel(loadingPanel);
   }
 
   protected void onExit() {
-
     this.doCloseWindow();
   }
 
@@ -163,7 +163,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   }
 
   protected void doLoadingCompleted() {
-    final GamePanel gamePanel = new GamePanel(this.scaleFactor);
+    final GamePanel gamePanel = new GamePanel(this.startOptions, this.scaleFactor);
 
     final Thread commDaemonThread = new Thread(() -> {
       LOGGER.info("Comm-Daemon started");
@@ -227,7 +227,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private void onGameEnd(final boolean victory) {
     LOGGER.info("Game session completed, victory flag=" + victory);
-    this.replaceContentPanel(new FinalPanel(this.scaleFactor, victory));
+    this.replaceContentPanel(new FinalPanel(this.startOptions, scaleFactor, victory));
   }
 
   private void onGameError() {
@@ -251,15 +251,21 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       }
     } finally {
       try {
-        for (Sound s : Sound.values()) {
-          s.dispose();
-        }
-        for (Animation a : Animation.values()) {
-          a.dispose();
+        if (this.exitAction != null) {
+          this.exitAction.run();
         }
       } finally {
-        LOGGER.info("Disposing main window");
-        this.dispose();
+        try {
+          for (Sound s : Sound.values()) {
+            s.dispose();
+          }
+          for (Animation a : Animation.values()) {
+            a.dispose();
+          }
+        } finally {
+          LOGGER.info("Disposing main window");
+          this.dispose();
+        }
       }
     }
   }

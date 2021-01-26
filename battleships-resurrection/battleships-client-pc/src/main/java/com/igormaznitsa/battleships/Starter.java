@@ -17,7 +17,7 @@ package com.igormaznitsa.battleships;
 
 import com.igormaznitsa.battleships.gui.BattleshipsFrame;
 import com.igormaznitsa.battleships.gui.OpeningDialog;
-import com.igormaznitsa.battleships.gui.StartData;
+import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
@@ -42,11 +42,11 @@ public class Starter {
         // ignoring
       }
 
-      final StartData startData = StartData.newBuilder().build();
-      final OpeningDialog openingDialog = new OpeningDialog(startData);
+      final StartOptions startOptions = StartOptions.newBuilder().build();
+      final OpeningDialog openingDialog = new OpeningDialog(startOptions);
       openingDialog.setVisible(true);
 
-      final StartData selectedData = openingDialog.getResult().orElse(null);
+      final StartOptions selectedData = openingDialog.getResult().orElse(null);
       if (selectedData == null) {
         LOGGER.info("Exit for player request");
         System.exit(0);
