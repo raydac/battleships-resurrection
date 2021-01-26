@@ -56,11 +56,6 @@ public final class OneTimeWaterEffectSprite extends FieldSprite {
   }
 
   @Override
-  public Point getSpritePoint() {
-    return this.realSpritePoint;
-  }
-
-  @Override
   public void render(final Graphics2D g2d) {
     if (!this.isCompleted()) {
       g2d.drawImage(this.animation.getFrame(this.frame), null, this.realSpritePoint.x,

@@ -17,7 +17,6 @@ package com.igormaznitsa.battleships.gui;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 public final class ScaleFactor {
@@ -52,16 +51,4 @@ public final class ScaleFactor {
     return new Point(descaledX, descaledY);
   }
 
-  public Point apply(final Point point) {
-    return new Point((int) Math.round(point.x * this.sx), (int) Math.round(point.y * this.sy));
-  }
-
-  public Rectangle apply(final Rectangle rectangle) {
-    return new Rectangle(
-        (int) Math.round(rectangle.x * this.sx),
-        (int) Math.round(rectangle.y * this.sy),
-        (int) Math.round(rectangle.width * this.sx),
-        (int) Math.round(rectangle.height * this.sy)
-    );
-  }
 }

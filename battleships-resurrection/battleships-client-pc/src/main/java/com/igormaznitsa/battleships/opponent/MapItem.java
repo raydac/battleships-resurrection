@@ -16,5 +16,5 @@
 package com.igormaznitsa.battleships.opponent;
 
 enum MapItem {
-  EMPTY, SHIP, BANNED, HIT, KILLED, MISS;
+  EMPTY, SHIP, BANNED, HIT, KILLED, MISS
 }

@@ -135,9 +135,7 @@ public abstract class BasePanel extends JComponent {
   }
 
   protected void fireSignal(final String signal) {
-    final Runnable runnable = () -> {
-      this.signalListenerList.forEach(x -> x.onSignal(this, signal));
-    };
+    final Runnable runnable = () -> this.signalListenerList.forEach(x -> x.onSignal(this, signal));
     if (SwingUtilities.isEventDispatchThread()) {
       runnable.run();
     } else {

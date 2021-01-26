@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 public final class GameField {
   public static final int FIELD_EDGE = 10;
   private final CellState[] gameField = new CellState[FIELD_EDGE * FIELD_EDGE];
-  private int[] freeShipsCount = new int[4];
+  private final int[] freeShipsCount = new int[4];
 
   public GameField() {
 
@@ -191,70 +191,6 @@ public final class GameField {
     return this.gameField[xy2offset(x, y)];
   }
 
-  public boolean hasActingShip() {
-    return IntStream.range(0, this.gameField.length)
-        .anyMatch(x -> this.gameField[x] == CellState.SHIP);
-  }
-
-  public void processStepResult(final CellState result) {
-    if (result != CellState.HIT && result != CellState.MISS && result != CellState.KILL) {
-      throw new IllegalArgumentException("Only HIT, MISS or KILL allowed as result");
-    }
-
-    final int targetOffset = IntStream.range(0, this.gameField.length)
-        .filter(x -> this.gameField[x] == CellState.TARGET)
-        .findFirst()
-        .orElseThrow(() -> new IllegalStateException("Target cell has not been set"));
-
-    switch (result) {
-      case MISS: {
-        this.gameField[targetOffset] = CellState.MISS;
-      }
-      break;
-      case HIT: {
-        this.gameField[targetOffset] = CellState.HIT;
-      }
-      break;
-      case KILL: {
-        this.destroyShipAt(offset2xy(targetOffset));
-      }
-      break;
-    }
-  }
-
-  private void destroyShipAt(final Point cell) {
-    int coord = xy2offset(cell.x, cell.y);
-
-    this.gameField[coord] = CellState.KILL;
-    for (int dx = -1; dx < 2; dx++) {
-      final int tx = cell.x + dx;
-      if (tx < 0 || tx >= FIELD_EDGE) {
-        continue;
-      }
-      for (int dy = -1; dy < 2; dy++) {
-        final int ty = cell.y + dy;
-        if (ty < 0 || ty >= FIELD_EDGE) {
-          continue;
-        }
-        coord = xy2offset(tx, ty);
-        switch (this.gameField[coord]) {
-          case HIT: {
-            this.destroyShipAt(new Point(tx, ty));
-          }
-          break;
-          case KILL: {
-            // ignoring
-          }
-          break;
-          default: {
-            this.gameField[coord] = CellState.BANNED;
-          }
-          break;
-        }
-      }
-    }
-  }
-
   public Optional<ShipType> findMaxAllowedShipForLen(final int length) {
     return Stream.of(ShipType.values())
         .filter(x -> this.freeShipsCount[x.ordinal()] > 0 && x.getCells() <= length)
@@ -282,21 +218,6 @@ public final class GameField {
       }
     }
     return lastFoundOffset < 0 ? Optional.empty() : Optional.of(offset2xy(lastFoundOffset));
-  }
-
-  public boolean placeTarget(final int x, final int y) {
-    this.removeTarget();
-    boolean result = false;
-    final int coord = xy2offset(x, y);
-    if (this.gameField[coord] == CellState.EMPTY) {
-      this.gameField[coord] = CellState.TARGET;
-      result = true;
-    }
-    return result;
-  }
-
-  public void clearShip(final int x, final int y) {
-
   }
 
   public boolean fixPlaceholder() {

@@ -24,8 +24,6 @@ import java.awt.Point;
 import java.util.List;
 
 public abstract class FieldSprite implements Comparable<FieldSprite> {
-  protected static final int EXPECTED_SPRITE_SIZE = 192;
-
   protected static final int DEVELOPMENT_LEVELS = 25;
 
   protected final List<Point> cells;
@@ -122,10 +120,6 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
   }
 
   public abstract void render(final Graphics2D g2d);
-
-  public Point getSpritePoint() {
-    return this.spritePoint;
-  }
 
   public boolean containsCell(final Point cell) {
     return cell != null && this.cells.contains(cell);

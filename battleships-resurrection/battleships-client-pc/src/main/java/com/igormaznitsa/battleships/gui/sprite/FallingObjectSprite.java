@@ -27,10 +27,9 @@ public abstract class FallingObjectSprite extends FieldSprite {
   private final Animation animation;
   private final int maxAllowedY;
   private double drawY;
-  private int steps;
   private int frame;
   private boolean completed;
-  private double stepY;
+  private final double stepY;
   private final Point realSpritePoint;
 
   public FallingObjectSprite(final Animation animation, final Optional<ShipSprite> shipSprite,
@@ -41,15 +40,10 @@ public abstract class FallingObjectSprite extends FieldSprite {
     this.maxAllowedY = this.spritePoint.y + spriteOffsetY;
     this.frame = 0;
     this.completed = false;
-    this.realSpritePoint = shipSprite.map(s -> s.spritePoint).orElseGet(() -> this.spritePoint);
+    this.realSpritePoint = shipSprite.map(s -> s.spritePoint).orElse(this.spritePoint);
     this.drawY = this.realSpritePoint.y - initialAltitude;
     this.stepY = (double) initialAltitude / (double) steps;
     sound.play();
-  }
-
-  @Override
-  public Point getSpritePoint() {
-    return this.realSpritePoint;
   }
 
   @Override

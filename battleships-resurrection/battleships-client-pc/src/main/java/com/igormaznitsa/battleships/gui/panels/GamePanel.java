@@ -80,7 +80,6 @@ import javax.swing.Timer;
 
 public class GamePanel extends BasePanel implements BsPlayer {
 
-  public static final Point PLAYER_POSITION = new Point(395, 683);
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(70);
   private static final int TICKS_BEFORE_CONTROL_ACTION = 3;
   private static final int GAME_FIELD_CELL_WIDTH = 23;
@@ -315,13 +314,12 @@ public class GamePanel extends BasePanel implements BsPlayer {
   }
 
   // auxiliary method for test purposes
+  @SuppressWarnings("unused")
   protected void fillEmptyCellsByFish() {
     IntStream.range(0, GameField.FIELD_EDGE * GameField.FIELD_EDGE)
         .mapToObj(c -> new Point(c % GameField.FIELD_EDGE, c / GameField.FIELD_EDGE))
         .filter(p -> this.findShipForCell(p.x, p.y).isEmpty())
-        .forEach(p -> {
-          this.animatedSpriteField.add(new FishSprite(p));
-        });
+        .forEach(p -> this.animatedSpriteField.add(new FishSprite(p)));
     Collections.sort(this.animatedSpriteField);
   }
 
@@ -547,9 +545,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
       break;
       case WAIT_FOR_TURN: {
         this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_DO_TURN))
-            .ifPresent(e -> {
-              this.initStage(Stage.PANEL_ENTER);
-            });
+            .ifPresent(e -> this.initStage(Stage.PANEL_ENTER));
       }
       break;
       case PANEL_ENTER: {
@@ -716,7 +712,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
               }
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
                   hitShip.getActionCell(), Optional.of(hitShip), Animation.EXPLODE);
-              Sound.WATER_SPLASH01.EXPLODE01.play();
+              Sound.EXPLODE01.play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
             }
@@ -797,7 +793,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
   }
 
   private void drawFish(final Graphics2D g) {
-    this.animatedSpriteField.stream().filter(x -> x instanceof FieldSprite)
+    this.animatedSpriteField.stream().filter(x -> x instanceof FishSprite)
         .forEach(x -> x.render(g));
   }
 
@@ -949,14 +945,11 @@ public class GamePanel extends BasePanel implements BsPlayer {
 
   @Override
   public void onGameKeyEvent(final KeyEvent e) {
-    switch (e.getKeyCode()) {
-      case KeyEvent.VK_SPACE: {
-        if (this.currentStage == Stage.PLACING) {
-          this.gameField.reset();
-          refreshUi();
-        }
+    if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+      if (this.currentStage == Stage.PLACING) {
+        this.gameField.reset();
+        refreshUi();
       }
-      break;
     }
   }
 
@@ -971,9 +964,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
     FIRING(InfoBanner.NONE),
     FIRING_RESULT(InfoBanner.NONE),
     ENEMY_TURN(InfoBanner.OPPONENTS_MOVE),
-    ENEMY_FIRING_RESULT(InfoBanner.OPPONENTS_MOVE),
-    VICTORY(InfoBanner.VICTORY),
-    LOST(InfoBanner.LOST);
+    ENEMY_FIRING_RESULT(InfoBanner.OPPONENTS_MOVE);
     private final InfoBanner banner;
 
     Stage(final InfoBanner banner) {

@@ -131,9 +131,7 @@ public enum Animation {
 
     final StringBuilder buffer = new StringBuilder(prefix.substring(0, postfixIndex));
     final String indexStr = Integer.toString(index);
-    for (int i = 0; i < numOfPostfixDigits - indexStr.length(); i++) {
-      buffer.append('0');
-    }
+    buffer.append("0".repeat(Math.max(0, numOfPostfixDigits - indexStr.length())));
     buffer.append(indexStr).append(".png");
     return buffer.toString();
   }

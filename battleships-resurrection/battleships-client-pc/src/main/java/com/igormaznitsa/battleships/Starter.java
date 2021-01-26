@@ -82,16 +82,15 @@ public class Starter {
               LOGGER.info("Detected support of display change: " + d);
               try {
                 d.setDisplayMode(displayMode);
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                  oldDisplayMode.ifPresent(old -> {
-                    try {
-                      LOGGER.info("Restoring display mode: " + oldDisplayMode);
-                      d.setDisplayMode(old);
-                    } catch (Exception ex) {
-                      ex.printStackTrace();
-                    }
-                  });
-                }));
+                Runtime.getRuntime()
+                    .addShutdownHook(new Thread(() -> oldDisplayMode.ifPresent(old -> {
+                      try {
+                        LOGGER.info("Restoring display mode: " + oldDisplayMode);
+                        d.setDisplayMode(old);
+                      } catch (Exception ex) {
+                        ex.printStackTrace();
+                      }
+                    })));
               } catch (Exception ex) {
                 LOGGER.log(Level.FINE, "Error during display change", ex);
               }
@@ -112,9 +111,7 @@ public class Starter {
           System.exit(5);
         });
       } else {
-        mainFrameRef.set(new BattleshipsFrame(selectedData, aiBot, () -> {
-          aiBot.dispose();
-        }));
+        mainFrameRef.set(new BattleshipsFrame(selectedData, aiBot, aiBot::dispose));
       }
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();

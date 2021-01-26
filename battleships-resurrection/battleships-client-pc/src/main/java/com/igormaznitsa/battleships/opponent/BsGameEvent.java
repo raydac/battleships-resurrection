@@ -37,11 +37,8 @@ public final class BsGameEvent {
     final int leftNumber = leftReady.getX() + leftReady.getY() * 31;
     final int rightNumber = rightReady.getX() + rightReady.getY() * 31;
 
-    if (leftNumber > rightNumber || (leftNumber == rightNumber
-        && (leftReady.getTimestamp() <= rightReady.getTimestamp()))) {
-      return true;
-    }
-    return false;
+    return leftNumber > rightNumber || (leftNumber == rightNumber
+        && (leftReady.getTimestamp() <= rightReady.getTimestamp()));
   }
 
   public UUID getUuid() {

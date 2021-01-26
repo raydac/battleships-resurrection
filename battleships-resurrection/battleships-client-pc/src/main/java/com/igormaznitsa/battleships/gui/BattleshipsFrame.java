@@ -156,9 +156,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     this.repaint();
     this.pack();
     newPanel.addSignalListener(this);
-    SwingUtilities.invokeLater(() -> {
-      newPanel.start();
-    });
+    SwingUtilities.invokeLater(newPanel::start);
     newPanel.requestFocus();
   }
 

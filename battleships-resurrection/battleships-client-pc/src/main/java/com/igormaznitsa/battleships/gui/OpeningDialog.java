@@ -50,7 +50,7 @@ public class OpeningDialog extends javax.swing.JDialog {
   private JRadioButton radioSinglePlayer;
   private JRadioButton radioMultiPlayer;
 
-  private StartOptions result = null;
+  private StartOptions result;
 
   public OpeningDialog(final StartOptions startOptions) {
     super((Frame) null, startOptions.getGameTitle().orElse("Battleship"), true,
@@ -114,11 +114,6 @@ public class OpeningDialog extends javax.swing.JDialog {
     this.textFieldHostName.setEnabled(false);
   }
 
-  private void disableFullScreen() {
-    this.radioFullScreen.setEnabled(false);
-  }
-
-  @SuppressWarnings("unchecked")
   private void initComponents() {
     GridBagConstraints gridBagConstraints;
 

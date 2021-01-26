@@ -66,9 +66,7 @@ public class FinalPanel extends BasePanel {
           case EXIT: {
             sound = detectedControl.getOkSound();
             selectedControl = detectedControl;
-            final Timer timer = new Timer(1500, d -> {
-              fireSignal(SIGNAL_EXIT);
-            });
+            final Timer timer = new Timer(1500, d -> fireSignal(SIGNAL_EXIT));
             timer.setRepeats(false);
             timer.start();
             refreshUi();
