@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GexBattleshipSingleSessionBot implements BsPlayer {
+public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private static final Logger LOGGER =
       Logger.getLogger(GexBattleshipSingleSessionBot.class.getName());
@@ -104,7 +104,7 @@ public class GexBattleshipSingleSessionBot implements BsPlayer {
   }
 
   @Override
-  public BsPlayer startBot() {
+  public BattleshipsPlayer startPlayer() {
     final Thread thread = new Thread(this::doRun, "bs-gex-bot-" + this.playerId);
     thread.setDaemon(true);
     if (this.thread.compareAndSet(null, thread)) {
@@ -120,7 +120,7 @@ public class GexBattleshipSingleSessionBot implements BsPlayer {
   }
 
   @Override
-  public void disposeBot() {
+  public void disposePlayer() {
     final Thread foundThread = this.thread.getAndSet(null);
     if (foundThread != null) {
       foundThread.interrupt();

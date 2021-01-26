@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public final class AiBattleshipsSingleSessionBot implements BsPlayer {
+public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
 
   private static final Logger LOGGER =
       Logger.getLogger(AiBattleshipsSingleSessionBot.class.getName());
@@ -184,13 +184,13 @@ public final class AiBattleshipsSingleSessionBot implements BsPlayer {
   }
 
   @Override
-  public BsPlayer startBot() {
+  public BattleshipsPlayer startPlayer() {
     this.thread.start();
     return this;
   }
 
   @Override
-  public void disposeBot() {
+  public void disposePlayer() {
     try {
       this.thread.interrupt();
       this.thread.join();

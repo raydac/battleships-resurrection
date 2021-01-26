@@ -19,7 +19,7 @@ import com.igormaznitsa.battleships.gui.BattleshipsFrame;
 import com.igormaznitsa.battleships.gui.OpeningDialog;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
-import com.igormaznitsa.battleships.opponent.BsPlayer;
+import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -53,7 +53,7 @@ public class Starter {
         System.exit(0);
       }
 
-      final BsPlayer battleshipBot = new AiBattleshipsSingleSessionBot().startBot();
+      final BattleshipsPlayer battleshipBot = new AiBattleshipsSingleSessionBot().startPlayer();
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
           GraphicsConfiguration::getDevice);
       final Optional<DisplayMode> oldDisplayMode = device.map(GraphicsDevice::getDisplayMode);
@@ -68,7 +68,7 @@ public class Starter {
               try {
                 d.setFullScreenWindow(null);
               } finally {
-                battleshipBot.disposeBot();
+                battleshipBot.disposePlayer();
               }
             }));
             final DisplayMode displayMode = new DisplayMode(800, 600, DisplayMode.BIT_DEPTH_MULTI,
@@ -113,7 +113,7 @@ public class Starter {
         });
       } else {
         mainFrameRef
-            .set(new BattleshipsFrame(selectedData, battleshipBot, battleshipBot::disposeBot));
+            .set(new BattleshipsFrame(selectedData, battleshipBot, battleshipBot::disposePlayer));
       }
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();

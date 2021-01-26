@@ -47,8 +47,8 @@ import com.igormaznitsa.battleships.gui.sprite.FishSprite;
 import com.igormaznitsa.battleships.gui.sprite.OneTimeWaterEffectSprite;
 import com.igormaznitsa.battleships.gui.sprite.ShipSprite;
 import com.igormaznitsa.battleships.gui.sprite.ShipType;
+import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.BsGameEvent;
-import com.igormaznitsa.battleships.opponent.BsPlayer;
 import com.igormaznitsa.battleships.opponent.GameEventType;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Graphics2D;
@@ -78,7 +78,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.swing.Timer;
 
-public class GamePanel extends BasePanel implements BsPlayer {
+public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(70);
   private static final int TICKS_BEFORE_CONTROL_ACTION = 3;
@@ -476,12 +476,12 @@ public class GamePanel extends BasePanel implements BsPlayer {
   }
 
   @Override
-  public BsPlayer startBot() {
-    return null;
+  public final BattleshipsPlayer startPlayer() {
+    return this;
   }
 
   @Override
-  public void disposeBot() {
+  public final void disposePlayer() {
 
   }
 
@@ -492,7 +492,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
     this.gameField.reset();
     Sound.WAVES_LOOP.playRepeat();
     this.timer.start();
-    this.startBot();
+    this.startPlayer();
   }
 
   private ShipType activateShipFire() {
@@ -789,7 +789,7 @@ public class GamePanel extends BasePanel implements BsPlayer {
   protected void doDispose() {
     Sound.stopAll();
     this.timer.stop();
-    this.disposeBot();
+    this.disposePlayer();
   }
 
   private void drawNumberOfShipsOnPanel(final Graphics2D g2d,

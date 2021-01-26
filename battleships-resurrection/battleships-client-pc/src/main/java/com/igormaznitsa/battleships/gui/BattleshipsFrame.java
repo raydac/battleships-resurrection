@@ -20,8 +20,8 @@ import com.igormaznitsa.battleships.gui.panels.BasePanel;
 import com.igormaznitsa.battleships.gui.panels.FinalPanel;
 import com.igormaznitsa.battleships.gui.panels.GamePanel;
 import com.igormaznitsa.battleships.gui.panels.LoadingPanel;
+import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.BsGameEvent;
-import com.igormaznitsa.battleships.opponent.BsPlayer;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Container;
 import java.awt.GraphicsConfiguration;
@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
 public final class BattleshipsFrame extends JFrame implements BasePanel.SignalListener {
 
   private static final Logger LOGGER = Logger.getLogger(BattleshipsFrame.class.getName());
-  private final BsPlayer opponent;
+  private final BattleshipsPlayer opponent;
 
   private final Runnable exitAction;
 
@@ -51,7 +51,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private final AtomicReference<Thread> commDaemonThreadRef = new AtomicReference<>();
 
-  public BattleshipsFrame(final StartOptions startOptions, final BsPlayer opponent,
+  public BattleshipsFrame(final StartOptions startOptions, final BattleshipsPlayer opponent,
                           final Runnable exitAction) {
     super(startOptions.getGameTitle().orElse("Battleship"),
         startOptions.getGraphicsConfiguration().orElse(

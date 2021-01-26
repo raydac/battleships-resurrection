@@ -18,12 +18,12 @@ package com.igormaznitsa.battleships.opponent;
 import java.time.Duration;
 import java.util.Optional;
 
-public interface BsPlayer {
+public interface BattleshipsPlayer {
   Optional<BsGameEvent> pollGameEvent(final Duration duration) throws InterruptedException;
 
   void pushGameEvent(BsGameEvent event);
 
-  BsPlayer startBot();
+  BattleshipsPlayer startPlayer();
 
-  void disposeBot();
+  void disposePlayer();
 }
