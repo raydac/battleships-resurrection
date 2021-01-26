@@ -1,4 +1,9 @@
-![Battleships banner](assets/github_banner.jpg)
+![Battleships banner](assets/github_banner.png)
+
+[![License GNU GPL3](https://img.shields.io/badge/license-GNU%20GPL%203-yellow.svg)](http://www.gnu.org/licenses/gpl.html)
+[![Java 11.0+](https://img.shields.io/badge/java-11.0%2b-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+[![PayPal donation](https://img.shields.io/badge/donation-PayPal-cyan.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
+[![YooMoney donation](https://img.shields.io/badge/donation-Yoo.money-blue.svg)](https://yoomoney.ru/to/41001158080699)
 
 # Disclaimer
 All Copyrights to both graphics and sound stuff belong to their authors. The project is already 20 years old and I can't find any footsteps of companies who played any role in the project. All sources and materials have been published just to be saved for long time and provide some example of game programming in Java for who may concern.    
@@ -18,7 +23,7 @@ The project can be also recognized as some example - "how to write a casual game
 ## Mobile client
 The mobile client is most hard part today to be built because it requires Sun WTK 2.5.2 and JDK 1.5, they both can be still found on Oracle site but I am not sure that the picture will be saved next several years. I have restored some Motorola A008 device profile for the WTK and it can be used to get picture of working device. To be honesty I have not eer saw working mobile client on the real device because during development it was absolutely new device with GPRS support and guys in Sweden had to visit the Sweden Motorila laboratory to test the client to write report for me, very long way to debug.
 
-![A008 screenshot](battleships-resurrection/battleships-client-a008/assets/emulator_screeagnshot.jpg)
+![A008 screenshot](battleships-resurrection/battleships-client-a008/assets/emulator_screenshot.jpg)
 
 To build mobile client from project root, you need use maven profile `midlet`. 
 
