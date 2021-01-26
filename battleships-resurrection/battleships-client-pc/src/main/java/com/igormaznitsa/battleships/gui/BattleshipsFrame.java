@@ -16,6 +16,9 @@
 package com.igormaznitsa.battleships.gui;
 
 
+import static java.util.Objects.requireNonNull;
+
+
 import com.igormaznitsa.battleships.gui.panels.BasePanel;
 import com.igormaznitsa.battleships.gui.panels.FinalPanel;
 import com.igormaznitsa.battleships.gui.panels.GamePanel;
@@ -24,10 +27,8 @@ import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Container;
-import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -45,36 +46,24 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   private final BattleshipsPlayer opponent;
 
   private final Runnable exitAction;
-
-  private final Optional<ScaleFactor> scaleFactor;
   private final StartOptions startOptions;
-
   private final AtomicReference<Thread> commDaemonThreadRef = new AtomicReference<>();
+  private Optional<ScaleFactor> scaleFactor;
 
-  public BattleshipsFrame(final StartOptions startOptions, final BattleshipsPlayer opponent,
+  public BattleshipsFrame(final StartOptions startOptions,
+                          final BattleshipsPlayer opponent,
                           final Runnable exitAction) {
     super(startOptions.getGameTitle().orElse("Battleship"),
         startOptions.getGraphicsConfiguration().orElse(
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
     this.startOptions = startOptions;
+    this.scaleFactor = Optional.empty();
     if (startOptions.isFullScreen()) {
       this.setResizable(false);
       this.setAlwaysOnTop(true);
       this.setUndecorated(true);
-      final Optional<GraphicsConfiguration> gconfig = startOptions.getGraphicsConfiguration();
-      if (gconfig.isPresent()) {
-        final Rectangle screen = gconfig.get().getBounds();
-        this.scaleFactor = Optional
-            .of(new ScaleFactor(screen.getWidth() / 800.0d, screen.getHeight() / 600.0d));
-        LOGGER.info("Calculated scale factor " + scaleFactor + " for screen: " + gconfig.get());
-      } else {
-        this.scaleFactor = Optional.empty();
-      }
-    } else {
-      this.scaleFactor = Optional.empty();
     }
-
     this.exitAction = exitAction;
     this.opponent = opponent;
 
@@ -138,7 +127,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     });
   }
 
-  public void start() {
+  public void start(final Optional<ScaleFactor> scaleFactor) {
+    this.scaleFactor = requireNonNull(scaleFactor);
     final LoadingPanel loadingPanel = new LoadingPanel(this.startOptions, this.scaleFactor);
     this.replaceContentPanel(loadingPanel);
   }

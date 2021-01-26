@@ -16,16 +16,19 @@
 package com.igormaznitsa.battleships.gui;
 
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 public final class ScaleFactor {
   private final double sx;
   private final double sy;
 
-  public ScaleFactor(final double sx, final double sy) {
-    this.sx = sx;
-    this.sy = sy;
+  public ScaleFactor(final GraphicsConfiguration graphicsConfiguration) {
+    final Rectangle screen = graphicsConfiguration.getBounds();
+    this.sx = screen.getWidth() / 800.0d;
+    this.sy = screen.getHeight() / 600.0d;
   }
 
   public double getScaleX() {

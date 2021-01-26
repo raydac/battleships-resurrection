@@ -17,6 +17,7 @@ package com.igormaznitsa.battleships;
 
 import com.igormaznitsa.battleships.gui.BattleshipsFrame;
 import com.igormaznitsa.battleships.gui.OpeningDialog;
+import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
@@ -56,10 +57,11 @@ public class Starter {
       final BattleshipsPlayer battleshipBot = new AiBattleshipsSingleSessionBot().startPlayer();
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
           GraphicsConfiguration::getDevice);
-      final Optional<DisplayMode> oldDisplayMode = device.map(GraphicsDevice::getDisplayMode);
 
       final AtomicReference<BattleshipsFrame> mainFrameRef = new AtomicReference<>();
 
+      final AtomicReference<Optional<ScaleFactor>> scaleFactorRef =
+          new AtomicReference<>(Optional.empty());
       if (selectedData.isFullScreen()) {
         device.ifPresentOrElse(d -> {
           if (d.isFullScreenSupported()) {
@@ -75,6 +77,8 @@ public class Starter {
                 DisplayMode.REFRESH_RATE_UNKNOWN);
             try {
               d.setFullScreenWindow(mainFrameRef.get());
+              scaleFactorRef
+                  .set(Optional.of(new ScaleFactor(selectedData.getGraphicsConfiguration().get())));
             } catch (Exception ex) {
               LOGGER.log(Level.SEVERE, "Can't set full screen window", ex);
               System.exit(4);
@@ -83,15 +87,7 @@ public class Starter {
               LOGGER.info("Detected support of display change: " + d);
               try {
                 d.setDisplayMode(displayMode);
-                Runtime.getRuntime()
-                    .addShutdownHook(new Thread(() -> oldDisplayMode.ifPresent(old -> {
-                      try {
-                        LOGGER.info("Restoring display mode: " + oldDisplayMode);
-                        d.setDisplayMode(old);
-                      } catch (Exception ex) {
-                        ex.printStackTrace();
-                      }
-                    })));
+                scaleFactorRef.set(Optional.empty());
               } catch (Exception ex) {
                 LOGGER.log(Level.FINE, "Error during display change", ex);
               }
@@ -113,13 +109,14 @@ public class Starter {
         });
       } else {
         mainFrameRef
-            .set(new BattleshipsFrame(selectedData, battleshipBot, battleshipBot::disposePlayer));
+            .set(new BattleshipsFrame(selectedData, battleshipBot,
+                battleshipBot::disposePlayer));
       }
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();
       if (mainFrame != null) {
         mainFrame.setVisible(true);
-        mainFrame.start();
+        mainFrame.start(scaleFactorRef.get());
       }
     });
 
