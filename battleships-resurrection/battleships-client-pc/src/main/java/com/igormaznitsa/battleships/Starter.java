@@ -55,6 +55,7 @@ public class Starter {
       }
 
       final BattleshipsPlayer battleshipBot = new AiBattleshipsSingleSessionBot().startPlayer();
+//      final BattleshipsPlayer battleshipBot = new GexBattleshipSingleSessionBot(selectedData).startPlayer();
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
           GraphicsConfiguration::getDevice);
 

@@ -48,7 +48,7 @@ public class LoadingPanel extends BasePanel {
     }
     LOGGER.info("Loading sounds");
     for (final Sound s : Sound.values()) {
-      s.load(this.startOptions.isWithSound());
+      s.load(this.startOptions.isWithSound(), false);
     }
     LOGGER.info("Loading banners");
     InfoBanner.loadAll();

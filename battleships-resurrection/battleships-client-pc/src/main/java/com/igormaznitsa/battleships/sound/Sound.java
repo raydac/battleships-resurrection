@@ -25,7 +25,7 @@ public enum Sound {
   ATTACK_HORN("Attack Horn.wav"),
   BUBBLES("Bubbles.wav"),
   DECK_CREAK("Deck Creak.wav"),
-  DEFEAT_HORN("Defeat Horn.wav"),
+  DEFEAT_HORN("Defeat Horn.wav", true),
   DRENDOUT_FIRE("Drendout Fire.wav"),
   EXPLODE01("Explode01.wav"),
   EXPLODE03("explode03.wav"),
@@ -46,17 +46,24 @@ public enum Sound {
   SUBMARINE_FIRE("Submarine Fire.wav"),
   TUNBLER_CRACK_AND_BELL("Tumbler Crack & Bell.wav"),
   TYPEWRITER("Typewriter.wav"),
-  VICTORY_HORN("Victory Horn.wav"),
+  VICTORY_HORN("Victory Horn.wav", true),
   WATER_SPLASH01("WaterSplash01.wav"),
   WATER_SPLASH02("WaterSplash02.wav"),
   WAVES_LOOP("Waves Loop.wav"),
+  SOS("sos.wav", true),
   WRONG_TUMBLER("WrongTumbler.wav");
 
   private final String resource;
+  private final boolean lazy;
   private Optional<SoundClip> clip = Optional.empty();
 
   Sound(final String resource) {
+    this(resource, false);
+  }
+
+  Sound(final String resource, final boolean lazy) {
     this.resource = resource;
+    this.lazy = lazy;
   }
 
   public static void stopAll() {
@@ -65,8 +72,10 @@ public enum Sound {
     }
   }
 
-  public synchronized void load(final boolean loadingAllowed) {
-    this.clip = loadingAllowed ? Optional.of(new SoundClip(this.resource)) : Optional.empty();
+  public synchronized void load(final boolean realLoadAllowed, final boolean forceLazy) {
+    if (!this.lazy || forceLazy && this.clip.isEmpty()) {
+      this.clip = realLoadAllowed ? Optional.of(new SoundClip(this.resource)) : Optional.empty();
+    }
   }
 
   public synchronized void play() {

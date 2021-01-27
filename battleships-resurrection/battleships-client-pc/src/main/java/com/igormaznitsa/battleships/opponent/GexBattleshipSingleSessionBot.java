@@ -20,18 +20,24 @@ import static java.util.Arrays.stream;
 
 import com.igormaznitsa.battleships.gui.StartOptions;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -52,27 +58,196 @@ public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private final AtomicLong packetCounter = new AtomicLong();
 
-  private final String playerId;
-
-  private final AtomicReference<Thread> thread = new AtomicReference<>();
+  private static final int PACKET_HEADER = 0xFFCAFE00;
+  private final int playerId;
+  private final AtomicReference<Optional<String>> sessionId =
+      new AtomicReference<>(Optional.empty());
+  private final AtomicReference<Thread> threadInput = new AtomicReference<>();
+  private final AtomicReference<Thread> threadOutput = new AtomicReference<>();
+  private final AtomicReference<InputStream> openedInputStream = new AtomicReference<>();
 
   public GexBattleshipSingleSessionBot(final StartOptions startOptions) {
-    this.playerId = UUID.randomUUID().toString();
+    final UUID uuid = UUID.randomUUID();
+    this.playerId =
+        (int) (0x7FFFFFFFL & uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
+    LOGGER.info("Generated player ID: " + this.playerId);
     this.httpClient = HttpClient.newHttpClient();
     try {
+      //todo replace by values from config
+      final String host = "localhost";
+      final int port = 30000;
+      LOGGER.info("Game server address: " + host + ':' + port);
       this.uriInput = new URI(String
-          .format("http://%s:%d/getoutstream", startOptions.getHostName().orElse("localhost"),
-              startOptions.getHostPort().orElse(30000)));
+          .format("http://%s:%d/getoutstream", host, port));
       this.uriOutput = new URI(String
-          .format("http://%s:%d/getinstream", startOptions.getHostName().orElse("localhost"),
-              startOptions.getHostPort().orElse(30000)));
+          .format("http://%s:%d/getinstream", host, port));
     } catch (URISyntaxException ex) {
       LOGGER.log(Level.SEVERE, "URI syntax error", ex);
       throw new IllegalArgumentException("Wrong URI format", ex);
     }
   }
 
-  private void doRun() {
+  private static void closeQuietly(final Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (Exception ex) {
+        // do nothing
+      }
+    }
+  }
+
+  private void doRunIn() {
+    try {
+      LOGGER.info("Processing of incoming packets started");
+      while (!Thread.currentThread().isInterrupted()) {
+        final HttpURLConnection httpURLConnection;
+        try {
+          httpURLConnection = (HttpURLConnection) this.uriInput.toURL().openConnection();
+          httpURLConnection.setConnectTimeout(3600000);
+          httpURLConnection.setInstanceFollowRedirects(false);
+          httpURLConnection.setUseCaches(false);
+          httpURLConnection.setRequestMethod("POST");
+          httpURLConnection.setRequestProperty("Content-Type", "application/octet-stream");
+          httpURLConnection.setRequestProperty("User-Agent", "battleships-gex-client");
+          httpURLConnection.setDoInput(true);
+          httpURLConnection.setRequestProperty("playerID", Integer.toString(this.playerId));
+          this.sessionId.get().ifPresent(s -> httpURLConnection.setRequestProperty("sessionID", s));
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, "Can't prepare listening connection", ex);
+          placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_SYSTEM_ERROR, 0, 0));
+          return;
+        }
+
+        try {
+          httpURLConnection.connect();
+        } catch (IOException ex) {
+          LOGGER.warning("Can't open connection: " + ex.getMessage());
+          try {
+            Thread.sleep(3000);
+          } catch (InterruptedException ix) {
+            Thread.currentThread().interrupt();
+          }
+          continue;
+        }
+
+        DataInputStream inputStream = null;
+        try {
+          inputStream = new DataInputStream(httpURLConnection.getInputStream());
+          this.openedInputStream.set(inputStream);
+
+          final int[] packetBuffer = new int[5];
+          int bufferPointer = -10;
+
+          while (!Thread.currentThread().isInterrupted()) {
+            try {
+              final int data = inputStream.readInt();
+              if (bufferPointer >= 0) {
+                packetBuffer[bufferPointer++] = data;
+                if (bufferPointer == packetBuffer.length) {
+                  final int checkSum = Arrays.stream(packetBuffer, 0, 4).sum();
+                  if (checkSum != packetBuffer[4]) {
+                    packetBuffer[0] = ProtocolEvent.NETWORK_ERROR.code;
+                  }
+                  this.onIncomingPacket(packetBuffer);
+                  bufferPointer = -1;
+                }
+              } else {
+                if (data == PACKET_HEADER) {
+                  bufferPointer = 0;
+                } else {
+                  bufferPointer = -1;
+                }
+              }
+            } catch (IOException ex) {
+              break;
+            }
+          }
+        } catch (IOException ex) {
+          closeQuietly(inputStream);
+          this.openedInputStream.set(null);
+        }
+      }
+    } finally {
+      LOGGER.info("Processing of incoming packets completed");
+    }
+  }
+
+  private void onIncomingPacket(final int[] packet) {
+    final ProtocolEvent event = ProtocolEvent.findForCode(packet[0]);
+    LOGGER.info("Detected incoming event " + event + ": " + Arrays.toString(packet));
+    switch (event) {
+      case JOIN_SESSION:
+      case NEW_SESSION: {
+        final String session = Integer.toString(packet[1]);
+        this.sessionId.set(Optional.of(session));
+        final boolean myFirstTurn = packet[2] != 0;
+        LOGGER.info((event == ProtocolEvent.NEW_SESSION ? "Created session " : "Joined session ") +
+            session + ", first turn is " + (myFirstTurn ? "MINE" : "OPPONENT"));
+      }
+      break;
+      case EXIT:
+      case OPPONENT_LOST: {
+        // ??? do nothing like in the mobile version ???
+      }
+      break;
+      case SESSION_REMOVE: {
+        // game session has been removed
+      }
+      case GAME_MOVE: {
+        // fire X,Y,0
+      }
+      break;
+      case GAME_RESULT: {
+        // fire result A,0,0
+        // A is HIT=3, KILL=4, MISS=5
+      }
+      break;
+      case OPPONENT_JOIN:
+      case PAUSE: {
+        // opponent has turned on pause mode
+      }
+      break;
+      case SERVER_GAME: {
+        // opponent in game
+      }
+      break;
+      case SERVER_PAUSE: {
+        // notification that server paused
+      }
+      break;
+      case SERVER_RESUMED: {
+        // notification that server work resumed
+      }
+      break;
+      case NETWORK_ERROR: {
+
+      }
+      break;
+    }
+    LOGGER.info("Incoming packet: " + Arrays.toString(packet));
+  }
+
+  private void placeEventIntoInQueue(final BsGameEvent event) {
+    try {
+      if (!this.queueIn.offer(event, 10, TimeUnit.SECONDS)) {
+        LOGGER.severe("Can't place event into internal queue for long time: " + event);
+        System.exit(14);
+      }
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  private void doRunOut() {
+    while (!Thread.currentThread().isInterrupted()) {
+      try {
+        final BsGameEvent event = this.queueOut.take();
+
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
+    }
   }
 
   private void sendDataPacketToServer(final String sessionId, final int... packet)
@@ -88,7 +263,7 @@ public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
     final byte[] data = null;
     final HttpRequest request = HttpRequest.newBuilder(this.uriOutput)
         .POST(HttpRequest.BodyPublishers.ofByteArray(data))
-        .setHeader("playerID", this.playerId)
+        .setHeader("playerID", Integer.toString(this.playerId))
         .setHeader("sessionID", sessionId)
         .setHeader("pn", Long.toString(this.packetCounter.get()))
         .build();
@@ -105,23 +280,42 @@ public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   @Override
   public BattleshipsPlayer startPlayer() {
-    final Thread thread = new Thread(this::doRun, "bs-gex-bot-" + this.playerId);
-    thread.setDaemon(true);
-    if (this.thread.compareAndSet(null, thread)) {
-      thread.start();
-    } else {
-      throw new IllegalStateException("Already started");
+    final Thread threadIn = new Thread(this::doRunIn, "bs-gex-bot-in-" + this.playerId);
+    threadIn.setDaemon(true);
+    if (!this.threadInput.compareAndSet(null, threadIn)) {
+      throw new IllegalStateException("Found already created thread in");
     }
+
+    final Thread threadOut = new Thread(this::doRunOut, "bs-gex-bot-out-" + this.playerId);
+    threadIn.setDaemon(true);
+    if (!this.threadOutput.compareAndSet(null, threadOut)) {
+      throw new IllegalStateException("Found alreadt created thread out");
+    }
+
+    this.threadInput.get().start();
+    this.threadOutput.get().start();
+
     return this;
   }
 
   @Override
-  public void pushGameEvent(BsGameEvent event) {
+  public void pushGameEvent(final BsGameEvent event) {
+
   }
 
   @Override
   public void disposePlayer() {
-    final Thread foundThread = this.thread.getAndSet(null);
+    closeQuietly(this.openedInputStream.get());
+    Thread foundThread = this.threadInput.getAndSet(null);
+    if (foundThread != null) {
+      foundThread.interrupt();
+      try {
+        foundThread.join();
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
+    }
+    foundThread = this.threadOutput.getAndSet(null);
     if (foundThread != null) {
       foundThread.interrupt();
       try {
@@ -151,7 +345,7 @@ public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
     SERVER_OVERLOADED(15),
     SERVER_GAME(16),
     SERVER_PAUSE(17),
-    SERVER_START(18),
+    SERVER_RESUMED(18),
     NETWORK_ERROR(19);
 
     private final int code;

@@ -22,8 +22,9 @@ import java.awt.image.BufferedImage;
 
 public enum InfoBanner {
   NONE(""),
+  ERROR("error"),
   CANT_CONNECT("cantconnect"),
-  LOST("lost"),
+  LOSE("lost"),
   OPPONENTS_MOVE("opponentsmove"),
   PLACEMENT("placement"),
   VICTORY("victory"),

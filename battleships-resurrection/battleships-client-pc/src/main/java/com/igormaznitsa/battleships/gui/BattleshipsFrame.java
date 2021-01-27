@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.igormaznitsa.battleships.gui.panels.BasePanel;
 import com.igormaznitsa.battleships.gui.panels.FinalPanel;
+import com.igormaznitsa.battleships.gui.panels.FinalState;
 import com.igormaznitsa.battleships.gui.panels.GamePanel;
 import com.igormaznitsa.battleships.gui.panels.LoadingPanel;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
@@ -194,7 +195,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       break;
       case BasePanel.SIGNAL_LOST:
       case BasePanel.SIGNAL_VICTORY: {
-        this.onGameEnd(BasePanel.SIGNAL_VICTORY.equalsIgnoreCase(signal));
+        this.onGameEnd(BasePanel.SIGNAL_VICTORY.equalsIgnoreCase(signal) ? FinalState.VICTORY :
+            FinalState.LOST);
       }
       break;
       case BasePanel.SIGNAL_RESUME: {
@@ -216,10 +218,9 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     }
   }
 
-
-  private void onGameEnd(final boolean victory) {
-    LOGGER.info("Game session completed, victory flag=" + victory);
-    this.replaceContentPanel(new FinalPanel(this.startOptions, scaleFactor, victory));
+  private void onGameEnd(final FinalState state) {
+    LOGGER.info("Game session ended, final state " + state);
+    this.replaceContentPanel(new FinalPanel(this.startOptions, scaleFactor, state));
   }
 
   private void onGameError() {

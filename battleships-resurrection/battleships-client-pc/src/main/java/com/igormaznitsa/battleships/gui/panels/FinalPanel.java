@@ -25,6 +25,7 @@ import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.utils.GfxUtils;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -39,21 +40,18 @@ public class FinalPanel extends BasePanel {
   private final BufferedImage image;
   private ControlElement selectedControl = ControlElement.NONE;
   private final InfoBanner infoBanner;
+  private final Optional<Color> fillColor;
 
   public FinalPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor,
-                    final boolean victory) {
+                    final FinalState state) {
     super(startOptions, scaleFactor);
-    final String imageResource;
-    if (victory) {
-      imageResource = "victory.png";
-      this.sound = Sound.VICTORY_HORN;
-      this.infoBanner = InfoBanner.VICTORY;
-    } else {
-      imageResource = "LOSE.png";
-      this.sound = Sound.DEFEAT_HORN;
-      this.infoBanner = InfoBanner.LOST;
-    }
-    this.image = GfxUtils.loadGfxImageAsType(imageResource, BufferedImage.TYPE_INT_RGB);
+
+    this.image =
+        GfxUtils.loadGfxImageAsType(state.getImageResourceName(), BufferedImage.TYPE_INT_RGB);
+    this.fillColor = state.getFillColor();
+    this.sound = state.getSound();
+    this.sound.load(startOptions.isWithSound(), true);
+    this.infoBanner = state.getBanner();
 
     this.addMouseListener(new MouseAdapter() {
       @Override
@@ -116,7 +114,19 @@ public class FinalPanel extends BasePanel {
 
   @Override
   protected void doPaint(final Graphics2D g2d) {
-    g2d.drawImage(this.image, null, 0, 0);
+    this.fillColor.ifPresent(c -> {
+      g2d.setColor(c);
+      g2d.fillRect(0, 0, GAMEFIELD_WIDTH, GAMEFIELD_HEIGHT);
+    });
+
+    if (this.image.getWidth() == GAMEFIELD_WIDTH && this.image.getHeight() == GAMEFIELD_HEIGHT) {
+      g2d.drawImage(this.image, null, 0, 0);
+    } else {
+      final int imageX = (GAMEFIELD_WIDTH - this.image.getWidth()) / 2;
+      final int imageY = (GAMEFIELD_HEIGHT - this.image.getHeight()) / 2;
+      g2d.drawImage(this.image, null, imageX, imageY);
+    }
+
     g2d.drawImage(Animation.E1_NEW.getFirst(), null, 0, 0);
     g2d.drawImage(Animation.E2_NEW.getFirst(), null, 512, 0);
     switch (this.selectedControl) {
