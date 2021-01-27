@@ -43,11 +43,12 @@ public abstract class BasePanel extends JComponent {
   public static final Point BANNER_COORD = new Point(423, 10);
 
   public static final String SIGNAL_LOADING_COMPLETED = "LOADING_COMPLETED";
-  public static final String SIGNAL_ERROR = "ERROR";
   public static final String SIGNAL_EXIT = "EXIT";
   public static final String SIGNAL_PAUSED = "PAUSED";
   public static final String SIGNAL_RESUME = "RESUME";
   public static final String SIGNAL_VICTORY = "VICTORY";
+  public static final String SIGNAL_SYSTEM_FAILURE = "SYSTEMFAILURE";
+  public static final String SIGNAL_PLAYER_IS_OUT = "PLAYERISOUT";
   public static final String SIGNAL_LOST = "LOST";
   private static final Cursor CURSOR = getDefaultToolkit()
       .createCustomCursor(loadResImage("cursor.png"), new Point(8, 8), "BattleShips");

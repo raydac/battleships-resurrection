@@ -15,12 +15,12 @@
 
 package com.igormaznitsa.battleships.opponent;
 
+import static com.igormaznitsa.battleships.utils.Utils.closeQuietly;
 import static java.util.Arrays.stream;
 
 
 import com.igormaznitsa.battleships.gui.StartOptions;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -43,10 +43,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
+public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private static final Logger LOGGER =
-      Logger.getLogger(GexBattleshipSingleSessionBot.class.getName());
+      Logger.getLogger(OldGexBattleshipSingleSessionBot.class.getName());
 
   private final BlockingQueue<BsGameEvent> queueIn = new ArrayBlockingQueue<>(10);
   private final BlockingQueue<BsGameEvent> queueOut = new ArrayBlockingQueue<>(10);
@@ -66,7 +66,7 @@ public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
   private final AtomicReference<Thread> threadOutput = new AtomicReference<>();
   private final AtomicReference<InputStream> openedInputStream = new AtomicReference<>();
 
-  public GexBattleshipSingleSessionBot(final StartOptions startOptions) {
+  public OldGexBattleshipSingleSessionBot(final StartOptions startOptions) {
     final UUID uuid = UUID.randomUUID();
     this.playerId =
         (int) (0x7FFFFFFFL & uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
@@ -84,16 +84,6 @@ public class GexBattleshipSingleSessionBot implements BattleshipsPlayer {
     } catch (URISyntaxException ex) {
       LOGGER.log(Level.SEVERE, "URI syntax error", ex);
       throw new IllegalArgumentException("Wrong URI format", ex);
-    }
-  }
-
-  private static void closeQuietly(final Closeable closeable) {
-    if (closeable != null) {
-      try {
-        closeable.close();
-      } catch (Exception ex) {
-        // do nothing
-      }
     }
   }
 

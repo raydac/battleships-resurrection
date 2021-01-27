@@ -199,11 +199,15 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
             FinalState.LOST);
       }
       break;
+      case BasePanel.SIGNAL_PLAYER_IS_OUT: {
+        this.onPlayerIsOut();
+      }
+      break;
       case BasePanel.SIGNAL_RESUME: {
         this.onGameResume();
       }
       break;
-      case BasePanel.SIGNAL_ERROR: {
+      case BasePanel.SIGNAL_SYSTEM_FAILURE: {
         this.onGameError();
       }
       break;
@@ -225,6 +229,14 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private void onGameError() {
     LOGGER.severe("Detected game error");
+    this.replaceContentPanel(
+        new FinalPanel(this.startOptions, this.scaleFactor, FinalState.SYSTEM_FAILURE));
+  }
+
+  private void onPlayerIsOut() {
+    LOGGER.severe("Detected that opponent has left the game room");
+    this.replaceContentPanel(
+        new FinalPanel(this.startOptions, this.scaleFactor, FinalState.OPPONENT_OFF));
   }
 
   private void onGamePaused() {

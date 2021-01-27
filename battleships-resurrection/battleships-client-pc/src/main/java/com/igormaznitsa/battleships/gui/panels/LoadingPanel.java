@@ -65,7 +65,7 @@ public class LoadingPanel extends BasePanel {
         this.fireSignal(SIGNAL_LOADING_COMPLETED);
       } catch (Throwable ex) {
         ex.printStackTrace();
-        this.fireSignal(SIGNAL_ERROR);
+        this.fireSignal(SIGNAL_SYSTEM_FAILURE);
       }
       final long endTime = System.currentTimeMillis();
       LOGGER.info("Spent time for loading: " + (endTime - startTime) + " ms");

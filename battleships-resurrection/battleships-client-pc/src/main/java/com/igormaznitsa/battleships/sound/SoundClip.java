@@ -15,13 +15,13 @@
 
 package com.igormaznitsa.battleships.sound;
 
+import com.igormaznitsa.battleships.utils.Utils;
 import java.io.ByteArrayInputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
-import org.apache.commons.io.IOUtils;
 
 public final class SoundClip implements AutoCloseable {
 
@@ -30,7 +30,7 @@ public final class SoundClip implements AutoCloseable {
 
   public SoundClip(final String resource) {
     try {
-      final byte[] data = IOUtils.resourceToByteArray("/assets/snd/" + resource);
+      final byte[] data = Utils.readResourceAsBytes("/assets/snd/" + resource);
       this.clip = AudioSystem.getClip();
       final AudioInputStream audioStream =
           AudioSystem.getAudioInputStream(new ByteArrayInputStream(data));
