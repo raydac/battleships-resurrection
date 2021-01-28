@@ -27,5 +27,7 @@ public interface BattleshipsPlayer {
 
   void disposePlayer();
 
+  boolean isAvailable();
+
   String getId();
 }

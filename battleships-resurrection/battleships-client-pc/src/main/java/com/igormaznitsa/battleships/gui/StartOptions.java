@@ -97,8 +97,8 @@ public class StartOptions {
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
     private boolean withSound = true;
-    private Optional<String> hostName = Optional.empty();
-    private OptionalInt hostPort = OptionalInt.empty();
+    private Optional<String> hostName = Optional.of("localhost");
+    private OptionalInt hostPort = OptionalInt.of(30000);
 
     public Builder setWithSound(final boolean value) {
       this.withSound = value;

@@ -486,6 +486,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   }
 
   @Override
+  public boolean isAvailable() {
+    return true;
+  }
+
+  @Override
   public String getId() {
     return "battleships-main-game-panel";
   }

@@ -53,8 +53,11 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private final HttpClient httpClient;
 
+  private final String id;
+
   private final URI uriInput;
   private final URI uriOutput;
+  private final URI uriTest;
 
   private final AtomicLong packetCounter = new AtomicLong();
 
@@ -67,6 +70,8 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
   private final AtomicReference<InputStream> openedInputStream = new AtomicReference<>();
 
   public OldGexBattleshipSingleSessionBot(final StartOptions startOptions) {
+    this.id = startOptions.getHostName().orElse("") + ':' + startOptions.getHostPort().orElse(-1);
+
     final UUID uuid = UUID.randomUUID();
     this.playerId =
         (int) (0x7FFFFFFFL & uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
@@ -81,9 +86,55 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
           .format("http://%s:%d/getoutstream", host, port));
       this.uriOutput = new URI(String
           .format("http://%s:%d/getinstream", host, port));
+      this.uriTest = new URI(String
+          .format("http://%s:%d/test", host, port));
     } catch (URISyntaxException ex) {
       LOGGER.log(Level.SEVERE, "URI syntax error", ex);
       throw new IllegalArgumentException("Wrong URI format", ex);
+    }
+  }
+
+  private static HttpURLConnection prepareConnection(
+      final String method,
+      final URI uri,
+      final int playerId,
+      final Optional<String> sessionId,
+      final boolean input,
+      final boolean output
+  ) throws IOException {
+    final HttpURLConnection connection;
+    try {
+      connection = (HttpURLConnection) uri.toURL().openConnection();
+      connection.setConnectTimeout(3600000);
+      connection.setInstanceFollowRedirects(false);
+      connection.setUseCaches(false);
+      connection.setRequestMethod(method);
+      connection.setRequestProperty("Content-Type", "application/octet-stream");
+      connection.setRequestProperty("User-Agent", "battleships-gex-client");
+      connection.setDoInput(input);
+      connection.setDoOutput(output);
+      connection.setRequestProperty("playerID", Integer.toString(playerId));
+      sessionId.ifPresent(s -> connection.setRequestProperty("sessionID", s));
+      return connection;
+    } catch (Exception ex) {
+      if (ex instanceof IOException) {
+        throw (IOException) ex;
+      } else {
+        throw new IOException(ex);
+      }
+    }
+  }
+
+  public boolean doTestCall() {
+    try {
+      final HttpURLConnection connection =
+          prepareConnection("GET", this.uriTest, this.playerId, this.sessionId.get(), true, false);
+      connection.connect();
+      connection.getInputStream().close();
+      connection.disconnect();
+      return true;
+    } catch (IOException ex) {
+      return false;
     }
   }
 
@@ -93,16 +144,9 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
       while (!Thread.currentThread().isInterrupted()) {
         final HttpURLConnection httpURLConnection;
         try {
-          httpURLConnection = (HttpURLConnection) this.uriInput.toURL().openConnection();
-          httpURLConnection.setConnectTimeout(3600000);
-          httpURLConnection.setInstanceFollowRedirects(false);
-          httpURLConnection.setUseCaches(false);
-          httpURLConnection.setRequestMethod("POST");
-          httpURLConnection.setRequestProperty("Content-Type", "application/octet-stream");
-          httpURLConnection.setRequestProperty("User-Agent", "battleships-gex-client");
-          httpURLConnection.setDoInput(true);
-          httpURLConnection.setRequestProperty("playerID", Integer.toString(this.playerId));
-          this.sessionId.get().ifPresent(s -> httpURLConnection.setRequestProperty("sessionID", s));
+          httpURLConnection =
+              prepareConnection("POST", this.uriInput, this.playerId, this.sessionId.get(), true,
+                  false);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, "Can't prepare listening connection", ex);
           placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
@@ -279,7 +323,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
     final Thread threadOut = new Thread(this::doRunOut, "bs-gex-bot-out-" + this.playerId);
     threadIn.setDaemon(true);
     if (!this.threadOutput.compareAndSet(null, threadOut)) {
-      throw new IllegalStateException("Found alreadt created thread out");
+      throw new IllegalStateException("Found already created thread out");
     }
 
     this.threadInput.get().start();
@@ -295,7 +339,12 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   @Override
   public String getId() {
-    return "battleships-old-gex-network-client";
+    return this.id;
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return this.doTestCall();
   }
 
   @Override

@@ -61,6 +61,14 @@ public class Starter {
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
       }
+
+      if (!selectedOpponent.isAvailable()) {
+        LOGGER.severe(selectedOpponent.getId() + " is unavailable");
+        JOptionPane.showMessageDialog(null, selectedOpponent.getId() + " is unavailable!",
+            "Error", JOptionPane.ERROR_MESSAGE);
+        System.exit(11);
+      }
+
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
           GraphicsConfiguration::getDevice);
 

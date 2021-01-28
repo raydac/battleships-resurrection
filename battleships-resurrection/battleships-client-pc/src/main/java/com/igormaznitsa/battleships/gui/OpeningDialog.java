@@ -77,10 +77,14 @@ public class OpeningDialog extends javax.swing.JDialog {
     this.radioMultiPlayer.addActionListener(e -> {
       if (this.radioMultiPlayer.isSelected()) {
         if (this.textFieldHostName.getText().isBlank()) {
-          this.textFieldHostName.setText("localhost");
+          startOptions.getHostName().ifPresent(t -> {
+            this.textFieldHostName.setText(t);
+          });
         }
         if (this.textFieldPort.getText().isBlank()) {
-          this.textFieldPort.setText("30000");
+          startOptions.getHostPort().ifPresent(p -> {
+            this.textFieldPort.setText(Integer.toString(p));
+          });
         }
       }
     });
@@ -88,7 +92,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     this.buttonGo.addActionListener(e -> {
       int hostPort = -1;
       try {
-        hostPort = Integer.parseInt(this.textFieldPort.getValue().toString().trim());
+        hostPort = Integer.parseInt(this.textFieldPort.getText().toString().trim());
       } catch (Exception ex) {
         // ignoring
       }
