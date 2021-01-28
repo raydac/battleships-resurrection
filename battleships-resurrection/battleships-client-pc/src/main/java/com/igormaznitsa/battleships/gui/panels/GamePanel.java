@@ -30,8 +30,8 @@ import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_LOST;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_MISS;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_OPPONENT_STARTS;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_READY;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_MAINSHIP;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_REGULARSHIP;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_MAIN;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_REGULAR;
 import static com.igormaznitsa.battleships.utils.Utils.RND;
 import static java.lang.Math.round;
 
@@ -486,6 +486,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   }
 
   @Override
+  public String getId() {
+    return "battleships-main-game-panel";
+  }
+
+  @Override
   protected void doStart() {
     this.selectedControl = ControlElement.NONE;
     this.initStage(Stage.PLACEMENT_START);
@@ -584,7 +589,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
               .orElseThrow(() -> new Error("Target must be presented"));
           final ShipType firingShip = this.activateShipFire();
           this.fireEventToOpponent(new BsGameEvent(
-              firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_MAINSHIP : EVENT_SHOT_REGULARSHIP,
+              firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_MAIN : EVENT_SHOT_REGULAR,
               target.x, target.y));
           this.initStage(Stage.FIRING);
         }
@@ -667,14 +672,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case ENEMY_TURN: {
         if (this.activeFallingObjectSprite == null) {
           this.findGameEventInQueue(
-              EnumSet.of(GameEventType.EVENT_SHOT_MAINSHIP, GameEventType.EVENT_SHOT_REGULARSHIP))
+              EnumSet.of(GameEventType.EVENT_SHOT_MAIN, GameEventType.EVENT_SHOT_REGULAR))
               .ifPresent(e -> {
                 this.savedGameEvent.set(Optional.of(e));
                 final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
                 final Point targetCell = hitShip.map(
                     FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
 
-                if (e.getType() == EVENT_SHOT_MAINSHIP) {
+                if (e.getType() == EVENT_SHOT_MAIN) {
                   this.activeFallingObjectSprite =
                       new FallingAirplaneSprite(hitShip, targetCell);
                 } else {

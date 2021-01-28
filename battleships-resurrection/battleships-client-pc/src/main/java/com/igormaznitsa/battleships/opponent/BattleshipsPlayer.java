@@ -26,4 +26,6 @@ public interface BattleshipsPlayer {
   BattleshipsPlayer startPlayer();
 
   void disposePlayer();
+
+  String getId();
 }

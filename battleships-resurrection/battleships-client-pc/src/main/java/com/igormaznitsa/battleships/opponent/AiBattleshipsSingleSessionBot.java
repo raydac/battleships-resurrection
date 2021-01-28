@@ -185,6 +185,11 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   }
 
   @Override
+  public String getId() {
+    return "local-ai-battleships-clients";
+  }
+
+  @Override
   public void disposePlayer() {
     try {
       this.thread.interrupt();
@@ -352,8 +357,8 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
           pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
         }
         break;
-        case EVENT_SHOT_MAINSHIP:
-        case EVENT_SHOT_REGULARSHIP: {
+        case EVENT_SHOT_MAIN:
+        case EVENT_SHOT_REGULAR: {
           final int cellOffset = offset(event.getX(), event.getY());
           GameEventType result = GameEventType.EVENT_MISS;
           if (this.myMap.get(cellOffset) == MapItem.SHIP) {
@@ -391,8 +396,8 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
           final int firingShip = this.selectShipToFire();
           this.pushIntoOutput(
               new BsGameEvent(
-                  firingShip == 4 ? GameEventType.EVENT_SHOT_MAINSHIP :
-                      GameEventType.EVENT_SHOT_REGULARSHIP,
+                  firingShip == 4 ? GameEventType.EVENT_SHOT_MAIN :
+                      GameEventType.EVENT_SHOT_REGULAR,
                   targetCell % FIELD_EDGE, targetCell / FIELD_EDGE));
         }
         break;

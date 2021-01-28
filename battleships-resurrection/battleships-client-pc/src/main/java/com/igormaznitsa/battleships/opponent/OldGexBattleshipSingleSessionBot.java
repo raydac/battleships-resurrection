@@ -294,6 +294,11 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
   }
 
   @Override
+  public String getId() {
+    return "battleships-old-gex-network-client";
+  }
+
+  @Override
   public void disposePlayer() {
     closeQuietly(this.openedInputStream.get());
     Thread foundThread = this.threadInput.getAndSet(null);
