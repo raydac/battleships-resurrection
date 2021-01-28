@@ -105,7 +105,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
           this.sessionId.get().ifPresent(s -> httpURLConnection.setRequestProperty("sessionID", s));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, "Can't prepare listening connection", ex);
-          placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_SYSTEM_ERROR, 0, 0));
+          placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
           return;
         }
 

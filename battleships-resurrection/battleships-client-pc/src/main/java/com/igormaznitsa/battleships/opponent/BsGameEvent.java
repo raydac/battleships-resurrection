@@ -33,21 +33,6 @@ public final class BsGameEvent {
     this.timestamp = System.currentTimeMillis();
   }
 
-  public static boolean isForceWaitForTurn(final BsGameEvent readyEvent) {
-    if (readyEvent.gameEventType != GameEventType.EVENT_READY) {
-      throw new IllegalArgumentException("Required ready event: " + readyEvent);
-    }
-    return readyEvent.x < 0 || readyEvent.y < 0;
-  }
-
-  public static boolean isFirstMoveLeft(final BsGameEvent leftReady, final BsGameEvent rightReady) {
-    final int leftNumber = leftReady.getX() + leftReady.getY() * 31;
-    final int rightNumber = rightReady.getX() + rightReady.getY() * 31;
-
-    return leftNumber > rightNumber || (leftNumber == rightNumber
-        && (leftReady.getTimestamp() <= rightReady.getTimestamp()));
-  }
-
   public UUID getUuid() {
     return this.uuid;
   }

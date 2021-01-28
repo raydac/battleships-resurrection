@@ -50,8 +50,6 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   private final int[] counterOfEnemyShips;
   private final int[] counterOfMyShips;
 
-  private final BsGameEvent myReadyGameEvent;
-
   private final Thread thread;
 
 
@@ -61,12 +59,9 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
     this.counterOfMyShips = new int[] {4, 3, 2, 1};
     this.counterOfEnemyShips = new int[] {4, 3, 2, 1};
     range(0, FIELD_EDGE * FIELD_EDGE).forEach(x -> this.enemyMap.add(MapItem.EMPTY));
-    this.myReadyGameEvent =
-        new BsGameEvent(GameEventType.EVENT_READY, this.random.nextInt(FIELD_EDGE),
-            this.random.nextInt(FIELD_EDGE));
     this.thread = new Thread(() -> {
       LOGGER.info("Field prepared for game session");
-      this.pushIntoOutput(this.myReadyGameEvent);
+      this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, 0, 0));
       while (!Thread.currentThread().isInterrupted()) {
         try {
           final BsGameEvent nextEvent = this.inQueue.take();
@@ -351,16 +346,14 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   }
 
   private synchronized void onIncomingGameEvent(BsGameEvent event) {
-    if (event.getType() == GameEventType.EVENT_READY) {
-      final BsGameEvent doTurn = new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0);
-      if (!BsGameEvent.isForceWaitForTurn(event) &&
-          BsGameEvent.isFirstMoveLeft(event, this.myReadyGameEvent)) {
-        pushIntoOutput(doTurn);
-      }
-    } else {
       switch (requireNonNull(event).getType()) {
-        case EVENT_SHOT_AIRCARRIER:
-        case EVENT_SHOT_REGULAR: {
+        case EVENT_OPPONENT_STARTS: {
+          LOGGER.info("Opponent starts");
+          pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+        }
+        break;
+        case EVENT_SHOT_MAINSHIP:
+        case EVENT_SHOT_REGULARSHIP: {
           final int cellOffset = offset(event.getX(), event.getY());
           GameEventType result = GameEventType.EVENT_MISS;
           if (this.myMap.get(cellOffset) == MapItem.SHIP) {
@@ -398,8 +391,8 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
           final int firingShip = this.selectShipToFire();
           this.pushIntoOutput(
               new BsGameEvent(
-                  firingShip == 4 ? GameEventType.EVENT_SHOT_AIRCARRIER :
-                      GameEventType.EVENT_SHOT_REGULAR,
+                  firingShip == 4 ? GameEventType.EVENT_SHOT_MAINSHIP :
+                      GameEventType.EVENT_SHOT_REGULARSHIP,
                   targetCell % FIELD_EDGE, targetCell / FIELD_EDGE));
         }
         break;
@@ -426,10 +419,12 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
           // means nothing for AI bot
         }
         break;
-        default:
+        default: {
+          LOGGER.severe("Unexpected event: " + event);
+          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 1, 0));
           throw new Error("Unexpected game event: " + event.getType());
+        }
       }
-    }
   }
 
   @Override
@@ -437,7 +432,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
     if (event != null) {
       try {
         if (!this.inQueue.offer(event, 5, TimeUnit.SECONDS)) {
-          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_SYSTEM_ERROR, 0, 0));
+          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
           this.thread.interrupt();
           throw new Error("Can't place event: " + event);
         }

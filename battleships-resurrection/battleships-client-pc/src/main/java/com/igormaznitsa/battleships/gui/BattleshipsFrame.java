@@ -25,7 +25,6 @@ import com.igormaznitsa.battleships.gui.panels.FinalState;
 import com.igormaznitsa.battleships.gui.panels.GamePanel;
 import com.igormaznitsa.battleships.gui.panels.LoadingPanel;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
-import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Container;
 import java.awt.GraphicsEnvironment;
@@ -33,7 +32,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -48,7 +46,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private final Runnable exitAction;
   private final StartOptions startOptions;
-  private final AtomicReference<Thread> commDaemonThreadRef = new AtomicReference<>();
+  private final AtomicReference<BattleshipsCommDaemon> commDaemonThreadRef =
+      new AtomicReference<>();
   private Optional<ScaleFactor> scaleFactor;
 
   public BattleshipsFrame(final StartOptions startOptions,
@@ -156,30 +155,9 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   protected void doLoadingCompleted() {
     final GamePanel gamePanel = new GamePanel(this.startOptions, this.scaleFactor);
 
-    final Thread commDaemonThread = new Thread(() -> {
-      LOGGER.info("Comm-Daemon started");
-      while (!Thread.currentThread().isInterrupted()) {
-        try {
-          Optional<BsGameEvent> event = this.opponent.pollGameEvent(Duration.ofMillis(100));
-          event.ifPresent(e -> {
-            LOGGER.info("Message to the game panel: " + e);
-            gamePanel.pushGameEvent(e);
-          });
-          event = gamePanel.pollGameEvent(Duration.ofMillis(100));
-          event.ifPresent(e -> {
-            LOGGER.info("Message to the opponent: " + e);
-            this.opponent.pushGameEvent(e);
-          });
-        } catch (InterruptedException ex) {
-          LOGGER.info("Comm-daemon has detected interruption");
-          Thread.currentThread().interrupt();
-        }
-      }
-      LOGGER.info("Comm-Daemon stopped");
-    }, "bs-communication-daemon");
-    commDaemonThread.setDaemon(true);
-    if (this.commDaemonThreadRef.compareAndSet(null, commDaemonThread)) {
-      commDaemonThread.start();
+    final BattleshipsCommDaemon newCommDaemon = new BattleshipsCommDaemon(gamePanel, this.opponent);
+    if (this.commDaemonThreadRef.compareAndSet(null, newCommDaemon)) {
+      newCommDaemon.start();
     }
     replaceContentPanel(gamePanel);
 
@@ -250,16 +228,10 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   private void doCloseWindow() {
     LOGGER.info("Closing game");
 
-    final Thread daemonThread = this.commDaemonThreadRef.getAndSet(null);
-    if (daemonThread != null) {
-      LOGGER.info("Interrupting comm daemon");
-      daemonThread.interrupt();
-      try {
-        daemonThread.join();
-      } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
-      }
-      LOGGER.info("Comm daemon has been interrupted");
+    final BattleshipsCommDaemon currentDaemon = this.commDaemonThreadRef.getAndSet(null);
+    if (currentDaemon != null) {
+      LOGGER.info("Disposing comm daemon");
+      currentDaemon.dispose();
     }
 
     try {

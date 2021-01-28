@@ -74,6 +74,17 @@ public class OpeningDialog extends javax.swing.JDialog {
     startOptions.getHostName().ifPresent(x -> this.textFieldHostName.setText(x));
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
+    this.radioMultiPlayer.addActionListener(e -> {
+      if (this.radioMultiPlayer.isSelected()) {
+        if (this.textFieldHostName.getText().isBlank()) {
+          this.textFieldHostName.setText("localhost");
+        }
+        if (this.textFieldPort.getText().isBlank()) {
+          this.textFieldPort.setText("30000");
+        }
+      }
+    });
+
     this.buttonGo.addActionListener(e -> {
       int hostPort = -1;
       try {
@@ -103,12 +114,6 @@ public class OpeningDialog extends javax.swing.JDialog {
 
   public Optional<StartOptions> getResult() {
     return Optional.ofNullable(this.result);
-  }
-
-  private void disableMultiplayer() {
-    this.radioMultiPlayer.setEnabled(false);
-    this.textFieldPort.setEnabled(false);
-    this.textFieldHostName.setEnabled(false);
   }
 
   private void initComponents() {

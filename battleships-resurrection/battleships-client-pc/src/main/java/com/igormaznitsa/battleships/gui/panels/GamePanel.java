@@ -28,8 +28,10 @@ import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_HIT;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_KILLED;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_LOST;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_MISS;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_AIRCARRIER;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_REGULAR;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_OPPONENT_STARTS;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_READY;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_MAINSHIP;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_REGULARSHIP;
 import static com.igormaznitsa.battleships.utils.Utils.RND;
 import static java.lang.Math.round;
 
@@ -74,11 +76,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.swing.Timer;
 
 public class GamePanel extends BasePanel implements BattleshipsPlayer {
+
+  private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
 
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(70);
   private static final int TICKS_BEFORE_CONTROL_ACTION = 3;
@@ -97,7 +102,6 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private final GameField gameField;
   private final BlockingQueue<BsGameEvent> incomingQueue = new ArrayBlockingQueue<>(10);
   private final BlockingQueue<BsGameEvent> outgoingQueue = new ArrayBlockingQueue<>(10);
-  private final BsGameEvent myReadyGameEvent;
   private Stage currentStage;
   private int stageStep;
   private ControlElement selectedControl;
@@ -239,10 +243,6 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       this.onTimer();
     });
     this.timer.setRepeats(true);
-
-    this.myReadyGameEvent =
-        new BsGameEvent(GameEventType.EVENT_READY, RND.nextInt(GameField.FIELD_EDGE),
-            RND.nextInt(GameField.FIELD_EDGE));
   }
 
   public static Point findShipRenderPositionForCell(final int cellX, final int cellY) {
@@ -547,14 +547,13 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       }
       break;
       case PLACEMENT_COMPLETED: {
-        this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_READY))
+        this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_OPPONENT_STARTS, EVENT_DO_TURN))
             .ifPresent(e -> {
-              if (BsGameEvent.isForceWaitForTurn(e) ||
-                  BsGameEvent.isFirstMoveLeft(this.myReadyGameEvent, e)) {
-                this.initStage(Stage.WAIT_FOR_TURN);
-              } else {
+              if (e.getType() == EVENT_OPPONENT_STARTS) {
                 this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
                 this.initStage(Stage.ENEMY_TURN);
+              } else if (e.getType() == EVENT_DO_TURN) {
+                this.initStage(Stage.PANEL_ENTER);
               }
             });
       }
@@ -585,7 +584,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
               .orElseThrow(() -> new Error("Target must be presented"));
           final ShipType firingShip = this.activateShipFire();
           this.fireEventToOpponent(new BsGameEvent(
-              firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_AIRCARRIER : EVENT_SHOT_REGULAR,
+              firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_MAINSHIP : EVENT_SHOT_REGULARSHIP,
               target.x, target.y));
           this.initStage(Stage.FIRING);
         }
@@ -646,7 +645,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                       this.gameField.tryRemoveShipAt(new Point(e.getX(), e.getY()));
                   if (removedShip.isEmpty()) {
                     this.fireEventToOpponent(
-                        new BsGameEvent(GameEventType.EVENT_SYSTEM_ERROR, 0, 0));
+                        new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
                     throw new Error("Can't remove killed enemy ship from map: " + e);
                   } else {
                     removedShip
@@ -668,14 +667,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case ENEMY_TURN: {
         if (this.activeFallingObjectSprite == null) {
           this.findGameEventInQueue(
-              EnumSet.of(GameEventType.EVENT_SHOT_AIRCARRIER, GameEventType.EVENT_SHOT_REGULAR))
+              EnumSet.of(GameEventType.EVENT_SHOT_MAINSHIP, GameEventType.EVENT_SHOT_REGULARSHIP))
               .ifPresent(e -> {
                 this.savedGameEvent.set(Optional.of(e));
                 final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
                 final Point targetCell = hitShip.map(
                     FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
 
-                if (e.getType() == EVENT_SHOT_AIRCARRIER) {
+                if (e.getType() == EVENT_SHOT_MAINSHIP) {
                   this.activeFallingObjectSprite =
                       new FallingAirplaneSprite(hitShip, targetCell);
                 } else {
@@ -933,7 +932,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         this.animatedSpriteField = this.gameField.moveFieldToShipSprites();
         //this.fillEmptyCellsByFish();
         this.gameField.reset();
-        this.fireEventToOpponent(this.myReadyGameEvent);
+        this.fireEventToOpponent(new BsGameEvent(EVENT_READY, 0, 0));
         this.initStage(Stage.PLACEMENT_END_ANIMATION);
       }
       break;
