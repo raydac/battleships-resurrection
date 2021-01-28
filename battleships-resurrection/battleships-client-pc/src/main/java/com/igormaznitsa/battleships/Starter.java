@@ -21,6 +21,7 @@ import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
+import com.igormaznitsa.battleships.opponent.OldGexBattleshipSingleSessionBot;
 import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -54,8 +55,12 @@ public class Starter {
         System.exit(0);
       }
 
-      final BattleshipsPlayer battleshipBot = new AiBattleshipsSingleSessionBot().startPlayer();
-//      final BattleshipsPlayer battleshipBot = new GexBattleshipSingleSessionBot(selectedData).startPlayer();
+      final BattleshipsPlayer selectedOpponent;
+      if (selectedData.isMultiPlayer()) {
+        selectedOpponent = new OldGexBattleshipSingleSessionBot(selectedData).startPlayer();
+      } else {
+        selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
+      }
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
           GraphicsConfiguration::getDevice);
 
@@ -67,11 +72,11 @@ public class Starter {
         device.ifPresentOrElse(d -> {
           if (d.isFullScreenSupported()) {
             LOGGER.info("Detected support of full screen: " + d);
-            mainFrameRef.set(new BattleshipsFrame(selectedData, battleshipBot, () -> {
+            mainFrameRef.set(new BattleshipsFrame(selectedData, selectedOpponent, () -> {
               try {
                 d.setFullScreenWindow(null);
               } finally {
-                battleshipBot.disposePlayer();
+                selectedOpponent.disposePlayer();
               }
             }));
             final DisplayMode displayMode = new DisplayMode(800, 600, DisplayMode.BIT_DEPTH_MULTI,
@@ -110,8 +115,8 @@ public class Starter {
         });
       } else {
         mainFrameRef
-            .set(new BattleshipsFrame(selectedData, battleshipBot,
-                battleshipBot::disposePlayer));
+            .set(new BattleshipsFrame(selectedData, selectedOpponent,
+                selectedOpponent::disposePlayer));
       }
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();

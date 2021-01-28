@@ -464,7 +464,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       }
       break;
       case PANEL_EXIT:
-      case PLACEMENT_END: {
+      case PLACEMENT_END_ANIMATION: {
         Sound.MENU_SCREEN_OUT.play();
       }
       break;
@@ -538,20 +538,25 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         }
       }
       break;
-      case PLACEMENT_END: {
+      case PLACEMENT_END_ANIMATION: {
         if (this.stageStep < E1_NEW.getLength() - 1) {
           this.stageStep++;
         } else {
-          this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_READY))
-              .ifPresent(e -> {
-                if (BsGameEvent.isFirstMoveLeft(this.myReadyGameEvent, e)) {
-                  this.initStage(Stage.WAIT_FOR_TURN);
-                } else {
-                  this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
-                  this.initStage(Stage.ENEMY_TURN);
-                }
-              });
+          this.initStage(Stage.PLACEMENT_COMPLETED);
         }
+      }
+      break;
+      case PLACEMENT_COMPLETED: {
+        this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_READY))
+            .ifPresent(e -> {
+              if (BsGameEvent.isForceWaitForTurn(e) ||
+                  BsGameEvent.isFirstMoveLeft(this.myReadyGameEvent, e)) {
+                this.initStage(Stage.WAIT_FOR_TURN);
+              } else {
+                this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+                this.initStage(Stage.ENEMY_TURN);
+              }
+            });
       }
       break;
       case WAIT_FOR_TURN: {
@@ -835,6 +840,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         g2d.drawImage(PANEL.getLast(), null, 0, 100);
         g2d.drawImage(E1_NEW.getLast(), null, 0, 0);
         g2d.drawImage(E2_NEW.getLast(), null, 512, 0);
+        this.currentStage.getBanner().render(g2d, BANNER_COORD);
         this.drawNumberOfShipsOnPanel(g2d, this.gameField.getShipsCount(ShipType.AIR_CARRIER),
             this.gameField.getShipsCount(ShipType.DREADNOUGHT),
             this.gameField.getShipsCount(ShipType.GUARD_SHIP),
@@ -842,7 +848,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         this.renderActionPanel(g2d, ACTION_PANEL_AREA.x, ACTION_PANEL_AREA.y, this.gameField, true);
       }
       break;
-      case PLACEMENT_END: {
+      case PLACEMENT_END_ANIMATION: {
         final int dx = round((PANEL.getWidth() / (float) E1_NEW.getLength()) * this.stageStep);
         g2d.drawImage(PANEL.getLast(), null, -dx, 100);
         g2d.drawImage(E1_NEW.getFrame(E1_NEW.getLength() - this.stageStep - 1),
@@ -863,6 +869,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         g2d.drawImage(E2_NEW.getFrame(this.stageStep), null, 512, 0);
       }
       break;
+      case PLACEMENT_COMPLETED:
       case FIRING:
       case WAIT_FOR_TURN:
       case ENEMY_TURN:
@@ -870,6 +877,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case FIRING_RESULT: {
         g2d.drawImage(E1_NEW.getFirst(), null, 0, 0);
         g2d.drawImage(E2_NEW.getFirst(), null, 512, 0);
+        this.currentStage.getBanner().render(g2d, BANNER_COORD);
       }
       break;
       case PANEL_EXIT: {
@@ -911,7 +919,6 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       break;
     }
 
-    this.currentStage.getBanner().render(g2d, BANNER_COORD);
   }
 
   private void doProcessGameControl(final ControlElement control) {
@@ -927,7 +934,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         //this.fillEmptyCellsByFish();
         this.gameField.reset();
         this.fireEventToOpponent(this.myReadyGameEvent);
-        this.initStage(Stage.PLACEMENT_END);
+        this.initStage(Stage.PLACEMENT_END_ANIMATION);
       }
       break;
       case NEUTRAL: {
@@ -968,8 +975,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private enum Stage {
     PLACEMENT_START(InfoBanner.NONE),
     PLACING(InfoBanner.PLACEMENT),
-    PLACEMENT_END(InfoBanner.NONE),
-    WAIT_FOR_TURN(InfoBanner.NONE),
+    PLACEMENT_END_ANIMATION(InfoBanner.NONE),
+    PLACEMENT_COMPLETED(InfoBanner.WAIT_OPPONENT),
+    WAIT_FOR_TURN(InfoBanner.WAIT_OPPONENT),
     PANEL_ENTER(InfoBanner.NONE),
     TARGET_SELECT(InfoBanner.YOUR_MOVE),
     PANEL_EXIT(InfoBanner.NONE),

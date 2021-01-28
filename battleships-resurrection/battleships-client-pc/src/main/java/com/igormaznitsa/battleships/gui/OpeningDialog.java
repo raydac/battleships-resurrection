@@ -97,8 +97,6 @@ public class OpeningDialog extends javax.swing.JDialog {
       this.dispose();
     });
 
-    this.disableMultiplayer();
-
     this.getContentPane().doLayout();
     this.pack();
   }

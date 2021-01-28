@@ -352,9 +352,10 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
 
   private synchronized void onIncomingGameEvent(BsGameEvent event) {
     if (event.getType() == GameEventType.EVENT_READY) {
-      final BsGameEvent doMoveEvent = new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0);
-      if (BsGameEvent.isFirstMoveLeft(event, this.myReadyGameEvent)) {
-        pushIntoOutput(doMoveEvent);
+      final BsGameEvent doTurn = new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0);
+      if (!BsGameEvent.isForceWaitForTurn(event) &&
+          BsGameEvent.isFirstMoveLeft(event, this.myReadyGameEvent)) {
+        pushIntoOutput(doTurn);
       }
     } else {
       switch (requireNonNull(event).getType()) {
