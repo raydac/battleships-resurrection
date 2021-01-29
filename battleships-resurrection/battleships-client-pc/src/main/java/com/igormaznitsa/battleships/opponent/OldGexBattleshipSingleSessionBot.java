@@ -20,6 +20,9 @@ import static java.util.Arrays.stream;
 
 
 import com.igormaznitsa.battleships.gui.StartOptions;
+import com.igormaznitsa.battleships.gui.panels.GameField;
+import com.igormaznitsa.battleships.utils.Utils;
+import java.awt.Point;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -32,6 +35,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -69,12 +73,16 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   private volatile BsGameEvent lastShot = null;
   private volatile boolean readyAlreadySent = false;
 
+  private final GameField gameField = new GameField();
+
+  private final int[] enemyShipNumber = new int[] {4, 3, 2, 1};
+
   public OldGexBattleshipSingleSessionBot(final StartOptions startOptions) {
     this.id = startOptions.getHostName().orElse("") + ':' + startOptions.getHostPort().orElse(-1);
 
     final UUID uuid = UUID.randomUUID();
     this.playerId =
-        (int) (0x7FFFFFFFL & uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
+        0x7FFFFFFF & (int) (uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
     LOGGER.info("Generated player ID: " + this.playerId);
     this.httpClient = HttpClient.newHttpClient();
     try {
@@ -257,8 +265,19 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
           LOGGER.log(Level.SEVERE, "Unexpected X Y in incoming move: " + cellX + ", " + cellY);
           this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
         } else {
+          final int numberAliveShips = Arrays.stream(this.enemyShipNumber).sum();
+          final boolean mainShipPresented = this.enemyShipNumber[3] > 0;
+
+          final GameEventType shot;
+
+          if (mainShipPresented && Utils.RND.nextInt(numberAliveShips) == 0) {
+            shot = GameEventType.EVENT_SHOT_MAIN;
+          } else {
+            shot = GameEventType.EVENT_SHOT_REGULAR;
+          }
+
           this.pushIntoOutput(
-              new BsGameEvent(GameEventType.EVENT_SHOT_REGULAR, cellX, cellY));
+              new BsGameEvent(shot, cellX, cellY));
         }
       }
       break;
@@ -272,6 +291,8 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         } else {
           switch (packet[1]) {
             case 3: { // HIT
+              this.gameField
+                  .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.HIT);
               this.pushIntoOutput(
                   new BsGameEvent(GameEventType.EVENT_HIT, foundLastShot.getX(),
                       foundLastShot.getY()));
@@ -279,12 +300,42 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
             }
             break;
             case 4: { // KILL
-              this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_KILLED,
-                  foundLastShot.getX(), foundLastShot.getY()));
-              this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+              this.gameField
+                  .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.KILL);
+              final List<Point> shipPoints =
+                  this.gameField
+                      .tryRemoveShipAt(new Point(foundLastShot.getX(), foundLastShot.getY()));
+              if (shipPoints.isEmpty() || shipPoints.size() > 4 ||
+                  this.enemyShipNumber[shipPoints.size() - 1] == 0) {
+                LOGGER.severe("Detected unexpected state of enemy map");
+                this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+              } else {
+                LOGGER.info("Detected kill of ship: " + shipPoints.size());
+                this.enemyShipNumber[shipPoints.size() - 1]--;
+                if (Arrays.stream(this.enemyShipNumber).allMatch(x -> x == 0)) {
+                  LOGGER.info("Detected all enemy ship destruction, ending game");
+                  this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_LOST,
+                      foundLastShot.getX(), foundLastShot.getY()));
+                  try {
+                    this.sendDataPacketToServer(ProtocolEvent.EXIT, 0, 0, 0);
+                  } catch (IOException ex) {
+                    LOGGER.severe("Can't send exit signal for error: " + ex.getMessage());
+                  } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                  } finally {
+                    this.sessionId.set(Optional.empty());
+                  }
+                } else {
+                  this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_KILLED,
+                      foundLastShot.getX(), foundLastShot.getY()));
+                  this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+                }
+              }
             }
             break;
             case 5: { // MISS
+              this.gameField
+                  .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.MISS);
               this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_MISS,
                   foundLastShot.getX(), foundLastShot.getY()));
             }
@@ -484,6 +535,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
   @Override
   public BattleshipsPlayer startPlayer() {
+    this.gameField.reset();
     final Thread threadIn = new Thread(this::doRunIn, "bs-gex-bot-in-" + this.playerId);
     threadIn.setDaemon(true);
     if (!this.threadInput.compareAndSet(null, threadIn)) {
