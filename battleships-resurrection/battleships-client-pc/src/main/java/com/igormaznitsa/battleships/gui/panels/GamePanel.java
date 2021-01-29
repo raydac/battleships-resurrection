@@ -23,12 +23,13 @@ import static com.igormaznitsa.battleships.gui.Animation.PANEL;
 import static com.igormaznitsa.battleships.gui.Animation.PAUSE_EXIT;
 import static com.igormaznitsa.battleships.gui.Animation.SPLASH;
 import static com.igormaznitsa.battleships.gui.Animation.SPLASH_GOR;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_ARRANGEMENT_COMPLETED;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_DO_TURN;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_HIT;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_KILLED;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_LOST;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_MISS;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_OPPONENT_STARTS;
+import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_OPPONENT_FIRST_TURN;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_READY;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_MAIN;
 import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_REGULAR;
@@ -432,7 +433,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       result = this.incomingQueue.poll();
       if (result == null) {
         break;
-      } else if (expected.contains(result.getType())) {
+      } else if (result.getType().isForced() || expected.contains(result.getType())) {
         break;
       } else {
         if (!this.incomingQueue.offer(result)) {
@@ -552,25 +553,37 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         if (this.stageStep < E1_NEW.getLength() - 1) {
           this.stageStep++;
         } else {
+          this.fireEventToOpponent(new BsGameEvent(EVENT_ARRANGEMENT_COMPLETED, 0, 0));
           this.initStage(Stage.PLACEMENT_COMPLETED);
         }
       }
       break;
       case PLACEMENT_COMPLETED: {
-        this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_OPPONENT_STARTS, EVENT_DO_TURN))
+        this.findGameEventInQueue(EnumSet.of(
+            EVENT_OPPONENT_FIRST_TURN,
+            EVENT_DO_TURN
+        ))
             .ifPresent(e -> {
-              if (e.getType() == EVENT_OPPONENT_STARTS) {
+              if (e.getType() == EVENT_OPPONENT_FIRST_TURN) {
                 this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
                 this.initStage(Stage.ENEMY_TURN);
               } else if (e.getType() == EVENT_DO_TURN) {
                 this.initStage(Stage.PANEL_ENTER);
+              } else {
+                this.processUnexpectedEvent(e);
               }
             });
       }
       break;
       case WAIT_FOR_TURN: {
         this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_DO_TURN))
-            .ifPresent(e -> this.initStage(Stage.PANEL_ENTER));
+            .ifPresent(e -> {
+              if (e.getType() == EVENT_DO_TURN) {
+                this.initStage(Stage.PANEL_ENTER);
+              } else {
+                this.processUnexpectedEvent(e);
+              }
+            });
       }
       break;
       case PANEL_ENTER: {
@@ -583,7 +596,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       break;
       case PLACING:
       case TARGET_SELECT: {
-        // do nothing
+        this.findGameEventInQueue(Collections.emptySet())
+            .ifPresent(this::processUnexpectedEvent);
       }
       break;
       case PANEL_EXIT: {
@@ -631,6 +645,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                         Sound.OUR_WATER_SPLASH_ONLY);
               }
               break;
+              default:
+                this.processUnexpectedEvent(e);
+                break;
             }
           });
         } else if (this.activeDecorationSprite.isCompleted()) {
@@ -679,20 +696,24 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
           this.findGameEventInQueue(
               EnumSet.of(GameEventType.EVENT_SHOT_MAIN, GameEventType.EVENT_SHOT_REGULAR))
               .ifPresent(e -> {
-                this.savedGameEvent.set(Optional.of(e));
-                final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
-                final Point targetCell = hitShip.map(
-                    FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
+                if (e.getType() == EVENT_SHOT_MAIN || e.getType() == EVENT_SHOT_REGULAR) {
+                  this.savedGameEvent.set(Optional.of(e));
+                  final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
+                  final Point targetCell = hitShip.map(
+                      FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
 
-                if (e.getType() == EVENT_SHOT_MAIN) {
-                  this.activeFallingObjectSprite =
-                      new FallingAirplaneSprite(hitShip, targetCell);
+                  if (e.getType() == EVENT_SHOT_MAIN) {
+                    this.activeFallingObjectSprite =
+                        new FallingAirplaneSprite(hitShip, targetCell);
+                  } else {
+                    this.activeFallingObjectSprite =
+                        new FallingRocketSprite(hitShip, targetCell);
+                  }
+                  this.animatedSpriteField.add(this.activeFallingObjectSprite);
+                  Collections.sort(this.animatedSpriteField);
                 } else {
-                  this.activeFallingObjectSprite =
-                      new FallingRocketSprite(hitShip, targetCell);
+                  this.processUnexpectedEvent(e);
                 }
-                this.animatedSpriteField.add(this.activeFallingObjectSprite);
-                Collections.sort(this.animatedSpriteField);
               });
         } else if (this.activeFallingObjectSprite.isCompleted()) {
           this.animatedSpriteField.remove(this.activeFallingObjectSprite);
@@ -773,6 +794,26 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       }
     }
     this.refreshUi();
+  }
+
+  private void processUnexpectedEvent(final BsGameEvent unexpectedEvent) {
+    if (unexpectedEvent == null) {
+      throw new NullPointerException("Unexpected event is null");
+    }
+    switch (unexpectedEvent.getType()) {
+      case EVENT_FAILURE: {
+        this.fireSignal(SIGNAL_SYSTEM_FAILURE);
+      }
+      break;
+      case EVENT_CONNECTION_ERROR:
+      case EVENT_GAME_ROOM_CLOSED: {
+        this.fireSignal(SIGNAL_PLAYER_IS_OUT);
+      }
+      break;
+      default: {
+        throw new Error("Non-processed unexpected event: " + unexpectedEvent);
+      }
+    }
   }
 
   private boolean noAnyFiringShip() {

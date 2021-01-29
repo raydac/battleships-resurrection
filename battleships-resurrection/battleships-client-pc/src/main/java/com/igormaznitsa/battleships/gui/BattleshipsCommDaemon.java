@@ -17,11 +17,13 @@ package com.igormaznitsa.battleships.gui;
 
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.BsGameEvent;
+import com.igormaznitsa.battleships.opponent.FirstMoveOrderProvider;
 import com.igormaznitsa.battleships.opponent.GameEventType;
 import com.igormaznitsa.battleships.utils.Utils;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -49,7 +51,7 @@ final class BattleshipsCommDaemon {
   }
 
   public void dispose() {
-    this.playerA.pushGameEvent(new BsGameEvent(GameEventType.CLOSING_GAME, 0, 0));
+    this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_GAME_ROOM_CLOSED, 0, 0));
     this.thread.interrupt();
     try {
       this.thread.join();
@@ -71,11 +73,12 @@ final class BattleshipsCommDaemon {
         opponent.pushGameEvent(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
       }
       break;
-      case CLOSING_GAME: {
-        LOGGER.info("Player '" + source.getId() + "' is leaving game room");
+      case EVENT_GAME_ROOM_CLOSED: {
+        LOGGER.info("Server or player '" + source.getId() + "' is leaving game room");
         opponent.pushGameEvent(event);
       }
       break;
+      case EVENT_ARRANGEMENT_COMPLETED:
       case EVENT_RESUME:
       case EVENT_PAUSE: {
         opponent.pushGameEvent(event);
@@ -97,7 +100,7 @@ final class BattleshipsCommDaemon {
         Optional<BsGameEvent> event = this.playerA.pollGameEvent(Duration.ofMillis(100));
         event.ifPresent(e -> {
           LOGGER.info("Message from A: " + e);
-          if (e.getType().isServiceEvent()) {
+          if (e.getType().isNotification()) {
             this.onServiceEvent(this.playerA, e);
           } else {
             this.playerB.pushGameEvent(e);
@@ -106,7 +109,7 @@ final class BattleshipsCommDaemon {
         event = this.playerB.pollGameEvent(Duration.ofMillis(100));
         event.ifPresent(e -> {
           LOGGER.info("Message from B: " + e);
-          if (e.getType().isServiceEvent()) {
+          if (e.getType().isNotification()) {
             this.onServiceEvent(this.playerB, e);
           } else {
             this.playerA.pushGameEvent(e);
@@ -124,12 +127,34 @@ final class BattleshipsCommDaemon {
     if ("ok".equals(this.playerSessionRecords.get(this.playerA.getId()).getOrDefault("ready", "no"))
         && "ok".equals(
         this.playerSessionRecords.get(this.playerB.getId()).getOrDefault("ready", "no"))) {
-      final boolean firstTurnA = Utils.RND.nextBoolean();
-      LOGGER.info("Both ready signal presented, first turn " + (firstTurnA ? "A" : "B"));
-      if (firstTurnA) {
-        this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_STARTS, 0, 0));
+
+      LOGGER.info("Both players ready signals collected");
+
+      final FirstMoveOrderProvider firstMoveOrderProvider;
+      if (this.playerA instanceof FirstMoveOrderProvider) {
+        LOGGER.info("Player A is first turn order provider");
+        firstMoveOrderProvider = (FirstMoveOrderProvider) this.playerA;
+      } else if (this.playerB instanceof FirstMoveOrderProvider) {
+        LOGGER.info("Player B is first turn order provider");
+        firstMoveOrderProvider = (FirstMoveOrderProvider) this.playerB;
       } else {
-        this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_STARTS, 0, 0));
+        LOGGER.info("Using internal dice to choose first turn player");
+        firstMoveOrderProvider = new FirstMoveOrderProvider() {
+          @Override
+          public BattleshipsPlayer findFirstTurnPlayer(final BattleshipsPlayer playerA,
+                                                       final BattleshipsPlayer playerB) {
+            return Utils.RND.nextBoolean() ? playerA : playerB;
+          }
+        };
+      }
+
+      final BattleshipsPlayer firstTurnPlayer = Objects
+          .requireNonNull(firstMoveOrderProvider.findFirstTurnPlayer(this.playerA, this.playerB));
+      LOGGER.info("first turn player is " + (firstTurnPlayer == this.playerA ? "A" : "B"));
+      if (this.playerA == firstTurnPlayer) {
+        this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+      } else {
+        this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
       }
     }
   }

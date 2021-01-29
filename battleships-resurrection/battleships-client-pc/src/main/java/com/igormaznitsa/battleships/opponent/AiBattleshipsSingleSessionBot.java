@@ -357,7 +357,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
 
   private synchronized void onIncomingGameEvent(BsGameEvent event) {
       switch (requireNonNull(event).getType()) {
-        case EVENT_OPPONENT_STARTS: {
+        case EVENT_OPPONENT_FIRST_TURN: {
           LOGGER.info("Opponent starts");
           pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
         }

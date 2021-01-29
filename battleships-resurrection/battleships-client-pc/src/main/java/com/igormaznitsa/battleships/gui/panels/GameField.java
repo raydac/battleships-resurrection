@@ -120,7 +120,10 @@ public final class GameField {
   }
 
   public void autoPlacingFreeShips() {
-    for (final ShipType shipType : ShipType.values()) {
+    final List<ShipType> sortedShipTypesFromDescend = Arrays.stream(ShipType.values())
+        .sorted((o1, o2) -> Integer.compare(o2.getCells(), o1.getCells()))
+        .collect(Collectors.toList());
+    for (final ShipType shipType : sortedShipTypesFromDescend) {
       while (this.freeShipsCount[shipType.ordinal()] > 0) {
         final List<Integer> freeCells = IntStream.range(0, this.gameField.length)
             .filter(x -> this.gameField[x] == CellState.EMPTY)

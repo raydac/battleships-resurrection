@@ -25,12 +25,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
@@ -43,31 +42,32 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
+public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, FirstMoveOrderProvider {
+
+  private static final int PACKET_HEADER = 0xFFCAFE00;
 
   private static final Logger LOGGER =
       Logger.getLogger(OldGexBattleshipSingleSessionBot.class.getName());
-
+  private static final int MOVE_MISS = 5;
+  private static final int MOVE_HIT = 3;
+  private static final int MOVE_KILLED = 4;
+  private volatile boolean myFirstTurn;
   private final BlockingQueue<BsGameEvent> queueIn = new ArrayBlockingQueue<>(10);
   private final BlockingQueue<BsGameEvent> queueOut = new ArrayBlockingQueue<>(10);
-
   private final HttpClient httpClient;
-
   private final String id;
-
   private final URI uriInput;
   private final URI uriOutput;
   private final URI uriTest;
-
   private final AtomicLong packetCounter = new AtomicLong();
-
-  private static final int PACKET_HEADER = 0xFFCAFE00;
   private final int playerId;
   private final AtomicReference<Optional<String>> sessionId =
       new AtomicReference<>(Optional.empty());
   private final AtomicReference<Thread> threadInput = new AtomicReference<>();
   private final AtomicReference<Thread> threadOutput = new AtomicReference<>();
   private final AtomicReference<InputStream> openedInputStream = new AtomicReference<>();
+  private volatile BsGameEvent lastShot = null;
+  private volatile boolean readyAlreadySent = false;
 
   public OldGexBattleshipSingleSessionBot(final StartOptions startOptions) {
     this.id = startOptions.getHostName().orElse("") + ':' + startOptions.getHostPort().orElse(-1);
@@ -125,6 +125,21 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
     }
   }
 
+  @Override
+  public BattleshipsPlayer findFirstTurnPlayer(final BattleshipsPlayer playerA,
+                                               final BattleshipsPlayer playerB) {
+    final BattleshipsPlayer me;
+    final BattleshipsPlayer opponent;
+    if (this == playerA) {
+      me = playerB;
+      opponent = playerA;
+    } else {
+      me = playerA;
+      opponent = playerB;
+    }
+    return this.myFirstTurn ? me : opponent;
+  }
+
   public boolean doTestCall() {
     try {
       final HttpURLConnection connection =
@@ -140,7 +155,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private void doRunIn() {
     try {
-      LOGGER.info("Processing of incoming packets started");
+      LOGGER.info("Processing of incoming network packets started");
       while (!Thread.currentThread().isInterrupted()) {
         final HttpURLConnection httpURLConnection;
         try {
@@ -183,7 +198,15 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
                   if (checkSum != packetBuffer[4]) {
                     packetBuffer[0] = ProtocolEvent.NETWORK_ERROR.code;
                   }
-                  this.onIncomingPacket(packetBuffer);
+                  if (packetBuffer[0] == ProtocolEvent.NONE.code) {
+                    try {
+                      Thread.sleep(10);
+                    } catch (InterruptedException ex) {
+                      Thread.currentThread().interrupt();
+                    }
+                  } else {
+                    this.onIncomingPacket(packetBuffer);
+                  }
                   bufferPointer = -1;
                 }
               } else {
@@ -209,57 +232,115 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private void onIncomingPacket(final int[] packet) {
     final ProtocolEvent event = ProtocolEvent.findForCode(packet[0]);
-    LOGGER.info("Detected incoming event " + event + ": " + Arrays.toString(packet));
+    LOGGER.info("Incoming event " + event + " " + Arrays.toString(packet));
     switch (event) {
       case JOIN_SESSION:
       case NEW_SESSION: {
         final String session = Integer.toString(packet[1]);
         this.sessionId.set(Optional.of(session));
-        final boolean myFirstTurn = packet[2] != 0;
+        this.myFirstTurn = packet[2] != 0;
         LOGGER.info((event == ProtocolEvent.NEW_SESSION ? "Created session " : "Joined session ") +
-            session + ", first turn is " + (myFirstTurn ? "MINE" : "OPPONENT"));
+            session + ", first turn is " + (myFirstTurn ? "MINE" : "OPPONENT'S"));
       }
       break;
+      case OPPONENT_LOST:
       case EXIT:
-      case OPPONENT_LOST: {
-        // ??? do nothing like in the mobile version ???
+      case SESSION_REMOVE: {
+        this.sessionId.set(Optional.empty());
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_GAME_ROOM_CLOSED, 0, 0));
       }
       break;
-      case SESSION_REMOVE: {
-        // game session has been removed
-      }
       case GAME_MOVE: {
-        // fire X,Y,0
+        final int cellX = packet[1];
+        final int cellY = packet[2];
+        if (cellX < 0 || cellX > 9 || cellY < 0 || cellY > 9) {
+          LOGGER.log(Level.SEVERE, "Unexpected X Y in incoming move: " + cellX + ", " + cellY);
+          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+        } else {
+          this.pushIntoOutput(
+              new BsGameEvent(GameEventType.EVENT_SHOT_REGULAR, cellX, cellY));
+        }
       }
       break;
       case GAME_RESULT: {
-        // fire result A,0,0
-        // A is HIT=3, KILL=4, MISS=5
+        final BsGameEvent foundLastShot = this.lastShot;
+        if (foundLastShot == null) {
+          LOGGER.log(Level.SEVERE, "Got result but without shot");
+          this.placeEventIntoInQueue(
+              new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, foundLastShot.getX(),
+                  foundLastShot.getY()));
+        } else {
+          switch (packet[1]) {
+            case 3: { // HIT
+              this.pushIntoOutput(
+                  new BsGameEvent(GameEventType.EVENT_HIT, foundLastShot.getX(),
+                      foundLastShot.getY()));
+              this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+            }
+            break;
+            case 4: { // KILL
+              this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_KILLED,
+                  foundLastShot.getX(), foundLastShot.getY()));
+              this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+            }
+            break;
+            case 5: { // MISS
+              this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_MISS,
+                  foundLastShot.getX(), foundLastShot.getY()));
+            }
+            break;
+            default: {
+              LOGGER.log(Level.SEVERE, "Unexpected turn result: " + packet[1]);
+              this.placeEventIntoInQueue(
+                  new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
+            }
+            break;
+          }
+        }
       }
       break;
-      case OPPONENT_JOIN:
-      case PAUSE: {
+      case OPPONENT_JOIN: {
         // opponent has turned on pause mode
       }
       break;
-      case SERVER_GAME: {
-        // opponent in game
+      case IN_GAME: {
+        if (this.readyAlreadySent) {
+          // player resumed
+          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_RESUME, 0, 0));
+        } else {
+          // game has started
+          this.readyAlreadySent = true;
+          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, 0, 0));
+        }
       }
       break;
+      case PAUSE:
       case SERVER_PAUSE: {
         // notification that server paused
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_PAUSE, 0, 0));
       }
       break;
       case SERVER_RESUMED: {
         // notification that server work resumed
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_RESUME, 0, 0));
       }
       break;
       case NETWORK_ERROR: {
-
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
+      }
+      break;
+      default: {
+        LOGGER.severe("Unexpected incoming event: " + event + " [" + Arrays.toString(packet) + ']');
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
       }
       break;
     }
-    LOGGER.info("Incoming packet: " + Arrays.toString(packet));
+  }
+
+  private void pushIntoOutput(final BsGameEvent event) {
+    if (!this.queueOut.offer(event)) {
+      throw new Error("Can't queue out-coming event: " + event);
+    }
   }
 
   private void placeEventIntoInQueue(final BsGameEvent event) {
@@ -276,40 +357,129 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
   private void doRunOut() {
     while (!Thread.currentThread().isInterrupted()) {
       try {
-        final BsGameEvent event = this.queueOut.take();
+        final BsGameEvent event = this.queueIn.take();
 
+        ProtocolEvent sendEvent = ProtocolEvent.NONE;
+        int arg1 = 0;
+        int arg2 = 0;
+        int arg3 = 0;
+
+        switch (event.getType()) {
+          case EVENT_OPPONENT_FIRST_TURN: {
+            this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+          }
+          break;
+          case EVENT_READY:
+          case EVENT_RESUME:
+          case EVENT_ARRANGEMENT_COMPLETED:
+          case EVENT_DO_TURN: {
+            sendEvent = ProtocolEvent.IN_GAME;
+          }
+          break;
+          case EVENT_FAILURE: {
+            sendEvent = ProtocolEvent.NETWORK_ERROR;
+          }
+          break;
+          case EVENT_PAUSE: {
+            sendEvent = ProtocolEvent.PAUSE;
+          }
+          break;
+          case EVENT_SHOT_MAIN:
+          case EVENT_SHOT_REGULAR: {
+            this.lastShot = event;
+            sendEvent = ProtocolEvent.GAME_MOVE;
+            arg1 = event.getX();
+            arg2 = event.getY();
+          }
+          break;
+          case EVENT_LOST:
+          case EVENT_KILLED:
+          case EVENT_MISS:
+          case EVENT_HIT: {
+            sendEvent = ProtocolEvent.GAME_RESULT;
+            switch (event.getType()) {
+              case EVENT_LOST:
+              case EVENT_KILLED: {
+                arg1 = MOVE_KILLED;
+              }
+              break;
+              case EVENT_MISS: {
+                this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+                arg1 = MOVE_MISS;
+              }
+              break;
+              case EVENT_HIT:
+                arg1 = MOVE_HIT;
+                break;
+            }
+          }
+          break;
+          default: {
+            LOGGER.log(Level.SEVERE, "Unexpected event: " + event);
+            sendEvent = ProtocolEvent.EXIT;
+            this.placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+          }
+          break;
+        }
+        if (sendEvent != ProtocolEvent.NONE) {
+          LOGGER.info("Sending event " + sendEvent + " " + arg1 + "," + arg2 + "," + arg3);
+          try {
+            this.sendDataPacketToServer(sendEvent, arg1, arg2, arg3);
+            LOGGER.info("Event " + sendEvent + " has been sent");
+          } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Can't send packet to server", ex);
+            this.placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+          }
+        }
       } catch (InterruptedException ex) {
         Thread.currentThread().interrupt();
       }
     }
   }
 
-  private void sendDataPacketToServer(final String sessionId, final int... packet)
+  private void sendDataPacketToServer(final ProtocolEvent event, final int arg1, final int arg2,
+                                      final int arg3)
       throws IOException, InterruptedException {
+
     final ByteArrayOutputStream bufferStream = new ByteArrayOutputStream();
     final DataOutputStream dataStream = new DataOutputStream(bufferStream);
 
-    for (final int d : packet) {
-      dataStream.writeInt(d);
-    }
-    dataStream.write(stream(packet).sum());
+    dataStream.writeInt(PACKET_HEADER);
+    dataStream.writeInt(event.code);
+    dataStream.writeInt(arg1);
+    dataStream.writeInt(arg2);
+    dataStream.writeInt(arg3);
+    dataStream.writeInt(event.code + arg1 + arg2 + arg3);
+    dataStream.flush();
+    dataStream.close();
 
-    final byte[] data = null;
-    final HttpRequest request = HttpRequest.newBuilder(this.uriOutput)
-        .POST(HttpRequest.BodyPublishers.ofByteArray(data))
-        .setHeader("playerID", Integer.toString(this.playerId))
-        .setHeader("sessionID", sessionId)
-        .setHeader("pn", Long.toString(this.packetCounter.get()))
-        .build();
-    final HttpResponse<Void> result =
-        this.httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+    final byte[] data = bufferStream.toByteArray();
+
+    final HttpURLConnection connection =
+        prepareConnection("POST", this.uriOutput, this.playerId, this.sessionId.get(), true, true);
+    connection.setRequestProperty("pn", Long.toString(this.packetCounter.get()));
+
+    connection.connect();
+    try (final OutputStream outputStream = connection.getOutputStream()) {
+      outputStream.write(data);
+      outputStream.flush();
+    }
+    final int responseCode = connection.getResponseCode();
+    LOGGER.info("Opened connection, got response code: " + responseCode);
+    if (responseCode != 200) {
+      LOGGER.log(Level.SEVERE,
+          "Can't send package to server, response status " + responseCode + ": " +
+              Arrays.toString(data));
+      throw new IOException("Error response code: " + responseCode);
+    }
+    connection.disconnect();
+    LOGGER.info("Packet successfully sent");
     this.packetCounter.incrementAndGet();
   }
 
-
   @Override
-  public Optional<BsGameEvent> pollGameEvent(Duration duration) throws InterruptedException {
-    return Optional.empty();
+  public Optional<BsGameEvent> pollGameEvent(final Duration duration) throws InterruptedException {
+    return Optional.ofNullable(this.queueOut.poll(duration.toMillis(), TimeUnit.MILLISECONDS));
   }
 
   @Override
@@ -334,7 +504,16 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   @Override
   public void pushGameEvent(final BsGameEvent event) {
-
+    if (event != null) {
+      try {
+        if (!this.queueIn.offer(event, 5, TimeUnit.SECONDS)) {
+          this.placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+          throw new Error("Can't place event: " + event);
+        }
+      } catch (InterruptedException ex) {
+        throw new Error("Can't place data into queue for long time: " + event);
+      }
+    }
   }
 
   @Override
@@ -387,7 +566,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer {
     WAIT_PACKET(13),
     LOCK_PACKET(14),
     SERVER_OVERLOADED(15),
-    SERVER_GAME(16),
+    IN_GAME(16),
     SERVER_PAUSE(17),
     SERVER_RESUMED(18),
     NETWORK_ERROR(19);

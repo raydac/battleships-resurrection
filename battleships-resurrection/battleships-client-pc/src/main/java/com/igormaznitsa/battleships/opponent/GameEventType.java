@@ -17,9 +17,10 @@ package com.igormaznitsa.battleships.opponent;
 
 public enum GameEventType {
   EVENT_READY(true),
-  EVENT_OPPONENT_STARTS(true),
+  EVENT_ARRANGEMENT_COMPLETED(true),
+  EVENT_OPPONENT_FIRST_TURN(true),
   EVENT_PAUSE(true),
-  EVENT_CONNECTION_ERROR(true),
+  EVENT_CONNECTION_ERROR(true, true),
   EVENT_RESUME(true),
   EVENT_SHOT_REGULAR(false),
   EVENT_SHOT_MAIN(false),
@@ -28,16 +29,26 @@ public enum GameEventType {
   EVENT_KILLED(false),
   EVENT_MISS(false),
   EVENT_LOST(false),
-  EVENT_FAILURE(true),
-  CLOSING_GAME(true);
+  EVENT_FAILURE(true, true),
+  EVENT_GAME_ROOM_CLOSED(true, true);
 
-  private final boolean serviceEvent;
+  private final boolean notification;
+  private final boolean force;
 
-  GameEventType(final boolean specialEvent) {
-    this.serviceEvent = specialEvent;
+  GameEventType(final boolean notification) {
+    this(notification, false);
   }
 
-  public boolean isServiceEvent() {
-    return this.serviceEvent;
+  GameEventType(final boolean notification, final boolean force) {
+    this.notification = notification;
+    this.force = force;
+  }
+
+  public boolean isForced() {
+    return this.force;
+  }
+
+  public boolean isNotification() {
+    return this.notification;
   }
 }
