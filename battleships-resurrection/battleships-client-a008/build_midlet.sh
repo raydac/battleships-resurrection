@@ -88,14 +88,16 @@ echo creating JAD
 
 JAR_SIZE=$(wc -c $TARGET_JAR | cut -d " " -f1)
 
-echo MIDlet-1: BattleShip, /Icon.png,  com.raydac.j2me.midlets.battleship.BattleShip > $TARGET_JAD
-echo MIDlet-Description: Battleships game client >> $TARGET_JAD
+echo MIDlet-1: BattleShip, /Icon.png, com.raydac.j2me.midlets.battleship.BattleShip > $TARGET_JAD
 echo MIDlet-Data-Size: 20000 >> $TARGET_JAD
+echo MIDlet-Description: Battleships game client >> $TARGET_JAD
 echo MIDlet-Jar-Size: $JAR_SIZE >> $TARGET_JAD
 echo MIDlet-Jar-URL: battleship.jar >> $TARGET_JAD
 echo MIDlet-Name: Battleship >> $TARGET_JAD
+echo MIDlet-Permissions: javax.microedition.io.Connector.http,javax.microedition.io.Connector.https,javax.microedition.io.Connector.comm >> $TARGET_JAD
 echo MIDlet-Vendor: Gamefederation >> $TARGET_JAD
 echo MIDlet-Version: 1.0 >> $TARGET_JAD
+echo Manifest-Version: 1.0 >> $TARGET_JAD
 echo MicroEdition-Configuration: CLDC-1.0 >> $TARGET_JAD
 echo MicroEdition-Profile: MIDP-1.0 >> $TARGET_JAD
 
