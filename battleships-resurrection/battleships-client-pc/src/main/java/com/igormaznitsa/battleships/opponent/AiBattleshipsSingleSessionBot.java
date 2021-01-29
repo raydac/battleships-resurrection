@@ -424,6 +424,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
           this.thread.interrupt();
         }
         break;
+        case EVENT_ARRANGEMENT_COMPLETED:
         case EVENT_PAUSE:
         case EVENT_RESUME: {
           // means nothing for AI bot
