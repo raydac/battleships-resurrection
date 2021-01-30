@@ -9,7 +9,7 @@
 All Copyrights to both graphics and sound stuff belong to their authors. The project is already 20 years old and I can't find any footsteps of companies who took part in the project. All sources and materials have been published just to be saved for history and  provide some example of game programming in Java for who may concern.    
 
 # What is it?
-It is just memorial project in an attempt to restore and save old archived sources found on my disks. The Battleships game was developed in beginning of 2001 by request from Gamefederation company (Sweden) under umbrella of RuSoft Ltd. company (Russia). I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html).
+It is just a commemorative project in an attempt to restore and save old archived sources found on my disks. The Battleships game was developed in beginning of 2001 by request from Gamefederation company (Sweden) under umbrella of RuSoft Ltd. company (Russia). I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html).
 
 # Screen-cast
 There is short screen-cast of a game session including GFX-compatible server, restored PC-client and emulated Motorola A008 client.
