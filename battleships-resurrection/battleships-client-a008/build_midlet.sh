@@ -48,13 +48,13 @@ fi
 
 echo compiling
 
-$JDK_HOME/bin/javac -source 1.3 -target 1.1 -bootclasspath $WTK_LIBS/emptyapi.zip -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/gamefederation/playmaker/client/j2me/*.java
+$JDK_HOME/bin/javac -source 1.3 -target 1.1 -g:none -bootclasspath $WTK_LIBS/emptyapi.zip -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/gamefederation/playmaker/client/j2me/*.java
 if [[ $? -ne 0 ]] ; then
     exit 1
 fi
 
 
-$JDK_HOME/bin/javac -source 1.3 -target 1.1 -bootclasspath $WTK_LIBS/emptyapi.zip -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/raydac/j2me/midlets/battleship/*.java
+$JDK_HOME/bin/javac -source 1.3 -target 1.1 -g:none -bootclasspath $WTK_LIBS/emptyapi.zip -d $MIDLET_TMPCLASSES -classpath $MIDLET_TMPCLASSES $MIDLET_PROJECT/src/com/raydac/j2me/midlets/battleship/*.java
 if [[ $? -ne 0 ]] ; then
     exit 1
 fi
