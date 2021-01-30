@@ -1,5 +1,5 @@
 /*
- *    Battleships PC client for GEX server
+ *    Battleships PC client with GFX multi-player game support
  *    Copyright (C) 2021 Igor Maznitsa
  *
  *    This program is free software: you can redistribute it and/or modify

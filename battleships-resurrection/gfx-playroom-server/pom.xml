@@ -12,9 +12,7 @@
     <artifactId>gfx-playroom-server</artifactId>
     <packaging>jar</packaging>
 
-    <description>quickly written minimalistic HTTP server supports commands of GEX platform (development of
-        Gamefederation AS)
-    </description>
+    <description>quickly written minimalistic GFX compatible server</description>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
