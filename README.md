@@ -11,6 +11,12 @@ All Copyrights to both graphics and sound stuff belong to their authors. The pro
 # What is it?
 It is just memorial project in an attempt to restore and save old archived sources found on my disks. The Battleships game was developed in beginning of 2001 by request of Gamefederation AS under umbrella of RuSoft Ltd. company. [I have written big Russian article about the project on the habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html).
 
+# Screen-cast
+I have made some small screen-cast of a game session through GFX-compatible server between the PC-client and emulated Motorola A008 client.
+
+[![](http://img.youtube.com/vi/f1cfqRjnRgk/0.jpg)](http://www.youtube.com/watch?v=f1cfqRjnRgk "Battleships screencast")
+
+
 # Short historical review
 I took a part in the project as a Java developer and both the network communication part and the mobile game client were under my responsibility. The original PC game client was developed by another two programmers and could work only under Windows with installed Direct3D. During my vacation of 2021 I decided to collect graphics and sound resources which were found on archive disks and reproduce PC client in pure Java. The original PC client was developed in C++ only for Windows and required Direct3D for its work. unfortunately I have not sources of the C++ client and had to make some investigation and tests to rewrite all game process from the scratch, so that I had spent about one week to restore single player version.
 
