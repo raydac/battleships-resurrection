@@ -29,5 +29,7 @@ public interface BattleshipsPlayer {
 
   boolean isAvailable();
 
+  boolean isReadyForGame();
+
   String getId();
 }

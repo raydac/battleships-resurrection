@@ -492,6 +492,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   }
 
   @Override
+  public boolean isReadyForGame() {
+    return true;
+  }
+
+  @Override
   public String getId() {
     return "battleships-main-game-panel";
   }
@@ -912,6 +917,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         g2d.drawImage(E2_NEW.getLast(), null, 512, 0);
         g2d.drawImage(FIRE.getFirst(), null, 136, 0);
         this.renderActionPanel(g2d, 287, 119, this.gameField, false);
+        this.currentStage.getBanner().render(g2d, BANNER_COORD);
       }
       break;
       case PANEL_ENTER: {
@@ -1031,8 +1037,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     PANEL_ENTER(InfoBanner.NONE),
     TARGET_SELECT(InfoBanner.YOUR_MOVE),
     PANEL_EXIT(InfoBanner.NONE),
-    FIRING(InfoBanner.NONE),
-    FIRING_RESULT(InfoBanner.NONE),
+    FIRING(InfoBanner.YOUR_MOVE),
+    FIRING_RESULT(InfoBanner.YOUR_MOVE),
     ENEMY_TURN(InfoBanner.OPPONENTS_MOVE),
     ENEMY_FIRING_RESULT(InfoBanner.OPPONENTS_MOVE);
     private final InfoBanner banner;

@@ -27,16 +27,19 @@ import com.igormaznitsa.battleships.gui.panels.LoadingPanel;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.sound.Sound;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 public final class BattleshipsFrame extends JFrame implements BasePanel.SignalListener {
@@ -125,6 +128,30 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       }
       return processed;
     });
+
+    final double scaleX;
+    final double scaleY;
+    if (startOptions.getGraphicsConfiguration().isPresent()) {
+      final AffineTransform transforms =
+          startOptions.getGraphicsConfiguration().get().getDefaultTransform();
+      scaleX = transforms.getScaleX();
+      scaleY = transforms.getScaleY();
+    } else {
+      scaleX = 1.0d;
+      scaleY = 1.0d;
+    }
+
+    final Dimension defaultFrameSize =
+        new Dimension((int) Math.round(scaleX * BasePanel.GAMEFIELD_WIDTH),
+            (int) Math.round(scaleY * BasePanel.GAMEFIELD_HEIGHT));
+    final JPanel panel = new JPanel();
+    panel.setSize(defaultFrameSize);
+    panel.setMaximumSize(defaultFrameSize);
+    panel.setMinimumSize(defaultFrameSize);
+    panel.setPreferredSize(defaultFrameSize);
+
+    this.setContentPane(panel);
+    this.pack();
   }
 
   public void start(final Optional<ScaleFactor> scaleFactor) {

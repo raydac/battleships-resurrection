@@ -19,9 +19,11 @@ import com.igormaznitsa.battleships.gui.BattleshipsFrame;
 import com.igormaznitsa.battleships.gui.OpeningDialog;
 import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
+import com.igormaznitsa.battleships.gui.WaitOpponentDialog;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.OldGexBattleshipSingleSessionBot;
+import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -47,6 +49,7 @@ public class Starter {
 
       final StartOptions startOptions = StartOptions.newBuilder().build();
       final OpeningDialog openingDialog = new OpeningDialog(startOptions);
+      GfxUtils.toScreenCenter(openingDialog);
       openingDialog.setVisible(true);
 
       final StartOptions selectedData = openingDialog.getResult().orElse(null);
@@ -60,6 +63,16 @@ public class Starter {
         selectedOpponent = new OldGexBattleshipSingleSessionBot(selectedData).startPlayer();
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
+      }
+
+      final WaitOpponentDialog waitOpponentDialog =
+          new WaitOpponentDialog(selectedData.getGraphicsConfiguration().orElse(null),
+              selectedData.getGameIcon().orElse(null), selectedOpponent);
+      if (waitOpponentDialog.start()) {
+        LOGGER.info("Waiting is completed");
+      } else {
+        LOGGER.warning("Wait was interrupted by user");
+        System.exit(1);
       }
 
       if (!selectedOpponent.isAvailable()) {
@@ -129,6 +142,9 @@ public class Starter {
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();
       if (mainFrame != null) {
+        if (!selectedData.isFullScreen()) {
+          GfxUtils.toScreenCenter(mainFrame);
+        }
         mainFrame.setVisible(true);
         mainFrame.start(scaleFactorRef.get());
       }

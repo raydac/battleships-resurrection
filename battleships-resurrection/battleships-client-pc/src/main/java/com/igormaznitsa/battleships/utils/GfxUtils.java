@@ -19,7 +19,10 @@ import static java.util.Objects.requireNonNull;
 
 
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +30,7 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.swing.SwingUtilities;
 
 public final class GfxUtils {
   private static final ImageReader PNG_IMAGE_READER =
@@ -36,6 +40,26 @@ public final class GfxUtils {
       new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 
   private GfxUtils() {
+  }
+
+  public static void doInSwingThread(final Runnable action) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      action.run();
+    } else {
+      SwingUtilities.invokeLater(action);
+    }
+  }
+
+  public static void toScreenCenter(final Window window) {
+    doInSwingThread(() -> {
+      final GraphicsConfiguration config = window.getGraphicsConfiguration();
+      if (config != null) {
+        final Rectangle screenBounds = config.getBounds();
+        final Rectangle windowBounds = window.getBounds();
+        window.setLocation(screenBounds.x + (screenBounds.width - windowBounds.width) / 2,
+            screenBounds.y + (screenBounds.height - windowBounds.height) / 2);
+      }
+    });
   }
 
   private static BufferedImage readPngStream(final InputStream stream) throws IOException {

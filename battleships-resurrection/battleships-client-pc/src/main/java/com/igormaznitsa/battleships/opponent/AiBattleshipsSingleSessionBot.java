@@ -195,6 +195,11 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   }
 
   @Override
+  public boolean isReadyForGame() {
+    return true;
+  }
+
+  @Override
   public void disposePlayer() {
     try {
       this.thread.interrupt();

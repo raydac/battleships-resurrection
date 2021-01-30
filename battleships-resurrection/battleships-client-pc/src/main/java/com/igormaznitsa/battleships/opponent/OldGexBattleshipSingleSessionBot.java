@@ -41,6 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -74,6 +75,8 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   private volatile boolean readyAlreadySent = false;
 
   private final GameField gameField = new GameField();
+
+  private final AtomicBoolean sessionReady = new AtomicBoolean(false);
 
   private final int[] enemyShipNumber = new int[] {4, 3, 2, 1};
 
@@ -146,6 +149,11 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
       opponent = playerB;
     }
     return this.myFirstTurn ? me : opponent;
+  }
+
+  @Override
+  public boolean isReadyForGame() {
+    return this.sessionReady.get();
   }
 
   public boolean doTestCall() {
@@ -246,6 +254,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
       case NEW_SESSION: {
         final String session = Integer.toString(packet[1]);
         this.sessionId.set(Optional.of(session));
+        this.sessionReady.set(event == ProtocolEvent.JOIN_SESSION);
         this.myFirstTurn = packet[2] != 0;
         LOGGER.info((event == ProtocolEvent.NEW_SESSION ? "Created session " : "Joined session ") +
             session + ", first turn is " + (myFirstTurn ? "MINE" : "OPPONENT'S"));
@@ -254,6 +263,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
       case OPPONENT_LOST:
       case EXIT:
       case SESSION_REMOVE: {
+        this.sessionReady.set(false);
         this.sessionId.set(Optional.empty());
         this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_GAME_ROOM_CLOSED, 0, 0));
       }
@@ -351,7 +361,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
       }
       break;
       case OPPONENT_JOIN: {
-        // opponent has turned on pause mode
+        this.sessionReady.set(true);
       }
       break;
       case IN_GAME: {
@@ -577,6 +587,7 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   public boolean isAvailable() {
     return this.doTestCall();
   }
+
 
   @Override
   public void disposePlayer() {
