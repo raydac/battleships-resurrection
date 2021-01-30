@@ -5,6 +5,8 @@
 [![PayPal donation](https://img.shields.io/badge/donation-PayPal-cyan.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AHWJHJFBAWGL2)
 [![YooMoney donation](https://img.shields.io/badge/donation-Yoo.money-blue.svg)](https://yoomoney.ru/to/41001158080699)
 
+> A company called Game Federation in Sweden had created games for the Palm Pilot. They had employed Russian developers. - Mikko Honkakorpi, ["Finnish Video Games: History and Catalog"](https://www.amazon.com/Finnish-Video-Games-History-Catalog/dp/0786499621) p.93
+
 # Disclaimer
 All Copyrights to both graphics and sound stuff belong to their authors. The project is already 20 years old and I can't find any footsteps of companies who took part in the project. All sources and materials have been published just to be saved for history and  provide some example of game programming in Java for who may concern.    
 
