@@ -26,6 +26,35 @@ Initially artists developed very detailed and smooth graphics and PC client got 
 
 The network part was implemented in Java 1.2 and communicated with C++ part through JNI. Mobile client for Motorola A008 was written in J2ME for MIDP1.0/CLDC1.0.
 
+## Team
+
+All guys who was directly involved into management and development in 2001, as I can recall. 
+
+### Producing
+
+- [Mark Pinan](https://www.linkedin.com/in/markpinan/)
+- Alexander Dymov
+
+### Designers
+
+- Vladimir Chernysh
+- [Dmitry Kholodov](https://www.linkedin.com/in/dmitry-kholodov-39394661/)
+
+### C++ team
+
+- [Sergey Kuligin](https://www.linkedin.com/in/sergeykuligin/)
+- a student (I don't remember his name)
+
+### Java team
+
+- [Christian Andersson](https://www.linkedin.com/in/christianand/)
+- [Markus Persson](https://www.linkedin.com/in/markus-persson-7282513/)
+- [Igor Maznitsa](https://www.linkedin.com/in/igormaznitsa/)
+
+### Sound team
+
+- some great game sound designer but I don't remember his name
+
 # Requirements to build
 
 ## Mobile client
