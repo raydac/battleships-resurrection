@@ -28,7 +28,7 @@ The network part was implemented in Java 1.2 and communicated with C++ part thro
 
 ## Team
 
-All guys who was directly involved into management and development in 2001, as I can recall. 
+All guys who were directly involved into management and development in 2001 (as I recall): 
 
 ### Producing
 
