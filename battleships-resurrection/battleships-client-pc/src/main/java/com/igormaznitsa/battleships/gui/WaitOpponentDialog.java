@@ -20,6 +20,7 @@ import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Taskbar;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -37,9 +38,19 @@ public class WaitOpponentDialog extends JDialog {
   private final Timer timer;
   private boolean completed;
 
-  public WaitOpponentDialog(final GraphicsConfiguration configuration, final Image icon,
+  public WaitOpponentDialog(final GraphicsConfiguration configuration,
+                            final String title,
+                            final Image icon,
                             final BattleshipsPlayer player) {
-    super(null, "Battleship", ModalityType.APPLICATION_MODAL, configuration);
+    super(null, title, ModalityType.APPLICATION_MODAL, configuration);
+
+    if (Taskbar.isTaskbarSupported()) {
+      Taskbar.getTaskbar().setIconBadge(title);
+      Taskbar.getTaskbar().setIconImage(icon);
+    } else {
+      GfxUtils.setLinuxApplicationTitle(title);
+    }
+
     this.setAlwaysOnTop(true);
     this.player = Objects.requireNonNull(player);
     this.setIconImage(icon);

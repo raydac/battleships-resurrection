@@ -22,10 +22,12 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -40,6 +42,18 @@ public final class GfxUtils {
       new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 
   private GfxUtils() {
+  }
+
+  public static void setLinuxApplicationTitle(final String title) {
+    final Toolkit xToolkit = Toolkit.getDefaultToolkit();
+    try {
+      final Field awtAppClassNameField =
+          xToolkit.getClass().getDeclaredField("awtAppClassName");
+      awtAppClassNameField.setAccessible(true);
+      awtAppClassNameField.set(xToolkit, title);
+    } catch (Exception ex) {
+      // just ignoring
+    }
   }
 
   public static void doInSwingThread(final Runnable action) {

@@ -26,10 +26,12 @@ import com.igormaznitsa.battleships.gui.panels.GamePanel;
 import com.igormaznitsa.battleships.gui.panels.LoadingPanel;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.sound.Sound;
+import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
+import java.awt.Taskbar;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -60,6 +62,14 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
         startOptions.getGraphicsConfiguration().orElse(
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
+
+    if (Taskbar.isTaskbarSupported()) {
+      startOptions.getGameTitle().ifPresent(t -> Taskbar.getTaskbar().setIconBadge(t));
+      startOptions.getGameIcon().ifPresent(i -> Taskbar.getTaskbar().setIconImage(i));
+    } else {
+      startOptions.getGameTitle().ifPresent(GfxUtils::setLinuxApplicationTitle);
+    }
+
     this.startOptions = startOptions;
     this.scaleFactor = Optional.empty();
     if (startOptions.isFullScreen()) {

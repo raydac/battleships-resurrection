@@ -7,12 +7,14 @@ import static javax.swing.BorderFactory.createEmptyBorder;
 import static javax.swing.BorderFactory.createTitledBorder;
 
 
+import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Taskbar;
 import java.text.DecimalFormat;
 import java.util.Optional;
 import javax.swing.Box;
@@ -62,6 +64,13 @@ public class OpeningDialog extends javax.swing.JDialog {
                 .getDefaultConfiguration()));
     startOptions.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
+
+    if (Taskbar.isTaskbarSupported()) {
+      startOptions.getGameTitle().ifPresent(t -> Taskbar.getTaskbar().setIconBadge(t));
+      startOptions.getGameIcon().ifPresent(i -> Taskbar.getTaskbar().setIconImage(i));
+    } else {
+      startOptions.getGameTitle().ifPresent(GfxUtils::setLinuxApplicationTitle);
+    }
 
     this.setAlwaysOnTop(true);
 

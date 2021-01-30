@@ -71,6 +71,7 @@ public class Starter {
 
       final WaitOpponentDialog waitOpponentDialog =
           new WaitOpponentDialog(selectedData.getGraphicsConfiguration().orElse(null),
+              selectedData.getGameTitle().orElse("BattleShips"),
               selectedData.getGameIcon().orElse(null), selectedOpponent);
       if (waitOpponentDialog.start()) {
         LOGGER.info("Waiting is completed");
