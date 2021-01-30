@@ -34,7 +34,7 @@ The mobile client is most hard part today to be built because it requires Sun WT
 To build the mobile client from project root, you need use maven profile `midlet`. 
 
 ## PC client
-The PC client has been totally rewritten in pure Java 11. I didn't have sources of C++ client (only graphics and sound resources from the technical version), so that I had to restore whole game process from the scratch (but I made the best to make it as much as possible close to the original one). The most terrible part was to calculate offsets and ship arrangements on the field because I had not any contact with designers of the game and may of things I made by offhand. 
+The PC client has been totally rewritten in pure Java 11. I didn't have sources of C++ client (only graphics and sound resources from the technical version), so that I had to restore whole game process from the scratch (but I made the best to make it as much as possible close to the original one). The most terrible part was to calculate offsets and ship arrangements on the field because I had not any contact with designers of the original game and many steps I made through guesswork. 
 
 New client is cross-platform one (in opposite to the original one which could work only under Windows with installed Direct3D) and there are versions for Windows, Linux and MacOS. The client jar file can be started on any platform where provided JDK 11 because it doesn't use any third-part libraries and only Swing+Java2D+JavaSound in use for media.  
 #### Original Windows game screenshot:
