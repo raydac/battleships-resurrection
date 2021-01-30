@@ -36,9 +36,11 @@ The PC client has been totally restored in pure Java 11, I had not any piece of 
 
 There is not any magic in build PC client. The project formed as regular maven project and can be build with `mvn`, if you want build cross-platform result images then use maven profile `publish`.
 
-## GEX play-room server
+## GFX play-room server
 
-It is the original GEX play-room server which was provided for E3 2001 in april 2001. I have changed nothing in it and it contains all my one-year experience Java coding (I hope that after 20 years of Java programming my skills have increased).
-The server also formed as maven project and even can be started directly from maven with goal `exec:java`.
+It is the original minimalistic GFX-compatible standalone play-room server which was prepared by me for E3 2001 in april 2001. I have changed in its sources thus it contains all my one-year experience Java coding (I hope that after 20 years of Java programming my skills in programming a bit better).
+The server also formed as maven project and even can be started directly through `exec:java`.
 
-I could not find any stuff about the GEX platform on my disks. As I remeber it was developed as module for BEA WebLogic server but for E3 2001 it was too early to use such enterprise approach thus we developed minimalistic pure Java solution.
+I could not find any documents of presentations about the GFX platform on my disks. As I remember it was delivered as a module for BEA WebLogic server but for E3 2001 it was too early to use such enterprise approach also it was still under development.
+
+![Screenshot](battleships-resurrection/gfx-playroom-server/assets/game-session-screenshot.jpg)
