@@ -131,7 +131,8 @@ public class OpeningDialog extends javax.swing.JDialog {
     final boolean enabled = this.radioMultiPlayer.isSelected();
     this.textFieldHostName.setEnabled(enabled);
     this.textFieldPort.setEnabled(enabled);
-    this.checkboxUseOldGfxClient.setEnabled(enabled);
+
+    this.checkboxUseOldGfxClient.setEnabled(false); // todo replace when implementd another client
   }
 
   public Optional<StartOptions> getResult() {
