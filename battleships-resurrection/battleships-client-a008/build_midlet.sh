@@ -79,7 +79,7 @@ if [[ $? -ne 0 ]] ; then
 fi
 
 echo packing icon
-$JDK_HOME/bin/jar uf $TARGET_JAR $MIDLET_PROJECT/Icon.png
+$JDK_HOME/bin/jar uf $TARGET_JAR -C $MIDLET_PROJECT Icon.png
 if [[ $? -ne 0 ]] ; then
     exit 1
 fi
