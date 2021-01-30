@@ -15,10 +15,12 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.text.DecimalFormat;
 import java.util.Optional;
+import javax.swing.Box;
 import javax.swing.Box.Filler;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -49,6 +51,7 @@ public class OpeningDialog extends javax.swing.JDialog {
   private JRadioButton radioFullScreen;
   private JRadioButton radioSinglePlayer;
   private JRadioButton radioMultiPlayer;
+  private JCheckBox checkboxUseOldGfxClient;
 
   private StartOptions result;
 
@@ -74,6 +77,12 @@ public class OpeningDialog extends javax.swing.JDialog {
     startOptions.getHostName().ifPresent(x -> this.textFieldHostName.setText(x));
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
+    this.checkboxUseOldGfxClient.setSelected(startOptions.isUseOldGfxClient());
+
+    this.radioSinglePlayer.addActionListener(e -> {
+      this.updateNetworkPanel();
+    });
+
     this.radioMultiPlayer.addActionListener(e -> {
       if (this.radioMultiPlayer.isSelected()) {
         if (this.textFieldHostName.getText().isBlank()) {
@@ -87,6 +96,7 @@ public class OpeningDialog extends javax.swing.JDialog {
           });
         }
       }
+      this.updateNetworkPanel();
     });
 
     this.buttonGo.addActionListener(e -> {
@@ -112,8 +122,16 @@ public class OpeningDialog extends javax.swing.JDialog {
       this.dispose();
     });
 
+    this.updateNetworkPanel();
     this.getContentPane().doLayout();
     this.pack();
+  }
+
+  private void updateNetworkPanel() {
+    final boolean enabled = this.radioMultiPlayer.isSelected();
+    this.textFieldHostName.setEnabled(enabled);
+    this.textFieldPort.setEnabled(enabled);
+    this.checkboxUseOldGfxClient.setEnabled(enabled);
   }
 
   public Optional<StartOptions> getResult() {
@@ -128,6 +146,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     modePanel = new JPanel();
     radioWindow = new JRadioButton();
     radioFullScreen = new JRadioButton();
+    checkboxUseOldGfxClient = new JCheckBox();
     networkPanel = new JPanel();
     radioSinglePlayer = new JRadioButton();
     radioMultiPlayer = new JRadioButton();
@@ -181,7 +200,7 @@ public class OpeningDialog extends javax.swing.JDialog {
 
     networkPanel.setBorder(
         createCompoundBorder(createTitledBorder("Network"), createEmptyBorder(8, 8, 8, 8)));
-    networkPanel.setLayout(new GridLayout(3, 2, 16, 0));
+    networkPanel.setLayout(new GridLayout(6, 2, 16, 0));
 
     radioSinglePlayer.setText("Single Player");
     networkPanel.add(radioSinglePlayer);
@@ -200,6 +219,11 @@ public class OpeningDialog extends javax.swing.JDialog {
     networkPanel.add(labelServerPort);
     networkPanel.add(textFieldHostName);
     networkPanel.add(textFieldPort);
+
+    networkPanel.add(Box.createHorizontalGlue());
+    checkboxUseOldGfxClient.setText("Use old GFX client");
+    checkboxUseOldGfxClient.setHorizontalAlignment(JCheckBox.LEFT);
+    networkPanel.add(checkboxUseOldGfxClient);
 
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -223,6 +247,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
     buttonsPanel.add(buttonExit, gridBagConstraints);
+
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 0;
@@ -233,12 +258,14 @@ public class OpeningDialog extends javax.swing.JDialog {
     gridBagConstraints.gridy = 5;
     gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
     mainPanel.add(buttonsPanel, gridBagConstraints);
+
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = GridBagConstraints.WEST;
     mainPanel.add(filler4, gridBagConstraints);
+
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;

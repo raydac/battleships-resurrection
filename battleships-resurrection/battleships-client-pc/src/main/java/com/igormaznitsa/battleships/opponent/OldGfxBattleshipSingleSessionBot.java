@@ -32,7 +32,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -47,19 +46,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, FirstMoveOrderProvider {
+public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, FirstMoveOrderProvider {
 
   private static final int PACKET_HEADER = 0xFFCAFE00;
 
   private static final Logger LOGGER =
-      Logger.getLogger(OldGexBattleshipSingleSessionBot.class.getName());
+      Logger.getLogger(OldGfxBattleshipSingleSessionBot.class.getName());
   private static final int MOVE_MISS = 5;
   private static final int MOVE_HIT = 3;
   private static final int MOVE_KILLED = 4;
   private volatile boolean myFirstTurn;
   private final BlockingQueue<BsGameEvent> queueIn = new ArrayBlockingQueue<>(10);
   private final BlockingQueue<BsGameEvent> queueOut = new ArrayBlockingQueue<>(10);
-  private final HttpClient httpClient;
   private final String id;
   private final URI uriInput;
   private final URI uriOutput;
@@ -80,18 +78,16 @@ public class OldGexBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
   private final int[] enemyShipNumber = new int[] {4, 3, 2, 1};
 
-  public OldGexBattleshipSingleSessionBot(final StartOptions startOptions) {
+  public OldGfxBattleshipSingleSessionBot(final StartOptions startOptions) {
     this.id = startOptions.getHostName().orElse("") + ':' + startOptions.getHostPort().orElse(-1);
 
     final UUID uuid = UUID.randomUUID();
     this.playerId =
         0x7FFFFFFF & (int) (uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
     LOGGER.info("Generated player ID: " + this.playerId);
-    this.httpClient = HttpClient.newHttpClient();
     try {
-      //todo replace by values from config
-      final String host = "localhost";
-      final int port = 30000;
+      final String host = startOptions.getHostName().orElse("localhost");
+      final int port = startOptions.getHostPort().orElse(30000);
       LOGGER.info("Game server address: " + host + ':' + port);
       this.uriInput = new URI(String
           .format("http://%s:%d/getoutstream", host, port));

@@ -29,6 +29,7 @@ public class StartOptions {
   private final boolean multiPlayer;
   private final boolean fullScreen;
   private final boolean withSound;
+  private final boolean useOldGfxClient;
   private final Optional<String> hostName;
   private final OptionalInt hostPort;
 
@@ -39,9 +40,11 @@ public class StartOptions {
                        final boolean fullScreen,
                        final boolean withSound,
                        final Optional<String> hostName,
-                       final OptionalInt hostPort
+                       final OptionalInt hostPort,
+                       final boolean useOldGfxClient
   ) {
     this.graphicsConfiguration = graphicsConfiguration;
+    this.useOldGfxClient = useOldGfxClient;
     this.gameTitle = gameTitle;
     this.withSound = withSound;
     this.gameIcon = gameIcon;
@@ -87,6 +90,10 @@ public class StartOptions {
     return this.hostPort;
   }
 
+  public boolean isUseOldGfxClient() {
+    return this.useOldGfxClient;
+  }
+
   public static class Builder {
     private Optional<GraphicsConfiguration> graphicsConfiguration =
         Optional.of(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
@@ -97,6 +104,7 @@ public class StartOptions {
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
     private boolean withSound = true;
+    private boolean useOldGfxClient = true;
     private Optional<String> hostName = Optional.of("localhost");
     private OptionalInt hostPort = OptionalInt.of(30000);
 
@@ -107,6 +115,11 @@ public class StartOptions {
 
     public Builder setHostPort(final int port) {
       this.hostPort = port < 0 ? OptionalInt.empty() : OptionalInt.of(port);
+      return this;
+    }
+
+    public Builder setUseOldGfxClient(final boolean value) {
+      this.useOldGfxClient = value;
       return this;
     }
 
@@ -148,7 +161,8 @@ public class StartOptions {
           this.fullScreen,
           this.withSound,
           this.hostName,
-          this.hostPort);
+          this.hostPort,
+          this.useOldGfxClient);
     }
 
   }

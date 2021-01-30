@@ -22,7 +22,7 @@ import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.gui.WaitOpponentDialog;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
-import com.igormaznitsa.battleships.opponent.OldGexBattleshipSingleSessionBot;
+import com.igormaznitsa.battleships.opponent.OldGfxBattleshipSingleSessionBot;
 import com.igormaznitsa.battleships.utils.GfxUtils;
 import java.awt.DisplayMode;
 import java.awt.GraphicsConfiguration;
@@ -60,7 +60,11 @@ public class Starter {
 
       final BattleshipsPlayer selectedOpponent;
       if (selectedData.isMultiPlayer()) {
-        selectedOpponent = new OldGexBattleshipSingleSessionBot(selectedData).startPlayer();
+        if (selectedData.isUseOldGfxClient()) {
+          selectedOpponent = new OldGfxBattleshipSingleSessionBot(selectedData).startPlayer();
+        } else {
+          throw new UnsupportedOperationException("Not implemented yet");
+        }
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
       }
