@@ -12,7 +12,7 @@
     <artifactId>gfx-playroom-server</artifactId>
     <packaging>jar</packaging>
 
-    <description>quickly written minimalistic GFX compatible server</description>
+    <description>quickly written in 2001, minimalistic GFX compatible server</description>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -35,6 +35,28 @@
                 <configuration>
                     <mainClass>BSSServer</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            \
+                            <minimizeJar>false</minimizeJar>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>BSSServer</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
