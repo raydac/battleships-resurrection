@@ -76,10 +76,10 @@ public class WaitOpponentDialog extends JDialog {
   private void check(final ActionEvent action) {
     if (!this.player.isAvailable()) {
       this.completed = false;
-      this.progressBar.setString("Waiting connection");
+      this.progressBar.setString("Waiting for server");
     } else if (!this.player.isReadyForGame()) {
       this.completed = false;
-      this.progressBar.setString("Waiting opponent");
+      this.progressBar.setString("Waiting for opponent");
     } else {
       this.completed = true;
       this.progressBar.setString("");
