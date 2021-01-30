@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>gex-playroom-server</artifactId>
+    <artifactId>gfx-playroom-server</artifactId>
     <packaging>jar</packaging>
 
     <description>quickly written minimalistic HTTP server supports commands of GEX platform (development of

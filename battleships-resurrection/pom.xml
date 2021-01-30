@@ -99,7 +99,7 @@
     </profiles>
 
     <modules>
-        <module>gex-playroom-server</module>
+        <module>gfx-playroom-server</module>
         <module>battleships-client-pc</module>
     </modules>
 
