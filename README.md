@@ -28,24 +28,24 @@ The network part was implemented in Java 1.2 and communicated with C++ part thro
 
 ## Team
 
-All guys directly involved into management and development in 2001 (as I recall): 
+All guys directly involved in management and development in 2001 (as I recall): 
 
 ### Producing
 
 - [Mark Pinan](https://www.linkedin.com/in/markpinan/)
 - Alexander Dymov
 
-### Designers
+### Desig
 
 - Vladimir Chernysh
 - [Dmitry Kholodov](https://www.linkedin.com/in/dmitry-kholodov-39394661/)
 
-### C++ team
+### C++ development
 
 - [Sergey Kuligin](https://www.linkedin.com/in/sergeykuligin/)
 - a student (I don't remember his name)
 
-### Java team
+### Java development
 
 - [Christian Andersson](https://www.linkedin.com/in/christianand/)
 - [Markus Persson](https://www.linkedin.com/in/markus-persson-7282513/)
