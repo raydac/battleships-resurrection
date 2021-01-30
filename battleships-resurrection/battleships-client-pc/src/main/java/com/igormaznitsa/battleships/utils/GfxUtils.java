@@ -20,8 +20,10 @@ import static java.util.Objects.requireNonNull;
 
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Taskbar;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -44,13 +46,31 @@ public final class GfxUtils {
   private GfxUtils() {
   }
 
-  public static void setLinuxApplicationTitle(final String title) {
-    final Toolkit xToolkit = Toolkit.getDefaultToolkit();
+  public static void setApplicationTitle(final Image icon, final String title) {
+    if (Taskbar.isTaskbarSupported()) {
+      final Taskbar taskbar = Taskbar.getTaskbar();
+      if (icon != null) {
+        try {
+          taskbar.setIconImage(icon);
+        } catch (Exception ex) {
+          // do nothing
+        }
+      }
+      if (title != null) {
+        try {
+          taskbar.setIconBadge(title);
+        } catch (Exception ex) {
+          // do nothing
+        }
+      }
+    }
+
+    final Toolkit toolkit = Toolkit.getDefaultToolkit();
     try {
       final Field awtAppClassNameField =
-          xToolkit.getClass().getDeclaredField("awtAppClassName");
+          toolkit.getClass().getDeclaredField("awtAppClassName");
       awtAppClassNameField.setAccessible(true);
-      awtAppClassNameField.set(xToolkit, title);
+      awtAppClassNameField.set(toolkit, title);
     } catch (Exception ex) {
       // just ignoring
     }

@@ -31,7 +31,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
-import java.awt.Taskbar;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -63,12 +62,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                 .getDefaultConfiguration()));
 
-    if (Taskbar.isTaskbarSupported()) {
-      startOptions.getGameTitle().ifPresent(t -> Taskbar.getTaskbar().setIconBadge(t));
-      startOptions.getGameIcon().ifPresent(i -> Taskbar.getTaskbar().setIconImage(i));
-    } else {
-      startOptions.getGameTitle().ifPresent(GfxUtils::setLinuxApplicationTitle);
-    }
+    GfxUtils.setApplicationTitle(startOptions.getGameIcon().orElse(null),
+        startOptions.getGameTitle().orElse(null));
 
     this.startOptions = startOptions;
     this.scaleFactor = Optional.empty();
