@@ -13,7 +13,7 @@ __All Copyrights to both graphics and sound stuff belong to their authors. The p
 # What is it?
 It is just a commemorative project in an attempt to restore and save old archived sources found on my disks.
 
-The Battleships game project was started in the beginning of 2001 under umbrella of Ru-Soft Ltd. (Russia) by order of Gamefederation company (Sweden) and had to be completed before the E3 2001 show start. I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html). The project took about 2.5 months and was successfully completed in time. For me the project is remarkable one because it was my first game experience in J2ME world (a year later I would take part in a big mobile project for a Finnish company to produce 20 mobile games in two months).
+The Battleships game project was started in the beginning of 2001 under umbrella of Ru-Soft Ltd. (Russia) by order of Gamefederation company (Sweden) and had to be completed before the E3 2001 exhibition start. I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html). The project took about 2.5 months and was successfully completed in time. For me the project is remarkable one because it was my first game experience in J2ME world (a year later I would take part in a big mobile project for a Finnish company to produce 20 mobile games in two months).
 
 # Screen-cast
 There is short screen-cast of a game session including GFX-compatible server, restored PC-client and emulated Motorola A008 client.
