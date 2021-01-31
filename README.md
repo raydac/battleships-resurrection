@@ -35,10 +35,14 @@ All guys directly involved in management and development in 2001 (as I recall):
 - [Mark Pinan](https://www.linkedin.com/in/markpinan/)
 - Alexander Dymov
 
-### Desig
+### Design
 
 - Vladimir Chernysh
 - [Dmitry Kholodov](https://www.linkedin.com/in/dmitry-kholodov-39394661/)
+
+### Sound effects
+
+- some great game sound designer (I don't remember his name)
 
 ### C++ development
 
@@ -50,10 +54,6 @@ All guys directly involved in management and development in 2001 (as I recall):
 - [Christian Andersson](https://www.linkedin.com/in/christianand/)
 - [Markus Persson](https://www.linkedin.com/in/markus-persson-7282513/)
 - [Igor Maznitsa](https://www.linkedin.com/in/igormaznitsa/)
-
-### Sound team
-
-- some great game sound designer (I don't remember his name)
 
 # Requirements to build
 
