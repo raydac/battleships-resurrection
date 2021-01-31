@@ -65,21 +65,21 @@ The mobile client is most hard part today to be built because it requires Sun WT
 To build the mobile client from project root, you need use maven profile `midlet`. 
 
 ## PC client
-The PC client has been totally rewritten in pure Java 11. I didn't have sources of C++ client (only graphics and sound resources from the technical version), so that I had to restore whole game process from the scratch (but I made the best to make it as much as possible close to the original one). The most terrible part was to calculate offsets and ship arrangements on the field because I had not any contact with designers of the original game and many steps I made through guesswork. 
+The PC client has been totally rewritten in pure Java 11. I didn't have sources of C++ client (only graphics and sound resources from the technical version), so that I had to restore whole game process from the scratch (but I've made an endeavor to make it as much as possible close to the original one). The most terrible part was to calculate offsets and ship arrangements on the field because I had not any contact with designers of the original game and many steps I made through guesswork. 
 
-New client is cross-platform one (in opposite to the original one which could work only under Windows with installed Direct3D) and there are versions for Windows, Linux and MacOS. The client jar file can be started on any platform where provided JDK 11 because it doesn't use any third-part libraries and only Swing+Java2D+JavaSound in use for media.  
-#### Original Windows game screenshot:
-![Screenshot](assets/original_win_game_screenshot.jpg)
-#### Restored game screenshot:
-![Screenshot](assets/restored_game_screenshot.jpg)
+The new client is cross-platform one (in opposite to the original one which could work only under Windows with installed Direct3D) and there are versions for Windows, Linux and MacOS. The client jar file can be started on any platform where provided JDK 11 because it doesn't use any third-part libraries and only Swing+Java2D+JavaSound in use for media.  
 
-There is not any magic in build PC client. The project formed as regular maven project and can be build with `mvn`, if you want build cross-platform result images then use maven profile `publish`.
+| Original PC client (Windows 10)                       | Restored PC client (Ubuntu 20.04)                |
+| ----------------------------------------------------- | ------------------------------------------------ |
+| ![Screenshot](assets/original_win_game_screenshot.jpg)|![Screenshot](assets/restored_game_screenshot.jpg)|
+
+There is not any magic to build the PC client. The project has been formed as a regular maven project and can be build with `mvn`, if you want build cross-platform result images then use maven profile `publish`.
 
 ## GFX play-room server
 
-It is the original minimalistic GFX-compatible standalone play-room server which was prepared by me for E3 2001 in april 2001. I have changed in its sources thus it contains all my one-year experience Java coding (I hope that after 20 years of Java programming my skills in programming a bit better).
+It is the original minimalistic GFX-compatible standalone play-room server which was prepared by me for E3 2001 in april 2001. I have no changes in its sources, and it contains all my one-year experience Java coding (I hope that after 20 years of Java programming my skills in programming a bit better).
 The server also formed as maven project and even can be started directly through `exec:java`.
 
-I could not find any documents of presentations about the GFX platform on my disks. As I remember it was delivered as a module for BEA WebLogic server but for E3 2001 it was too early to use such enterprise approach also it was still under development. Server is not fully production-ready because it was developed for restricted use in presentation bounds but allows organise game sessions between clients.
+I could not find either documents or presentations about the GFX platform on my disks. As I recall, the real production-ready GFX server was delivered as a module for BEA WebLogic server. The standalone solution is not fully production-ready because it was developed for restricted use in bounds of presentations but allows organising game sessions between clients.
 
 ![Screenshot](battleships-resurrection/gfx-playroom-server/assets/game-session-screenshot.jpg)
