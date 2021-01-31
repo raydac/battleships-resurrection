@@ -16,7 +16,7 @@ It is just a commemorative project in an attempt to restore and save old archive
 # Screen-cast
 There is short screen-cast of a game session including GFX-compatible server, restored PC-client and emulated Motorola A008 client.
 
-[![](http://img.youtube.com/vi/f1cfqRjnRgk/0.jpg)](http://www.youtube.com/watch?v=f1cfqRjnRgk "Battleships screencast")
+[![](assets/game-session-screenshot-youtube.jpg)](http://www.youtube.com/watch?v=f1cfqRjnRgk "Battleships screencast")
 
 
 # Short historical review
@@ -81,5 +81,3 @@ It is the original minimalistic GFX-compatible standalone play-room server which
 The server also formed as maven project and even can be started directly through `exec:java`.
 
 I could not find either documents or presentations about the GFX platform on my disks. As I recall, the real production-ready GFX server was delivered as a module for BEA WebLogic server. The standalone solution is not fully production-ready because it was developed for restricted use in bounds of presentations but allows organising game sessions between clients.
-
-![Screenshot](battleships-resurrection/gfx-playroom-server/assets/game-session-screenshot.jpg)
