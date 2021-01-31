@@ -31,7 +31,7 @@ There is short screen-cast of a game session including GFX-compatible server, re
 # Short historical review
 I took a part in the project as a Java developer and both the network communication part, and the mobile game client were in my responsibility. The original PC game client was developed by another two developers in C++ exclusively for Windows (it strongly required Direct3D for work).
 
-Initially artists developed very detailed and smooth graphics and PC client got size about 160 Mb but then guys from Gamefederation notified us that they were going to load the PC client distributive during presentation and 160 Mb was too big size for network in 2001. As solution, the game graphics was reworked, and it started look a bit blurry. The result PC gae client size was decreased to about 60 Mb.
+Initially artists developed very detailed and smooth graphics and PC client got size about 160 Mb but then guys from Gamefederation notified us that they were going to load the PC client distributive during presentation and 160 Mb was too big size for network in 2001. As solution, the game graphics was reworked, and it started look a bit blurry. The result PC client size was decreased to about 60 Mb.
 
 The network part was entirely implemented in Java 1.2 and communicated with C++ part through JNI. The mobile client for Motorola A008 was written in J2ME (MIDP1.0/CLDC1.0 profile).
 
