@@ -90,8 +90,9 @@ public final class GfxUtils {
       if (config != null) {
         final Rectangle screenBounds = config.getBounds();
         final Rectangle windowBounds = window.getBounds();
-        window.setLocation(screenBounds.x + (screenBounds.width - windowBounds.width) / 2,
-            screenBounds.y + (screenBounds.height - windowBounds.height) / 2);
+        final int guessedX = screenBounds.x + (screenBounds.width - windowBounds.width) / 2;
+        final int guessedY = screenBounds.y + (screenBounds.height - windowBounds.height) / 2;
+        window.setLocation(guessedX, Math.max(guessedY, 64));
       }
     });
   }
