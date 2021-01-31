@@ -24,6 +24,7 @@ MIDLET_CLASSES=$PROJECT_DIR/target/classes
 MIDLET_PROJECT=$PROJECT_DIR/BattleShip
 TARGET_JAR=$PROJECT_DIR/target/$MIDLET_NAME.jar
 TARGET_JAD=$PROJECT_DIR/target/$MIDLET_NAME.jad
+TARGET_MIDLET_ZIP=$PROJECT_DIR/target/BattleShip_A008.zip
 
 WTK_LIBS=$PROJECT_DIR/libs
 
@@ -101,3 +102,5 @@ echo Manifest-Version: 1.0 >> $TARGET_JAD
 echo MicroEdition-Configuration: CLDC-1.0 >> $TARGET_JAD
 echo MicroEdition-Profile: MIDP-1.0 >> $TARGET_JAD
 
+echo zipping
+zip -j -r $TARGET_MIDLET_ZIP $TARGET_JAD $TARGET_JAR

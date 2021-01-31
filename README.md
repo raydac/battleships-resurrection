@@ -11,20 +11,29 @@
 __All Copyrights to both graphics and sound stuff belong to their authors. The project is already 20 years old, and I can't find any footsteps of companies involved into the project. All sources and materials have been published just to be saved for history and as an example of game programming in Java for who may concern.__    
 
 # What is it?
-It is just a commemorative project in an attempt to restore and save old archived sources found on my disks. The Battleships game was developed in beginning of 2001 by request from Gamefederation company (Sweden) under umbrella of RuSoft Ltd. company (Russia). I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html).
+It is just a commemorative project in an attempt to restore and save old archived sources found on my disks.
+
+The Battleships game project was started in the beginning of 2001 under umbrella of Ru-Soft Ltd. (Russia) by order of Gamefederation company (Sweden) and had to be completed before the E3 2001 show start. I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html). The project took about 2.5 months and was successfully completed in time. For me the project is remarkable one because it was my first game experience in J2ME world (a year later I would take part in a big mobile project for a Finnish company to produce 20 mobile games in two months).
 
 # Screen-cast
 There is short screen-cast of a game session including GFX-compatible server, restored PC-client and emulated Motorola A008 client.
 
-[![](assets/game-session-screenshot-youtube.jpg)](http://www.youtube.com/watch?v=f1cfqRjnRgk "Battleships screencast")
+[![Link to the youtube screen-cast](assets/game-session-screenshot-youtube.jpg)](http://www.youtube.com/watch?v=f1cfqRjnRgk "Battleships screencast")
 
+# Pre-built components
+- [PC client for Linux (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0-S/battleships-resurrection-1.0.0-SNAPSHOT-linux-x64-withjdk.tar.gz)
+- [PC client for Windows (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0-S/battleships-resurrection-1.0.0-SNAPSHOT-windows-x64-withjdk.zip)
+- [PC client for MacOS (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0-S/battleships-resurrection-1.0.0-SNAPSHOT-macos-x64-withjdk.zip)
+- [PC client, cross-platform JAR file](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0-S/battleships-resurrection-1.0.0-SNAPSHOT.jar)  
+- [pre-built GFX-compatible server (only JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0-S/gfx-playroom-server-1.0.0-SNAPSHOT.jar)
+- [pre-built J2ME midlet for Motorola A008 (zipped JAD+JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0-S/BattleShip_A008.zip)
 
 # Short historical review
-I took a part in the project as a Java developer and both the network communication part, and the mobile game client were in my responsibility. The original PC game client was developed by another two developers in C++ exclusively for Windows (it strongly required Direct3D for work). Whole project in 2001 took 2.5 months.
+I took a part in the project as a Java developer and both the network communication part, and the mobile game client were in my responsibility. The original PC game client was developed by another two developers in C++ exclusively for Windows (it strongly required Direct3D for work).
 
 Initially artists developed very detailed and smooth graphics and PC client got size about 160 Mb but then guys from Gamefederation notified us that they were going to load the PC client distributive during presentation and 160 Mb was too big size for network in 2001. As solution, the game graphics was reworked, and it started look a bit blurry. The result PC gae client size was decreased to about 60 Mb.
 
-The network part was implemented in Java 1.2 and communicated with C++ part through JNI. Mobile client for Motorola A008 was written in J2ME for MIDP1.0/CLDC1.0.
+The network part was entirely implemented in Java 1.2 and communicated with C++ part through JNI. The mobile client for Motorola A008 was written in J2ME (MIDP1.0/CLDC1.0 profile).
 
 ## Team
 
@@ -58,11 +67,11 @@ All guys directly involved in management and development in 2001 (as I recall):
 # Requirements to build
 
 ## Mobile client
-The mobile client is most hard part today to be built because it requires Sun WTK 2.5.2 and JDK 1.5, they both can be still found on Oracle site, but I am not sure that the picture will be saved next several years. I have restored some Motorola A008 device profile for the WTK, and it can be used to get picture of working device. To be honesty I have not ever saw working mobile client on the real device because during development it was an absolutely new device with GPRS support and guys in Sweden had to visit the Sweden Motorola laboratory to test the client to write report for me, very long way to debug.
+The mobile client is most hard part today to be built because it requires Sun WTK 2.5.2 and JDK 1.5, they both can be still found on Oracle site, but I am not sure that the picture will be the same during next several years. I have restored some Motorola A008 device profile for the WTK, and it can be used to get picture of working device. To be honesty I have not ever saw working mobile client on the real device because during development it was an absolutely new device with GPRS support and guys in Sweden had to visit the Sweden Motorola laboratory to test the client to write report for me, it was very long way to debug.
 
 ![A008 screenshot](battleships-resurrection/battleships-client-a008/assets/emulator_screenshot.jpg)
 
-To build the mobile client from project root, you need use maven profile `midlet`. 
+To build the mobile client from the project root, you need use maven profile `midlet` and tune paths in the pom to your installed JDK 1.5 and keep in mind that the `preverify` tool is presented only for Linux. 
 
 ## PC client
 The PC client has been totally rewritten in pure Java 11. I didn't have sources of C++ client (only graphics and sound resources from the technical version), so that I had to restore whole game process from the scratch (but I've made an endeavor to make it as much as possible close to the original one). The most terrible part was to calculate offsets and ship arrangements on the field because I had not any contact with designers of the original game and many steps I made through guesswork. 
