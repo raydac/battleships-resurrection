@@ -8,7 +8,7 @@
 > A company called Game Federation in Sweden had created games for the Palm Pilot. They had employed Russian developers. - [Mikko Honkakorpi](https://www.linkedin.com/in/mikkoh/), ["Finnish Video Games: History and Catalog"](https://www.amazon.com/Finnish-Video-Games-History-Catalog/dp/0786499621) p.93
 
 # Disclaimer
-__All Copyrights to both graphics and sound stuff belong to their authors. The project is already 20 years old and I can't find any footsteps of companies who took part in the project and software parts produced for it. All sources and materials have been published just to be saved for history and as an example of game programming in Java for who may concern.__    
+__All Copyrights to both graphics and sound stuff belong to their authors. The project is already 20 years old, and I can't find any footsteps of companies involved into the project. All sources and materials have been published just to be saved for history and as an example of game programming in Java for who may concern.__    
 
 # What is it?
 It is just a commemorative project in an attempt to restore and save old archived sources found on my disks. The Battleships game was developed in beginning of 2001 by request from Gamefederation company (Sweden) under umbrella of RuSoft Ltd. company (Russia). I have written pair articles on [habr.com](https://habr.com/ru/post/458124/) and in [my blog](http://raydac.blogspot.com/2015/05/the-battleships-game-e3-2001.html).
