@@ -21,12 +21,14 @@ There is short screen-cast of a game session including GFX-compatible server, re
 [![Link to the youtube screen-cast](assets/game-session-screenshot-youtube.jpg)](http://www.youtube.com/watch?v=f1cfqRjnRgk "Battleships screencast")
 
 # Pre-built components
-- [PC client for Linux (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0-linux-x64-withjdk.tar.gz)
-- [PC client for Windows (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0-windows-x64-withjdk.zip)
-- [PC client for MacOS (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0-macos-x64-withjdk.zip)
-- [PC client, cross-platform JAR file](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0.jar)  
-- [pre-built GFX-compatible server (only JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/gfx-playroom-server-1.0.0.jar)
-- [pre-built J2ME midlet for Motorola A008 (zipped JAD+JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/BattleShip_A008.zip)
+| OS                                    |  Download link                                                                                                                                                                                | 
+| --------------------------------------| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Windows](assets/icons/win64x64.png) | __[Game client for Windows (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0-windows-x64-withjdk.zip)__ |
+| ![MacOS](assets/icons/macos64x64.png) | __[Game client for MacOS (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0-macos-x64-withjdk.zip)__     |
+| ![Linux](assets/icons/linux64x64.png) | __[Game client for Linux (64-bit, JDK image included)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0-linux-x64-withjdk.tar.gz)__  |
+| ![Java](assets/icons/java64x64.png)   | __[Game client, cross-platform JAR file](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/battleships-resurrection-1.0.0.jar)__                                     | 
+| ![Java](assets/icons/java64x64.png)   | _[pre-built GFX-compatible server (only JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/gfx-playroom-server-1.0.0.jar)_                                      |
+| ![Java](assets/icons/java64x64.png)   | _[pre-built J2ME midlet for Motorola A008 (zipped JAD+JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.0.0/BattleShip_A008.zip)_                                  |
 
 # Short historical review
 I took a part in the project as a Java developer and both the network communication part, and the mobile game client were in my responsibility. The original PC game client was developed by another two developers in C++ exclusively for Windows (it strongly required Direct3D for work).
