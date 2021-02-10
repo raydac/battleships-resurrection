@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>battleships-resurrection</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>battleships-client-a008</artifactId>
     <packaging>jar</packaging>

@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>battleships-resurrection</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>battleships-client-pc</artifactId>
@@ -223,12 +223,12 @@
                                 </opts>
                             </jre>
                             <versionInfo>
-                                <fileVersion>0.0.0.7</fileVersion>
-                                <txtFileVersion>0.0.0.7</txtFileVersion>
+                                <fileVersion>0.1.0.1</fileVersion>
+                                <txtFileVersion>0.1.0.1</txtFileVersion>
                                 <fileDescription>battleship</fileDescription>
                                 <copyright>Copyright &#169; 2001</copyright>
-                                <productVersion>0.0.0.7</productVersion>
-                                <txtProductVersion>0.0.0.7</txtProductVersion>
+                                <productVersion>0.1.0.1</productVersion>
+                                <txtProductVersion>0.1.0.1</txtProductVersion>
                                 <productName>RuSoft BattleShip game</productName>
                                 <companyName>RuSoft</companyName>
                                 <internalName>${project.name}</internalName>
@@ -327,7 +327,6 @@
                     <plugin>
                         <groupId>com.coderplus.maven.plugins</groupId>
                         <artifactId>copy-rename-maven-plugin</artifactId>
-                        <version>1.0.1</version>
                         <executions>
                             <execution>
                                 <id>rename-mac-jar-to-zip</id>
