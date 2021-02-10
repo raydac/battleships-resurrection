@@ -126,6 +126,7 @@ public class OpeningDialog extends javax.swing.JDialog {
         // ignoring
       }
       this.result = StartOptions.newBuilder()
+          .setGraphicsConfiguration(this.getGraphicsConfiguration())
           .setGameTitle(startOptions.getGameTitle().orElse("Battleships"))
           .setGameIcon(startOptions.getGameIcon().orElse(null))
           .setFullScreen(this.radioFullScreen.isSelected())
