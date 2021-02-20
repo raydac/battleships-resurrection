@@ -78,7 +78,12 @@ public abstract class BasePanel extends JComponent {
     if (this.needsRepaintForMouse()) {
       this.addMouseMotionListener(new MouseAdapter() {
         @Override
-        public void mouseDragged(MouseEvent e) {
+        public void mouseEntered(final MouseEvent e) {
+          repaint();
+        }
+
+        @Override
+        public void mouseDragged(final MouseEvent e) {
           repaint();
         }
 
