@@ -15,25 +15,18 @@
 
 package com.igormaznitsa.battleships;
 
-import com.igormaznitsa.battleships.gui.BattleshipsFrame;
-import com.igormaznitsa.battleships.gui.OpeningDialog;
-import com.igormaznitsa.battleships.gui.ScaleFactor;
-import com.igormaznitsa.battleships.gui.StartOptions;
-import com.igormaznitsa.battleships.gui.WaitOpponentDialog;
+import com.igormaznitsa.battleships.gui.*;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.OldGfxBattleshipSingleSessionBot;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.DisplayMode;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 public class Starter {
 
@@ -113,6 +106,7 @@ public class Starter {
                   .set(Optional.of(new ScaleFactor(selectedData.getGraphicsConfiguration().get())));
             } catch (Exception ex) {
               LOGGER.log(Level.SEVERE, "Can't set full screen window", ex);
+              selectedOpponent.disposePlayer();
               System.exit(4);
             }
             if (d.isDisplayChangeSupported()) {
@@ -130,13 +124,15 @@ public class Starter {
           } else {
             LOGGER.severe("Full screen is not supported by device: " + d);
             JOptionPane.showMessageDialog(null, "Full-screen is not supported for the device!",
-                "Can't full screen", JOptionPane.ERROR_MESSAGE);
+                    "Can't full screen", JOptionPane.ERROR_MESSAGE);
+            selectedOpponent.disposePlayer();
             System.exit(3);
           }
         }, () -> {
           JOptionPane.showMessageDialog(null, "Can't find device for full screen",
               "Can't start full-screen", JOptionPane.ERROR_MESSAGE);
           LOGGER.severe("Can't find device for full screen");
+          selectedOpponent.disposePlayer();
           System.exit(5);
         });
       } else {

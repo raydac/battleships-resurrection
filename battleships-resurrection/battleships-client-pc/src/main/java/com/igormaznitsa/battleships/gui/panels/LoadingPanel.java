@@ -22,7 +22,9 @@ import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.sound.SoundClip;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Graphics2D;
+import com.igormaznitsa.battleships.utils.ImageCursor;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -34,10 +36,10 @@ public class LoadingPanel extends BasePanel {
   private final BufferedImage background;
   private final Optional<SoundClip> soundClip;
 
-  public LoadingPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor) {
-    super(startOptions, scaleFactor);
+  public LoadingPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
+    super(startOptions, scaleFactor, gameCursor);
     this.soundClip =
-        startOptions.isWithSound() ? Optional.of(new SoundClip("fullpart.wav")) : Optional.empty();
+            startOptions.isWithSound() ? Optional.of(new SoundClip("fullpart.wav")) : Optional.empty();
     this.background = GfxUtils.loadGfxImageAsType("splash.png", BufferedImage.TYPE_INT_RGB, 1.0d);
   }
 

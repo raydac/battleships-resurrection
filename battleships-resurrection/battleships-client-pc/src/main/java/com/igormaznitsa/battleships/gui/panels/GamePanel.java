@@ -15,48 +15,19 @@
 
 package com.igormaznitsa.battleships.gui.panels;
 
-import static com.igormaznitsa.battleships.gui.Animation.DONE_AUTO;
-import static com.igormaznitsa.battleships.gui.Animation.E1_NEW;
-import static com.igormaznitsa.battleships.gui.Animation.E2_NEW;
-import static com.igormaznitsa.battleships.gui.Animation.FIRE;
-import static com.igormaznitsa.battleships.gui.Animation.PANEL;
-import static com.igormaznitsa.battleships.gui.Animation.PAUSE_EXIT;
-import static com.igormaznitsa.battleships.gui.Animation.SPLASH;
-import static com.igormaznitsa.battleships.gui.Animation.SPLASH_GOR;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_ARRANGEMENT_COMPLETED;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_DO_TURN;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_HIT;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_KILLED;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_LOST;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_MISS;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_OPPONENT_FIRST_TURN;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_READY;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_MAIN;
-import static com.igormaznitsa.battleships.opponent.GameEventType.EVENT_SHOT_REGULAR;
-import static com.igormaznitsa.battleships.utils.Utils.RND;
-import static java.lang.Math.round;
-
-
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
-import com.igormaznitsa.battleships.gui.sprite.DecorationSprite;
-import com.igormaznitsa.battleships.gui.sprite.FallingAirplaneSprite;
-import com.igormaznitsa.battleships.gui.sprite.FallingObjectSprite;
-import com.igormaznitsa.battleships.gui.sprite.FallingRocketSprite;
-import com.igormaznitsa.battleships.gui.sprite.FieldSprite;
-import com.igormaznitsa.battleships.gui.sprite.FishSprite;
-import com.igormaznitsa.battleships.gui.sprite.OneTimeWaterEffectSprite;
-import com.igormaznitsa.battleships.gui.sprite.ShipSprite;
-import com.igormaznitsa.battleships.gui.sprite.ShipType;
+import com.igormaznitsa.battleships.gui.sprite.*;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import com.igormaznitsa.battleships.opponent.GameEventType;
 import com.igormaznitsa.battleships.sound.Sound;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import com.igormaznitsa.battleships.utils.ImageCursor;
+
+import javax.swing.Timer;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -64,15 +35,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -80,7 +44,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.swing.Timer;
+
+import static com.igormaznitsa.battleships.gui.Animation.*;
+import static com.igormaznitsa.battleships.opponent.GameEventType.*;
+import static com.igormaznitsa.battleships.utils.Utils.RND;
+import static java.lang.Math.round;
 
 public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
@@ -116,11 +84,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private long envTicksBeforeBirdSound = ENV_SOUNDS_TICKS_BIRD_SOUND;
   private long envTicksBeforeOtherSound = ENV_SOUNDS_TICKS_OTHER_SOUND;
   private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
-      new AtomicReference<>(Optional.empty());
+          new AtomicReference<>(Optional.empty());
   private List<FieldSprite> animatedSpriteField = Collections.emptyList();
 
-  public GamePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor) {
-    super(startOptions, scaleFactor);
+  public GamePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
+    super(startOptions, scaleFactor, gameCursor);
 
     this.gameField = new GameField();
     this.background = Animation.FON.getFrame(0);
@@ -129,8 +97,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       @Override
       public void mouseDragged(final MouseEvent mouseEvent) {
         if (currentStage == Stage.PLACING && pressedPlaceShipMouseButton) {
-          final Point preparedMousePoint = scaleFactor.map(sf -> sf.translateMousePoint(mouseEvent))
-              .orElse(mouseEvent.getPoint());
+          final Point preparedMousePoint = scaleFactor.map(sf -> sf.translatePoint(mouseEvent))
+                  .orElse(mouseEvent.getPoint());
           if (lastPressedEmptyCell == null) {
             lastPressedEmptyCell = mouse2game(preparedMousePoint);
             final GameField.CellState cellState =
@@ -166,7 +134,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       @Override
       public void mousePressed(final MouseEvent mouseEvent) {
         final Point preparedMousePoint =
-            scaleFactor.map(sf -> sf.translateMousePoint(mouseEvent)).orElse(mouseEvent.getPoint());
+                scaleFactor.map(sf -> sf.translatePoint(mouseEvent)).orElse(mouseEvent.getPoint());
         final ControlElement detectedControl = ControlElement.find(preparedMousePoint);
         switch (currentStage) {
           case PLACING: {
@@ -244,6 +212,10 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       this.onTimer();
     });
     this.timer.setRepeats(true);
+  }
+
+  public boolean needsRepaintForMouse() {
+    return false;
   }
 
   public static Point findShipRenderPositionForCell(final int cellX, final int cellY) {

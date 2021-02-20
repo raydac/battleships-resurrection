@@ -15,33 +15,25 @@
 
 package com.igormaznitsa.battleships.utils;
 
-import static java.util.Objects.requireNonNull;
-
-
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Taskbar;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+
+import static java.util.Objects.requireNonNull;
 
 public final class GfxUtils {
   private static final ImageReader PNG_IMAGE_READER =
-      ImageIO.getImageReadersByFormatName("png").next();
+          ImageIO.getImageReadersByFormatName("png").next();
 
   private static final BufferedImage EMPTY_128x128_ARGB =
-      new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
+          new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 
   private GfxUtils() {
   }
@@ -68,7 +60,7 @@ public final class GfxUtils {
     final Toolkit toolkit = Toolkit.getDefaultToolkit();
     try {
       final Field awtAppClassNameField =
-          toolkit.getClass().getDeclaredField("awtAppClassName");
+              toolkit.getClass().getDeclaredField("awtAppClassName");
       awtAppClassNameField.setAccessible(true);
       awtAppClassNameField.set(toolkit, title);
     } catch (Exception ex) {
@@ -124,8 +116,8 @@ public final class GfxUtils {
 
   public static BufferedImage loadResImage(final String fileName) {
     try (final InputStream stream = requireNonNull(
-        GfxUtils.class.getClassLoader().getResourceAsStream("assets/res/" + fileName),
-        "Can't find resource: " + fileName)) {
+            GfxUtils.class.getClassLoader().getResourceAsStream("assets/res/" + fileName),
+            "Can't find resource: " + fileName)) {
       return readPngStream(stream);
     } catch (IOException ex) {
       throw new Error("Detected error during load: " + fileName, ex);
@@ -140,15 +132,42 @@ public final class GfxUtils {
     return loadGfxImageAsType(fileName, imageType, 1.0d);
   }
 
+  public static BufferedImage scaleImage(final BufferedImage source, final int targetImageType,
+                                         final double scaleX, final double scaleY, final boolean quality) {
+    final int scaledWidth = (int) Math.round(source.getWidth() * scaleX);
+    final int scaledHeight = (int) Math.round(source.getHeight() * scaleY);
+    final BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, targetImageType);
+    final Graphics2D gfx = scaled.createGraphics();
+    try {
+      gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+              quality ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+      gfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+              quality ? RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY : RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+      gfx.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+              quality ? RenderingHints.VALUE_COLOR_RENDER_QUALITY : RenderingHints.VALUE_COLOR_RENDER_SPEED);
+      gfx.setRenderingHint(RenderingHints.KEY_RENDERING,
+              quality ? RenderingHints.VALUE_RENDER_QUALITY : RenderingHints.VALUE_RENDER_SPEED);
+      gfx.drawImage(source, 0, 0, scaledWidth, scaledHeight, null);
+    } finally {
+      gfx.dispose();
+    }
+    return scaled;
+  }
+
+  public static Cursor makeEmptyAwtCursor() {
+    final BufferedImage image = new BufferedImage(8, 8, BufferedImage.TYPE_INT_ARGB);
+    return Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "empty-cursor");
+  }
+
   public static BufferedImage loadGfxImageAsType(final String fileName, final int imageType,
                                                  final double scale) {
     try (final InputStream stream = requireNonNull(
-        GfxUtils.class.getClassLoader().getResourceAsStream("assets/gfx/" + fileName),
-        "Can't find resource: " + fileName)) {
+            GfxUtils.class.getClassLoader().getResourceAsStream("assets/gfx/" + fileName),
+            "Can't find resource: " + fileName)) {
       final BufferedImage image = readPngStream(stream);
       if (image.getType() != imageType) {
         final BufferedImage newImage =
-            new BufferedImage(image.getWidth(), image.getHeight(), imageType);
+                new BufferedImage(image.getWidth(), image.getHeight(), imageType);
         final Graphics2D gfx = newImage.createGraphics();
         try {
           gfx.drawImage(image, null, 0, 0);
@@ -160,22 +179,7 @@ public final class GfxUtils {
       if (Math.abs(1.0d - scale) <= 0.000000000001d) {
         return image;
       } else {
-        final int scaledWidth = (int) Math.round(image.getWidth() * scale);
-        final int scaledHeight = (int) Math.round(image.getHeight() * scale);
-        final BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, imageType);
-        final Graphics2D gfx = scaled.createGraphics();
-        try {
-          gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-          gfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-              RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-          gfx.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-          gfx.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-          gfx.drawImage(image, 0, 0, scaledWidth, scaledHeight, null);
-        } finally {
-          gfx.dispose();
-        }
-        return scaled;
+        return scaleImage(image, imageType, scale, scale, true);
       }
     } catch (IOException ex) {
       throw new Error("Detected error during load: " + fileName, ex);

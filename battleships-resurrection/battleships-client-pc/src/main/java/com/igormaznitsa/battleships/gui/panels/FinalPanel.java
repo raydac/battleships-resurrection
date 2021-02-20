@@ -15,24 +15,23 @@
 
 package com.igormaznitsa.battleships.gui.panels;
 
-import static com.igormaznitsa.battleships.gui.panels.ControlElement.NONE;
-import static com.igormaznitsa.battleships.gui.panels.ControlElement.PAUSE;
-
-
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.gui.InfoBanner;
 import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import com.igormaznitsa.battleships.utils.ImageCursor;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
-import javax.swing.Timer;
+
+import static com.igormaznitsa.battleships.gui.panels.ControlElement.NONE;
+import static com.igormaznitsa.battleships.gui.panels.ControlElement.PAUSE;
 
 public class FinalPanel extends BasePanel {
 
@@ -43,11 +42,11 @@ public class FinalPanel extends BasePanel {
   private final Optional<Color> fillColor;
 
   public FinalPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor,
-                    final FinalState state) {
-    super(startOptions, scaleFactor);
+                    final FinalState state, final ImageCursor gameCursor) {
+    super(startOptions, scaleFactor, gameCursor);
 
     this.image =
-        GfxUtils.loadGfxImageAsType(state.getImageResourceName(), BufferedImage.TYPE_INT_RGB);
+            GfxUtils.loadGfxImageAsType(state.getImageResourceName(), BufferedImage.TYPE_INT_RGB);
     this.fillColor = state.getFillColor();
     this.sound = state.getSound();
     this.sound.load(startOptions.isWithSound(), true);
@@ -57,7 +56,7 @@ public class FinalPanel extends BasePanel {
       @Override
       public void mousePressed(final MouseEvent mouseEvent) {
         final Point translatedMousePoint =
-            scaleFactor.map(sf -> sf.translateMousePoint(mouseEvent)).orElse(mouseEvent.getPoint());
+                scaleFactor.map(sf -> sf.translatePoint(mouseEvent)).orElse(mouseEvent.getPoint());
         final ControlElement detectedControl = ControlElement.find(translatedMousePoint);
         Sound sound = null;
         switch (detectedControl) {

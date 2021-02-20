@@ -15,27 +15,21 @@
 
 package com.igormaznitsa.battleships.gui.panels;
 
-import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
-import static java.awt.Toolkit.getDefaultToolkit;
-
-
 import com.igormaznitsa.battleships.gui.ScaleFactor;
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import com.igormaznitsa.battleships.utils.ImageCursor;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 public abstract class BasePanel extends JComponent {
   public static final int GAMEFIELD_WIDTH = 800;
@@ -50,8 +44,6 @@ public abstract class BasePanel extends JComponent {
   public static final String SIGNAL_SYSTEM_FAILURE = "SYSTEMFAILURE";
   public static final String SIGNAL_PLAYER_IS_OUT = "PLAYERISOUT";
   public static final String SIGNAL_LOST = "LOST";
-  private static final Cursor CURSOR = getDefaultToolkit()
-      .createCustomCursor(loadResImage("cursor.png"), new Point(8, 8), "BattleShips");
   private final AtomicBoolean disposed = new AtomicBoolean();
   private final List<SignalListener> signalListenerList = new CopyOnWriteArrayList<>();
 
@@ -61,15 +53,41 @@ public abstract class BasePanel extends JComponent {
   private final Dimension size;
   protected final StartOptions startOptions;
 
-  public BasePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor) {
+  private static final Cursor EMPTY_CURSOR = GfxUtils.makeEmptyAwtCursor();
+  private final ImageCursor gameCursor;
+
+  public BasePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
     super();
+
+    if (Toolkit.getDefaultToolkit().getMaximumCursorColors() > 0) {
+      this.setCursor(EMPTY_CURSOR);
+      this.gameCursor = gameCursor;
+    } else {
+      // host system doesn't support custom cursors
+      this.gameCursor = null;
+    }
+
     this.startOptions = startOptions;
     this.scaleFactor = scaleFactor;
-    this.setCursor(CURSOR);
+
     this.size =
-        scaleFactor.map(sf -> new Dimension((int) Math.round(GAMEFIELD_WIDTH * sf.getScaleX()),
-            (int) Math.round(GAMEFIELD_HEIGHT * sf.getScaleY())))
-            .orElse(new Dimension(GAMEFIELD_WIDTH, GAMEFIELD_HEIGHT));
+            scaleFactor.map(sf -> new Dimension((int) Math.round(GAMEFIELD_WIDTH * sf.getScaleX()),
+                    (int) Math.round(GAMEFIELD_HEIGHT * sf.getScaleY())))
+                    .orElse(new Dimension(GAMEFIELD_WIDTH, GAMEFIELD_HEIGHT));
+
+    if (this.needsRepaintForMouse()) {
+      this.addMouseMotionListener(new MouseAdapter() {
+        @Override
+        public void mouseDragged(MouseEvent e) {
+          repaint();
+        }
+
+        @Override
+        public void mouseMoved(final MouseEvent e) {
+          repaint();
+        }
+      });
+    }
   }
 
   @Override
@@ -106,7 +124,7 @@ public abstract class BasePanel extends JComponent {
     if (show) {
       if (creditsImage == null) {
         creditsImage =
-            GfxUtils.loadGfxImageAsType("credits.png", BufferedImage.TYPE_INT_ARGB);
+                GfxUtils.loadGfxImageAsType("credits.png", BufferedImage.TYPE_INT_ARGB);
       }
     } else {
       creditsImage = null;
@@ -153,15 +171,30 @@ public abstract class BasePanel extends JComponent {
     this.scaleFactor.ifPresent(sf -> sf.apply(gfx));
 
     gfx.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-        RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT);
+            RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT);
     gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
     gfx.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-        RenderingHints.VALUE_COLOR_RENDER_DEFAULT);
+            RenderingHints.VALUE_COLOR_RENDER_DEFAULT);
 
     this.doPaint(gfx);
 
     if (creditsImage != null) {
       gfx.drawImage(creditsImage, null, 0, 0);
+    }
+
+    drawCursor(gfx);
+  }
+
+  public boolean needsRepaintForMouse() {
+    return true;
+  }
+
+  private void drawCursor(final Graphics2D gfx) {
+    if (this.gameCursor != null) {
+      final PointerInfo info = MouseInfo.getPointerInfo();
+      final Point mousePoint = info.getLocation();
+      SwingUtilities.convertPointFromScreen(mousePoint, this);
+      this.gameCursor.render(gfx, mousePoint);
     }
   }
 

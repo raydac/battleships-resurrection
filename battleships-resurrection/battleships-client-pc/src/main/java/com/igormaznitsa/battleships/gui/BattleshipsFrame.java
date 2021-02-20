@@ -16,21 +16,14 @@
 package com.igormaznitsa.battleships.gui;
 
 
-import static java.util.Objects.requireNonNull;
-
-
-import com.igormaznitsa.battleships.gui.panels.BasePanel;
-import com.igormaznitsa.battleships.gui.panels.FinalPanel;
-import com.igormaznitsa.battleships.gui.panels.FinalState;
-import com.igormaznitsa.battleships.gui.panels.GamePanel;
-import com.igormaznitsa.battleships.gui.panels.LoadingPanel;
+import com.igormaznitsa.battleships.gui.panels.*;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.sound.Sound;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.KeyboardFocusManager;
+import com.igormaznitsa.battleships.utils.ImageCursor;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -39,9 +32,9 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+
+import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
+import static java.util.Objects.requireNonNull;
 
 public final class BattleshipsFrame extends JFrame implements BasePanel.SignalListener {
 
@@ -51,19 +44,21 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   private final Runnable exitAction;
   private final StartOptions startOptions;
   private final AtomicReference<BattleshipsCommDaemon> commDaemonThreadRef =
-      new AtomicReference<>();
+          new AtomicReference<>();
   private Optional<ScaleFactor> scaleFactor;
+
+  private ImageCursor gameCursor = null;
 
   public BattleshipsFrame(final StartOptions startOptions,
                           final BattleshipsPlayer opponent,
                           final Runnable exitAction) {
     super(startOptions.getGameTitle().orElse("Battleship"),
-        startOptions.getGraphicsConfiguration().orElse(
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                .getDefaultConfiguration()));
+            startOptions.getGraphicsConfiguration().orElse(
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+                            .getDefaultConfiguration()));
 
     GfxUtils.setApplicationTitle(startOptions.getGameIcon().orElse(null),
-        startOptions.getGameTitle().orElse(null));
+            startOptions.getGameTitle().orElse(null));
 
     this.startOptions = startOptions;
     this.scaleFactor = Optional.empty();
@@ -138,7 +133,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     final double scaleY;
     if (startOptions.getGraphicsConfiguration().isPresent()) {
       final AffineTransform transforms =
-          startOptions.getGraphicsConfiguration().get().getDefaultTransform();
+              startOptions.getGraphicsConfiguration().get().getDefaultTransform();
       scaleX = transforms.getScaleX();
       scaleY = transforms.getScaleY();
     } else {
@@ -147,8 +142,10 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     }
 
     final Dimension defaultFrameSize =
-        new Dimension((int) Math.round(scaleX * BasePanel.GAMEFIELD_WIDTH),
-            (int) Math.round(scaleY * BasePanel.GAMEFIELD_HEIGHT));
+            new Dimension((int) Math.round(scaleX * BasePanel.GAMEFIELD_WIDTH),
+                    (int) Math.round(scaleY * BasePanel.GAMEFIELD_HEIGHT));
+
+
     final JPanel panel = new JPanel();
     panel.setSize(defaultFrameSize);
     panel.setMaximumSize(defaultFrameSize);
@@ -161,8 +158,33 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   public void start(final Optional<ScaleFactor> scaleFactor) {
     this.scaleFactor = requireNonNull(scaleFactor);
-    final LoadingPanel loadingPanel = new LoadingPanel(this.startOptions, this.scaleFactor);
+    this.gameCursor = new ImageCursor(loadResImage("cursor.png"), 8, 8);
+
+    final LoadingPanel loadingPanel = new LoadingPanel(this.startOptions, this.scaleFactor, this.gameCursor);
     this.replaceContentPanel(loadingPanel);
+
+    if (this.startOptions.isFullScreen()) {
+      this.moveMouseIntoCenterOfForm();
+    }
+  }
+
+  private void moveMouseIntoCenterOfForm() {
+    try {
+      Robot robot;
+      if (this.startOptions.getGraphicsConfiguration().isPresent()) {
+        robot = new Robot(this.startOptions.getGraphicsConfiguration().get().getDevice());
+      } else {
+        robot = new Robot();
+      }
+      final Rectangle formBounds = this.getBounds();
+      LOGGER.info("Main form bounds: " + formBounds);
+      final Point point = new Point(formBounds.width / 2, formBounds.height / 2);
+      this.scaleFactor.ifPresent(s -> s.translatePoint(point));
+      robot.mouseMove(formBounds.x + point.x, formBounds.y + point.y);
+      this.repaint();
+    } catch (Exception ex) {
+      LOGGER.warning("Can't move mouse into form center: " + ex.getMessage());
+    }
   }
 
   protected void onExit() {
@@ -185,7 +207,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
   }
 
   protected void doLoadingCompleted() {
-    final GamePanel gamePanel = new GamePanel(this.startOptions, this.scaleFactor);
+    final GamePanel gamePanel = new GamePanel(this.startOptions, this.scaleFactor, this.gameCursor);
 
     final BattleshipsCommDaemon newCommDaemon = new BattleshipsCommDaemon(gamePanel, this.opponent);
     if (this.commDaemonThreadRef.compareAndSet(null, newCommDaemon)) {
@@ -206,7 +228,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       case BasePanel.SIGNAL_LOST:
       case BasePanel.SIGNAL_VICTORY: {
         this.onGameEnd(BasePanel.SIGNAL_VICTORY.equalsIgnoreCase(signal) ? FinalState.VICTORY :
-            FinalState.LOST);
+                FinalState.LOST);
       }
       break;
       case BasePanel.SIGNAL_PLAYER_IS_OUT: {
@@ -234,19 +256,19 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private void onGameEnd(final FinalState state) {
     LOGGER.info("Game session ended, final state " + state);
-    this.replaceContentPanel(new FinalPanel(this.startOptions, scaleFactor, state));
+    this.replaceContentPanel(new FinalPanel(this.startOptions, scaleFactor, state, this.gameCursor));
   }
 
   private void onGameError() {
     LOGGER.severe("Detected game error");
     this.replaceContentPanel(
-        new FinalPanel(this.startOptions, this.scaleFactor, FinalState.SYSTEM_FAILURE));
+            new FinalPanel(this.startOptions, this.scaleFactor, FinalState.SYSTEM_FAILURE, this.gameCursor));
   }
 
   private void onPlayerIsOut() {
     LOGGER.severe("Detected that opponent has left the game room");
     this.replaceContentPanel(
-        new FinalPanel(this.startOptions, this.scaleFactor, FinalState.OPPONENT_OFF));
+            new FinalPanel(this.startOptions, this.scaleFactor, FinalState.OPPONENT_OFF, this.gameCursor));
   }
 
   private void onGamePaused() {

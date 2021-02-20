@@ -15,10 +15,9 @@
 
 package com.igormaznitsa.battleships.gui;
 
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Point;
-import java.awt.Rectangle;
+import com.igormaznitsa.battleships.gui.panels.BasePanel;
+
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public final class ScaleFactor {
@@ -27,8 +26,9 @@ public final class ScaleFactor {
 
   public ScaleFactor(final GraphicsConfiguration graphicsConfiguration) {
     final Rectangle screen = graphicsConfiguration.getBounds();
-    this.sx = screen.getWidth() / 800.0d;
-    this.sy = screen.getHeight() / 600.0d;
+    final Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration);
+    this.sx = (screen.getWidth() - screenInsets.left - screenInsets.right) / (double) BasePanel.GAMEFIELD_WIDTH;
+    this.sy = (screen.getHeight() - screenInsets.top - screenInsets.bottom) / (double) BasePanel.GAMEFIELD_HEIGHT;
   }
 
   public double getScaleX() {
@@ -48,10 +48,15 @@ public final class ScaleFactor {
     return "ScaleFactor[sx=" + this.sx + ", sy=" + this.sy + ']';
   }
 
-  public Point translateMousePoint(final MouseEvent event) {
-    final int descaledX = (int) Math.round(event.getPoint().x / this.sx);
-    final int descaledY = (int) Math.round(event.getPoint().y / this.sy);
-    return new Point(descaledX, descaledY);
+  public Point translatePoint(final MouseEvent event) {
+    translatePoint(event.getPoint());
+    return event.getPoint();
+  }
+
+  public void translatePoint(final Point point) {
+    final int descaledX = (int) Math.round(point.x / this.sx);
+    final int descaledY = (int) Math.round(point.y / this.sy);
+    point.move(descaledX, descaledY);
   }
 
 }
