@@ -1,0 +1,80 @@
+<!--
+  ~    Battleships PC client with GFX multi-player game support
+  ~    Copyright (C) 2021 Igor Maznitsa
+  ~
+  ~    This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  -->
+
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>withjre_windows</id>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <includeSiteDirectory>false</includeSiteDirectory>
+
+    <formats>
+        <format>jar</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}${file.separator}src${file.separator}assembly${file.separator}mac</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
+            <excludes>
+                <exclude>
+                    Battleships.app${file.separator}Contents${file.separator}MacOS${file.separator}battleships
+                </exclude>
+                <exclude>
+                    Battleships.app${file.separator}Contents${file.separator}Resources${file.separator}**${file.separator}*
+                </exclude>
+            </excludes>
+            <includes>
+                <include>*/**</include>
+            </includes>
+            <filtered>true</filtered>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}${file.separator}src${file.separator}assembly${file.separator}mac</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
+            <includes>
+                <include>Battleships.app${file.separator}Contents${file.separator}Resources${file.separator}*
+                </include>
+            </includes>
+            <filtered>false</filtered>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}${file.separator}jre_macos_amd64</directory>
+            <outputDirectory>
+                ${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS${file.separator}jre
+            </outputDirectory>
+            <includes>
+                <include>*/**</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    <files>
+        <file>
+            <source>
+                ${project.basedir}${file.separator}src${file.separator}assembly${file.separator}mac${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS${file.separator}battleships
+            </source>
+            <destName>battleships</destName>
+            <outputDirectory>${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS
+            </outputDirectory>
+            <fileMode>0755</fileMode>
+        </file>
+        <file>
+            <source>${project.build.directory}${file.separator}${project.build.finalName}.jar</source>
+            <destName>battleships-resurrection-${project.version}.jar</destName>
+            <outputDirectory>${file.separator}Battleships.app${file.separator}Contents${file.separator}MacOS
+            </outputDirectory>
+        </file>
+    </files>
+</assembly>
