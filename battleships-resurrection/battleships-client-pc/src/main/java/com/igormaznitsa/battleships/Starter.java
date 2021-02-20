@@ -63,9 +63,9 @@ public class Starter {
       }
 
       final WaitOpponentDialog waitOpponentDialog =
-          new WaitOpponentDialog(selectedData.getGraphicsConfiguration().orElse(null),
-              selectedData.getGameTitle().orElse("BattleShips"),
-              selectedData.getGameIcon().orElse(null), selectedOpponent);
+              new WaitOpponentDialog(selectedData.getGraphicsConfiguration().orElse(null),
+                      selectedData.getGameTitle().orElse("BattleShips"),
+                      selectedData.getGameIcon().orElse(null), selectedOpponent);
       if (waitOpponentDialog.start()) {
         LOGGER.info("Waiting is completed");
       } else {
@@ -76,17 +76,17 @@ public class Starter {
       if (!selectedOpponent.isAvailable()) {
         LOGGER.severe(selectedOpponent.getId() + " is unavailable");
         JOptionPane.showMessageDialog(null, selectedOpponent.getId() + " is unavailable!",
-            "Error", JOptionPane.ERROR_MESSAGE);
+                "Error", JOptionPane.ERROR_MESSAGE);
         System.exit(11);
       }
 
       final Optional<GraphicsDevice> device = selectedData.getGraphicsConfiguration().map(
-          GraphicsConfiguration::getDevice);
+              GraphicsConfiguration::getDevice);
 
       final AtomicReference<BattleshipsFrame> mainFrameRef = new AtomicReference<>();
 
       final AtomicReference<Optional<ScaleFactor>> scaleFactorRef =
-          new AtomicReference<>(Optional.empty());
+              new AtomicReference<>(Optional.empty());
       if (selectedData.isFullScreen()) {
         device.ifPresentOrElse(d -> {
           if (d.isFullScreenSupported()) {
@@ -99,11 +99,12 @@ public class Starter {
               }
             }));
             final DisplayMode displayMode = new DisplayMode(800, 600, DisplayMode.BIT_DEPTH_MULTI,
-                DisplayMode.REFRESH_RATE_UNKNOWN);
+                    DisplayMode.REFRESH_RATE_UNKNOWN);
             try {
               d.setFullScreenWindow(mainFrameRef.get());
               scaleFactorRef
-                  .set(Optional.of(new ScaleFactor(selectedData.getGraphicsConfiguration().get())));
+                      .set(Optional.of(new ScaleFactor(selectedData.getGraphicsConfiguration().get())));
+              LOGGER.info("Set full screen window");
             } catch (Exception ex) {
               LOGGER.log(Level.SEVERE, "Can't set full screen window", ex);
               selectedOpponent.disposePlayer();
@@ -114,12 +115,13 @@ public class Starter {
               try {
                 d.setDisplayMode(displayMode);
                 scaleFactorRef.set(Optional.empty());
+                LOGGER.info("Display mode is set: " + displayMode);
               } catch (Exception ex) {
                 LOGGER.log(Level.FINE, "Error during display change", ex);
               }
             } else {
               d.setFullScreenWindow(null);
-              LOGGER.log(Level.FINE, "Display change is not allowed by device: " + d);
+              LOGGER.info("Display change is not allowed by device: " + d);
             }
           } else {
             LOGGER.severe("Full screen is not supported by device: " + d);
@@ -130,15 +132,15 @@ public class Starter {
           }
         }, () -> {
           JOptionPane.showMessageDialog(null, "Can't find device for full screen",
-              "Can't start full-screen", JOptionPane.ERROR_MESSAGE);
+                  "Can't start full-screen", JOptionPane.ERROR_MESSAGE);
           LOGGER.severe("Can't find device for full screen");
           selectedOpponent.disposePlayer();
           System.exit(5);
         });
       } else {
         mainFrameRef
-            .set(new BattleshipsFrame(selectedData, selectedOpponent,
-                selectedOpponent::disposePlayer));
+                .set(new BattleshipsFrame(selectedData, selectedOpponent,
+                        selectedOpponent::disposePlayer));
       }
 
       final BattleshipsFrame mainFrame = mainFrameRef.get();
