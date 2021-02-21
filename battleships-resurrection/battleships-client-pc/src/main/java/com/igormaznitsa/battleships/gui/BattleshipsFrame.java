@@ -180,7 +180,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
       LOGGER.info("Main form bounds: " + formBounds);
       final Point point = new Point(formBounds.width / 2, formBounds.height / 2);
       this.scaleFactor.ifPresent(s -> s.translatePoint(point));
-      robot.mouseMove(formBounds.x + point.x, formBounds.y + point.y);
+      SwingUtilities.convertPointToScreen(point, this);
+      robot.mouseMove(point.x, point.y);
       this.repaint();
     } catch (Exception ex) {
       LOGGER.warning("Can't move mouse into form center: " + ex.getMessage());
