@@ -59,13 +59,8 @@ public abstract class BasePanel extends JComponent {
   public BasePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
     super();
 
-    if (Toolkit.getDefaultToolkit().getMaximumCursorColors() > 0) {
-      this.setCursor(EMPTY_CURSOR);
-      this.gameCursor = gameCursor;
-    } else {
-      // host system doesn't support custom cursors
-      this.gameCursor = null;
-    }
+    this.setCursor(EMPTY_CURSOR);
+    this.gameCursor = gameCursor;
 
     this.startOptions = startOptions;
     this.scaleFactor = scaleFactor;

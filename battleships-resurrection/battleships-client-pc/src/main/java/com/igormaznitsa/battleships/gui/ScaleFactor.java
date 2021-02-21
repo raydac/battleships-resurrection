@@ -26,9 +26,11 @@ public final class ScaleFactor {
 
   public ScaleFactor(final GraphicsConfiguration graphicsConfiguration) {
     final Rectangle screen = graphicsConfiguration.getBounds();
-    final Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration);
-    this.sx = (screen.getWidth() - screenInsets.left - screenInsets.right) / (double) BasePanel.GAMEFIELD_WIDTH;
-    this.sy = (screen.getHeight() - screenInsets.top - screenInsets.bottom) / (double) BasePanel.GAMEFIELD_HEIGHT;
+//    final Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration);
+//    this.sx = (screen.getWidth() - screenInsets.left - screenInsets.right) / (double) BasePanel.GAMEFIELD_WIDTH;
+//    this.sy = (screen.getHeight() - screenInsets.top - screenInsets.bottom) / (double) BasePanel.GAMEFIELD_HEIGHT;
+    this.sx = screen.getWidth() / (double) BasePanel.GAMEFIELD_WIDTH;
+    this.sy = screen.getHeight() / (double) BasePanel.GAMEFIELD_HEIGHT;
   }
 
   public double getScaleX() {

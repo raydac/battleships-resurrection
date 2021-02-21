@@ -38,6 +38,20 @@ public final class GfxUtils {
   private GfxUtils() {
   }
 
+  public static boolean tryMacOsFullScreen(final Window frame) {
+    boolean result = true;
+    try {
+      Class<? extends Object> fsu = Class.forName("com.apple.eawt.FullScreenUtilities");
+      fsu.getMethod("setWindowCanFullScreen", Window.class, Boolean.TYPE).invoke(null, frame, true);
+      Class<? extends Object> app = Class.forName("com.apple.eawt.Application");
+      Object geta = app.getMethod("getApplication").invoke(null);
+      geta.getClass().getMethod("requestToggleFullScreen", Window.class).invoke(geta, frame);
+    } catch (Exception e) {
+      result = false;
+    }
+    return result;
+  }
+
   public static void setApplicationTitle(final Image icon, final String title) {
     if (Taskbar.isTaskbarSupported()) {
       final Taskbar taskbar = Taskbar.getTaskbar();
@@ -155,8 +169,9 @@ public final class GfxUtils {
   }
 
   public static Cursor makeEmptyAwtCursor() {
-    final BufferedImage image = new BufferedImage(8, 8, BufferedImage.TYPE_INT_ARGB);
-    return Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "empty-cursor");
+    final Dimension size = Toolkit.getDefaultToolkit().getBestCursorSize(1, 1);
+    final BufferedImage image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+    return Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "hidden-cursor");
   }
 
   public static BufferedImage loadGfxImageAsType(final String fileName, final int imageType,

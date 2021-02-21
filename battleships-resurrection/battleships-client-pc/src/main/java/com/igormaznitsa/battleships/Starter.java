@@ -98,6 +98,9 @@ public class Starter {
                 selectedOpponent.disposePlayer();
               }
             }));
+
+            GfxUtils.tryMacOsFullScreen(mainFrameRef.get());
+
             final DisplayMode displayMode = new DisplayMode(800, 600, DisplayMode.BIT_DEPTH_MULTI,
                     DisplayMode.REFRESH_RATE_UNKNOWN);
             try {
@@ -120,7 +123,6 @@ public class Starter {
                 LOGGER.log(Level.FINE, "Error during display change", ex);
               }
             } else {
-              d.setFullScreenWindow(null);
               LOGGER.info("Display change is not allowed by device: " + d);
             }
           } else {
