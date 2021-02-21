@@ -174,6 +174,18 @@ public final class GfxUtils {
     return Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "hidden-cursor");
   }
 
+  public static void setCursorForAll(final Container component, final Cursor cursor) {
+    component.setCursor(cursor);
+    for (int i = 0; i < component.getComponentCount(); i++) {
+      final Component child = component.getComponent(i);
+      if (child instanceof Container) {
+        setCursorForAll((Container) child, cursor);
+      } else {
+        child.setCursor(cursor);
+      }
+    }
+  }
+
   public static BufferedImage loadGfxImageAsType(final String fileName, final int imageType,
                                                  final double scale) {
     try (final InputStream stream = requireNonNull(

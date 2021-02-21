@@ -49,6 +49,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   private ImageCursor gameCursor = null;
 
+  private final Cursor emptyCursor = GfxUtils.makeEmptyAwtCursor();
+
   public BattleshipsFrame(final StartOptions startOptions,
                           final BattleshipsPlayer opponent,
                           final Runnable exitAction) {
@@ -153,6 +155,9 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     panel.setPreferredSize(defaultFrameSize);
 
     this.setContentPane(panel);
+
+    GfxUtils.setCursorForAll(this, this.emptyCursor);
+
     this.pack();
   }
 
@@ -205,6 +210,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     newPanel.addSignalListener(this);
     SwingUtilities.invokeLater(newPanel::start);
     newPanel.requestFocus();
+    GfxUtils.setCursorForAll(this, this.emptyCursor);
   }
 
   protected void doLoadingCompleted() {

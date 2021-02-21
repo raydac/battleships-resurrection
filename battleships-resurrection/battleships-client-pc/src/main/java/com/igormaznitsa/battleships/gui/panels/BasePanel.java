@@ -53,15 +53,11 @@ public abstract class BasePanel extends JComponent {
   private final Dimension size;
   protected final StartOptions startOptions;
 
-  private static final Cursor EMPTY_CURSOR = GfxUtils.makeEmptyAwtCursor();
   private final ImageCursor gameCursor;
 
   public BasePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
     super();
-
-    this.setCursor(EMPTY_CURSOR);
     this.gameCursor = gameCursor;
-
     this.startOptions = startOptions;
     this.scaleFactor = scaleFactor;
 
