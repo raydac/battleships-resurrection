@@ -33,6 +33,8 @@ public class Starter {
   private static final Logger LOGGER = Logger.getLogger(Starter.class.getName());
 
   public static void main(final String... args) {
+    System.setProperty("apple.awt.fullscreenhidecursor", "true");
+
     SwingUtilities.invokeLater(() -> {
       try {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

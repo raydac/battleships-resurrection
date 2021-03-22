@@ -24,9 +24,7 @@ import com.igormaznitsa.battleships.utils.ImageCursor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -211,6 +209,12 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     SwingUtilities.invokeLater(newPanel::start);
     newPanel.requestFocus();
     GfxUtils.setCursorForAll(this, this.emptyCursor);
+    newPanel.addMouseMotionListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(final MouseEvent e) {
+        GfxUtils.setCursorForAll(newPanel, emptyCursor);
+      }
+    });
   }
 
   protected void doLoadingCompleted() {
