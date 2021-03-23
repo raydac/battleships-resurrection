@@ -169,7 +169,7 @@ public final class GfxUtils {
   }
 
   public static Cursor makeEmptyAwtCursor() {
-    final Dimension size = Toolkit.getDefaultToolkit().getBestCursorSize(1, 1);
+    final Dimension size = Toolkit.getDefaultToolkit().getBestCursorSize(32, 32);
     final BufferedImage image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
     return Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "hidden-cursor");
   }
