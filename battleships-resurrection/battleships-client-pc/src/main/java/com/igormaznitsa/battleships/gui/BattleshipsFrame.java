@@ -155,6 +155,8 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     this.setContentPane(panel);
 
     GfxUtils.setCursorForAll(this, this.emptyCursor);
+    GfxUtils.setCursorForAll(this.getContentPane(), this.emptyCursor);
+    GfxUtils.setCursorForAll(this.getGlassPane(), this.emptyCursor);
 
     this.pack();
   }

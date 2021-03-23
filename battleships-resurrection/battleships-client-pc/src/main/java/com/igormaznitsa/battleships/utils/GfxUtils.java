@@ -174,14 +174,19 @@ public final class GfxUtils {
     return Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(0, 0), "hidden-cursor");
   }
 
-  public static void setCursorForAll(final Container component, final Cursor cursor) {
-    component.setCursor(cursor);
-    for (int i = 0; i < component.getComponentCount(); i++) {
-      final Component child = component.getComponent(i);
-      if (child instanceof Container) {
-        setCursorForAll((Container) child, cursor);
-      } else {
-        child.setCursor(cursor);
+  public static void setCursorForAll(final Component component, final Cursor cursor) {
+    if (component != null) {
+      component.setCursor(cursor);
+      if (component instanceof Container) {
+        final Container container = (Container) component;
+        for (int i = 0; i < container.getComponentCount(); i++) {
+          final Component child = container.getComponent(i);
+          if (child instanceof Container) {
+            setCursorForAll((Container) child, cursor);
+          } else {
+            child.setCursor(cursor);
+          }
+        }
       }
     }
   }
