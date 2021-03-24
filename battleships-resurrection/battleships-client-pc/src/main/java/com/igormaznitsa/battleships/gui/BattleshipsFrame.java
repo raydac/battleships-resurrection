@@ -85,6 +85,11 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
         }
         doCloseWindow();
       }
+
+      @Override
+      public void windowActivated(WindowEvent e) {
+        GfxUtils.setCursorForAll(BattleshipsFrame.this, emptyCursor);
+      }
     });
 
     final KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
