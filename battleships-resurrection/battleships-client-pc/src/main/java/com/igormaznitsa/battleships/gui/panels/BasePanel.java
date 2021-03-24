@@ -86,6 +86,10 @@ public abstract class BasePanel extends JComponent {
     }
   }
 
+  public String getApplicationBadgeTitle() {
+    return null;
+  }
+
   @Override
   public final Dimension getMinimumSize() {
     return this.size;

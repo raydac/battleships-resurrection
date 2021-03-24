@@ -15,37 +15,18 @@
 
 package com.igormaznitsa.battleships.gui;
 
-import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
-import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
-import static javax.swing.BorderFactory.createCompoundBorder;
-import static javax.swing.BorderFactory.createEmptyBorder;
-import static javax.swing.BorderFactory.createTitledBorder;
-
-
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
+
+import javax.swing.*;
+import javax.swing.Box.Filler;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.Optional;
-import javax.swing.Box;
-import javax.swing.Box.Filler;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
-import javax.swing.text.NumberFormatter;
+
+import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
+import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
+import static javax.swing.BorderFactory.*;
 
 public class OpeningDialog extends javax.swing.JDialog {
 
@@ -79,8 +60,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     startOptions.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
 
-    GfxUtils.setApplicationTitle(startOptions.getGameIcon().orElse(null),
-        startOptions.getGameTitle().orElse(null));
+    GfxUtils.setApplicationTaskbarTitle(startOptions.getGameIcon().orElse(null), "Settings");
 
     this.setAlwaysOnTop(true);
 

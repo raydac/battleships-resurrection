@@ -225,7 +225,7 @@
                             <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
                             <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads</downloadUrl>
                             <classPath>
-                                <mainClass>com.igormaznitsa.battleships.Starter</mainClass>
+                                <mainClass>BattleShips</mainClass>
                             </classPath>
                             <icon>src/assembly/windows/appico.ico</icon>
                             <jre>
@@ -270,9 +270,9 @@
                                     <outfile>${project.build.directory}${file.separator}battleships-resurrection.exe
                                     </outfile>
                                     <dontWrapJar>true</dontWrapJar>
-                                    <jar>.\battleships-resurrection.jar</jar>
+                                    <jar>%EXEDIR%\battleships-resurrection.jar</jar>
                                     <jre>
-                                        <path>.\jre</path>
+                                        <path>%EXEDIR%\jre</path>
                                     </jre>
                                 </configuration>
                             </execution>
@@ -471,7 +471,7 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.igormaznitsa.battleships.Starter</mainClass>
+                                    <mainClass>BattleShips</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

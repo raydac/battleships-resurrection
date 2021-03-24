@@ -43,6 +43,11 @@ public class LoadingPanel extends BasePanel {
     this.background = GfxUtils.loadGfxImageAsType("splash.png", BufferedImage.TYPE_INT_RGB, 1.0d);
   }
 
+  @Override
+  public String getApplicationBadgeTitle() {
+    return "Loading";
+  }
+
   protected void doLoading() {
     LOGGER.info("Loading animation");
     for (final Animation a : Animation.values()) {

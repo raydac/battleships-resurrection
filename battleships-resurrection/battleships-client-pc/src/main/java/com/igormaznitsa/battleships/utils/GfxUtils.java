@@ -52,22 +52,18 @@ public final class GfxUtils {
     return result;
   }
 
-  public static void setApplicationTitle(final Image icon, final String title) {
+  public static void setApplicationTaskbarTitle(final Image taskBarIcon, final String taskBarBadgeTitle) {
     if (Taskbar.isTaskbarSupported()) {
       final Taskbar taskbar = Taskbar.getTaskbar();
-      if (icon != null) {
-        try {
-          taskbar.setIconImage(icon);
-        } catch (Exception ex) {
-          // do nothing
-        }
+      try {
+        taskbar.setIconImage(taskBarIcon);
+      } catch (Exception ex) {
+        // do nothing
       }
-      if (title != null) {
-        try {
-          taskbar.setIconBadge(title);
-        } catch (Exception ex) {
-          // do nothing
-        }
+      try {
+        taskbar.setIconBadge(taskBarBadgeTitle);
+      } catch (Exception ex) {
+        // do nothing
       }
     }
 
@@ -76,7 +72,7 @@ public final class GfxUtils {
       final Field awtAppClassNameField =
               toolkit.getClass().getDeclaredField("awtAppClassName");
       awtAppClassNameField.setAccessible(true);
-      awtAppClassNameField.set(toolkit, title);
+      awtAppClassNameField.set(toolkit, taskBarBadgeTitle);
     } catch (Exception ex) {
       // just ignoring
     }

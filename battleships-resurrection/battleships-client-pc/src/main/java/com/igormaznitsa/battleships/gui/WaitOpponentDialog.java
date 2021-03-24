@@ -17,19 +17,13 @@ package com.igormaznitsa.battleships.gui;
 
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.GraphicsConfiguration;
-import java.awt.GridLayout;
-import java.awt.Image;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
-import javax.swing.BorderFactory;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.Timer;
 
 public class WaitOpponentDialog extends JDialog {
   private final BattleshipsPlayer player;
@@ -43,7 +37,7 @@ public class WaitOpponentDialog extends JDialog {
                             final BattleshipsPlayer player) {
     super(null, title, ModalityType.APPLICATION_MODAL, configuration);
 
-      GfxUtils.setApplicationTitle(icon, title);
+    GfxUtils.setApplicationTaskbarTitle(icon, title);
 
     this.setAlwaysOnTop(true);
     this.player = Objects.requireNonNull(player);

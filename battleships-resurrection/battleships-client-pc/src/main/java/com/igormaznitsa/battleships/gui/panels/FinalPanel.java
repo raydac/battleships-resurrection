@@ -40,10 +40,13 @@ public class FinalPanel extends BasePanel {
   private ControlElement selectedControl = ControlElement.NONE;
   private final InfoBanner infoBanner;
   private final Optional<Color> fillColor;
+  private final FinalState finalState;
 
   public FinalPanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor,
                     final FinalState state, final ImageCursor gameCursor) {
     super(startOptions, scaleFactor, gameCursor);
+
+    this.finalState = state;
 
     this.image =
             GfxUtils.loadGfxImageAsType(state.getImageResourceName(), BufferedImage.TYPE_INT_RGB);
@@ -99,6 +102,22 @@ public class FinalPanel extends BasePanel {
         }
       }
     });
+  }
+
+  @Override
+  public String getApplicationBadgeTitle() {
+    switch (this.finalState) {
+      case LOST:
+        return "Lost";
+      case OPPONENT_OFF:
+        return "Opponent off";
+      case SYSTEM_FAILURE:
+        return "Failure";
+      case VICTORY:
+        return "Victory";
+      default:
+        return null;
+    }
   }
 
   @Override

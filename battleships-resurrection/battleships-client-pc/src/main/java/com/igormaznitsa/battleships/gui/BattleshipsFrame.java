@@ -57,10 +57,9 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
                     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                             .getDefaultConfiguration()));
 
-    GfxUtils.setApplicationTitle(startOptions.getGameIcon().orElse(null),
-            startOptions.getGameTitle().orElse(null));
-
     this.startOptions = startOptions;
+    GfxUtils.setApplicationTaskbarTitle(this.startOptions.getGameIcon().orElse(null), null);
+
     this.scaleFactor = Optional.empty();
     if (startOptions.isFullScreen()) {
       this.setResizable(false);
@@ -222,6 +221,9 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
         GfxUtils.setCursorForAll(newPanel, emptyCursor);
       }
     });
+
+    GfxUtils.setApplicationTaskbarTitle(this.startOptions.getGameIcon().orElse(null),
+            newPanel.getApplicationBadgeTitle());
   }
 
   protected void doLoadingCompleted() {

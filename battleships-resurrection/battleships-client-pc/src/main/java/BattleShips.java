@@ -13,8 +13,6 @@
  *     GNU General Public License for more details.
  */
 
-package com.igormaznitsa.battleships;
-
 import com.igormaznitsa.battleships.gui.*;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
@@ -28,9 +26,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Starter {
+public class BattleShips {
 
-  private static final Logger LOGGER = Logger.getLogger(Starter.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BattleShips.class.getName());
 
   public static void main(final String... args) {
     System.setProperty("apple.awt.fullscreenhidecursor", "true");
