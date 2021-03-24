@@ -222,10 +222,11 @@
                         <artifactId>launch4j-maven-plugin</artifactId>
                         <configuration>
                             <headerType>gui</headerType>
-                            <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
-                            <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads</downloadUrl>
+                            <downloadUrl>https://bell-sw.com/pages/downloads/#/java-11-lts</downloadUrl>
+                            <jar>battleships-resurrection.jar</jar>
                             <classPath>
                                 <mainClass>BattleShips</mainClass>
+                                <addDependencies>false</addDependencies>
                             </classPath>
                             <icon>src/assembly/windows/appico.ico</icon>
                             <jre>
@@ -237,7 +238,6 @@
                                     <opt>-server</opt>
                                     <opt>-Dsun.rmi.transport.tcp.maxConnectionThreads=0</opt>
                                     <opt>-XX:+DisableAttachMechanism</opt>
-                                    <opt>-Xverify:none</opt>
                                     <opt>-Dsun.java2d.d3d=true</opt>
                                     <opt>-Dsun.java2d.ddoffscreen=true</opt>
                                     <opt>-Dsun.java2d.ddforcevram=true</opt>
@@ -247,8 +247,8 @@
                                 </opts>
                             </jre>
                             <versionInfo>
-                                <fileVersion>0.1.0.1</fileVersion>
-                                <txtFileVersion>0.1.0.1</txtFileVersion>
+                                <fileVersion>0.1.0.2</fileVersion>
+                                <txtFileVersion>0.1.0.2</txtFileVersion>
                                 <fileDescription>battleship</fileDescription>
                                 <copyright>Copyright &#169; 2001</copyright>
                                 <productVersion>0.1.0.1</productVersion>
@@ -270,7 +270,6 @@
                                     <outfile>${project.build.directory}${file.separator}battleships-resurrection.exe
                                     </outfile>
                                     <dontWrapJar>true</dontWrapJar>
-                                    <jar>%EXEDIR%\battleships-resurrection.jar</jar>
                                     <jre>
                                         <path>%EXEDIR%\jre</path>
                                     </jre>
