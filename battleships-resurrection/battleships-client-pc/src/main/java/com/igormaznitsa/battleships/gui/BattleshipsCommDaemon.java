@@ -20,6 +20,7 @@ import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import com.igormaznitsa.battleships.opponent.FirstMoveOrderProvider;
 import com.igormaznitsa.battleships.opponent.GameEventType;
 import com.igormaznitsa.battleships.utils.Utils;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -139,13 +140,7 @@ final class BattleshipsCommDaemon {
         firstMoveOrderProvider = (FirstMoveOrderProvider) this.playerB;
       } else {
         LOGGER.info("Using internal dice to choose first turn player");
-        firstMoveOrderProvider = new FirstMoveOrderProvider() {
-          @Override
-          public BattleshipsPlayer findFirstTurnPlayer(final BattleshipsPlayer playerA,
-                                                       final BattleshipsPlayer playerB) {
-            return Utils.RND.nextBoolean() ? playerA : playerB;
-          }
-        };
+        firstMoveOrderProvider = (playerA, playerB) -> Utils.RND.nextBoolean() ? playerA : playerB;
       }
 
       final BattleshipsPlayer firstTurnPlayer = Objects

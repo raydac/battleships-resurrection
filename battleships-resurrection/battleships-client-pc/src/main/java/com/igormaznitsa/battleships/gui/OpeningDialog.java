@@ -101,7 +101,7 @@ public class OpeningDialog extends javax.swing.JDialog {
     this.buttonGo.addActionListener(e -> {
       int hostPort = -1;
       try {
-        hostPort = Integer.parseInt(this.textFieldPort.getText().toString().trim());
+        hostPort = Integer.parseInt(this.textFieldPort.getText().trim());
       } catch (Exception ex) {
         // ignoring
       }
