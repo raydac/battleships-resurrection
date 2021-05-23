@@ -52,16 +52,15 @@ import static java.lang.Math.round;
 
 public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
-  private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
-
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(70);
+  private static final Logger LOGGER = Logger.getLogger(GamePanel.class.getName());
   private static final int TICKS_BEFORE_CONTROL_ACTION = 3;
   private static final int GAME_FIELD_CELL_WIDTH = 23;
   private static final int GAME_FIELD_CELL_HEIGHT = 23;
   private static final Ellipse2D FIRE_BUTTON_AREA = new Ellipse2D.Float(184, 16, 43, 43);
   private static final Rectangle ACTION_PANEL_AREA =
-      new Rectangle(287, 119, GAME_FIELD_CELL_WIDTH * GameField.FIELD_EDGE,
-          GAME_FIELD_CELL_HEIGHT * GameField.FIELD_EDGE);
+          new Rectangle(287, 119, GAME_FIELD_CELL_WIDTH * GameField.FIELD_EDGE,
+                  GAME_FIELD_CELL_HEIGHT * GameField.FIELD_EDGE);
   private static final Point HORIZONS_SPLASH_COORDS = new Point(561, 32);
   private static final Point HORIZONS_EXPLOSION_COORDS = new Point(585, 36);
   private static final long ENV_SOUNDS_TICKS_BIRD_SOUND = 60;
@@ -71,6 +70,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private final GameField gameField;
   private final BlockingQueue<BsGameEvent> incomingQueue = new ArrayBlockingQueue<>(10);
   private final BlockingQueue<BsGameEvent> outgoingQueue = new ArrayBlockingQueue<>(10);
+  private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
+          new AtomicReference<>(Optional.empty());
   private Stage currentStage;
   private int stageStep;
   private ControlElement selectedControl;
@@ -83,9 +84,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private OneTimeWaterEffectSprite fieldWaterEffect = null;
   private long envTicksBeforeBirdSound = ENV_SOUNDS_TICKS_BIRD_SOUND;
   private long envTicksBeforeOtherSound = ENV_SOUNDS_TICKS_OTHER_SOUND;
-  private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
-          new AtomicReference<>(Optional.empty());
   private List<FieldSprite> animatedSpriteField = Collections.emptyList();
+  private ShipType lastFiringShipType = ShipType.U_BOAT;
 
   public GamePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
     super(startOptions, scaleFactor, gameCursor);
@@ -102,7 +102,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
           if (lastPressedEmptyCell == null) {
             lastPressedEmptyCell = mouse2game(preparedMousePoint);
             final GameField.CellState cellState =
-                gameField.getState(lastPressedEmptyCell.x, lastPressedEmptyCell.y);
+                    gameField.getState(lastPressedEmptyCell.x, lastPressedEmptyCell.y);
             if (cellState == GameField.CellState.EMPTY) {
               gameField.tryMakePlaceholder(lastPressedEmptyCell, lastPressedEmptyCell);
             } else {
@@ -150,14 +150,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
             } else if (ACTION_PANEL_AREA.contains(preparedMousePoint)) {
               lastPressedEmptyCell = mouse2game(preparedMousePoint);
               final GameField.CellState cellState =
-                  gameField.getState(lastPressedEmptyCell.x, lastPressedEmptyCell.y);
+                      gameField.getState(lastPressedEmptyCell.x, lastPressedEmptyCell.y);
               if (mouseEvent.isPopupTrigger()) {
                 // remove
                 pressedPlaceShipMouseButton = false;
                 if (cellState == GameField.CellState.SHIP) {
                   final List<Point> removedShipCells =
-                      gameField.tryRemoveShipAt(
-                          new Point(lastPressedEmptyCell.x, lastPressedEmptyCell.y));
+                          gameField.tryRemoveShipAt(
+                                  new Point(lastPressedEmptyCell.x, lastPressedEmptyCell.y));
                   if (!removedShipCells.isEmpty()) {
                     gameField.ensureBanAroundShips();
                     gameField.increaseFreeShips(removedShipCells.size());
@@ -201,7 +201,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         }
 
         if (detectedControl == ControlElement.PAUSE || detectedControl == ControlElement.EXIT
-            || detectedControl == ControlElement.NEUTRAL) {
+                || detectedControl == ControlElement.NEUTRAL) {
           doSelectControl(detectedControl);
         }
       }
@@ -214,10 +214,6 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     this.timer.setRepeats(true);
   }
 
-  public boolean needsRepaintForMouse() {
-    return false;
-  }
-
   public static Point findShipRenderPositionForCell(final int cellX, final int cellY) {
     final int deltaX = 34;
     final int deltaY = 19;
@@ -228,7 +224,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     final double baseY = middleY - cellX * deltaY;
 
     return new Point((int) Math.round(baseX + cellY * deltaX),
-        (int) Math.round(baseY + cellY * deltaY));
+            (int) Math.round(baseY + cellY * deltaY));
+  }
+
+  public boolean needsRepaintForMouse() {
+    return false;
   }
 
   private void processEnvironmentSounds() {
@@ -263,7 +263,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       switch (RND.nextInt(40)) {
         case 12:
           if (this.currentStage == Stage.TARGET_SELECT ||
-              this.currentStage == Stage.ENEMY_FIRING_RESULT) {
+                  this.currentStage == Stage.ENEMY_FIRING_RESULT) {
             sound = Sound.MORSE2;
           }
           break;
@@ -290,9 +290,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   @SuppressWarnings("unused")
   protected void fillEmptyCellsByFish() {
     IntStream.range(0, GameField.FIELD_EDGE * GameField.FIELD_EDGE)
-        .mapToObj(c -> new Point(c % GameField.FIELD_EDGE, c / GameField.FIELD_EDGE))
-        .filter(p -> this.findShipForCell(p.x, p.y).isEmpty())
-        .forEach(p -> this.animatedSpriteField.add(new FishSprite(p)));
+            .mapToObj(c -> new Point(c % GameField.FIELD_EDGE, c / GameField.FIELD_EDGE))
+            .filter(p -> this.findShipForCell(p.x, p.y).isEmpty())
+            .forEach(p -> this.animatedSpriteField.add(new FishSprite(p)));
     Collections.sort(this.animatedSpriteField);
   }
 
@@ -300,14 +300,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   public void pushGameEvent(final BsGameEvent event) {
     if (event != null && !this.incomingQueue.offer(event)) {
       throw new Error("Can't place event into queue for long time: " + event + " queue.size="
-          + this.incomingQueue.size());
+              + this.incomingQueue.size());
     }
   }
 
   @Override
   public Optional<BsGameEvent> pollGameEvent(final Duration duration) throws InterruptedException {
     return Optional
-        .ofNullable(this.outgoingQueue.poll(duration.toMillis(), TimeUnit.MILLISECONDS));
+            .ofNullable(this.outgoingQueue.poll(duration.toMillis(), TimeUnit.MILLISECONDS));
   }
 
   private void renderActionPanel(final Graphics2D g, final int offsetX, final int offsetY,
@@ -394,7 +394,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private void fireEventToOpponent(final BsGameEvent event) {
     if (!this.outgoingQueue.offer(Objects.requireNonNull(event))) {
       throw new Error(
-          "Can't queue output game event: " + event + " (size=" + this.outgoingQueue.size() + ')');
+              "Can't queue output game event: " + event + " (size=" + this.outgoingQueue.size() + ')');
     }
   }
 
@@ -485,17 +485,24 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   private ShipType activateShipFire() {
     final List<ShipSprite> foundAliveShips = this.animatedSpriteField.stream()
-        .filter(x -> x instanceof ShipSprite)
-        .map(x -> (ShipSprite) x)
-        .filter(x -> !x.isDestroyed())
-        .collect(Collectors.toCollection(ArrayList::new));
+            .filter(x -> x instanceof ShipSprite)
+            .map(x -> (ShipSprite) x)
+            .filter(x -> !x.isDestroyed())
+            .collect(Collectors.toCollection(ArrayList::new));
     Collections.shuffle(foundAliveShips, RND);
     if (foundAliveShips.isEmpty()) {
       throw new Error("Unexpected fire request without alive ships");
     } else {
-      final ShipSprite firingShip = foundAliveShips.remove(0);
+      final Optional<ShipSprite> airCarrier = foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.AIR_CARRIER).findFirst();
+      final ShipSprite firingShip;
+      if (this.lastFiringShipType != ShipType.AIR_CARRIER && airCarrier.isPresent() && RND.nextBoolean()) {
+        firingShip = airCarrier.orElseThrow();
+      } else {
+        firingShip = foundAliveShips.remove(0);
+      }
+      this.lastFiringShipType = firingShip.getShipType();
       firingShip.fire();
-      return firingShip.getShipType();
+      return this.lastFiringShipType;
     }
   }
 
@@ -537,30 +544,30 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       break;
       case PLACEMENT_COMPLETED: {
         this.findGameEventInQueue(EnumSet.of(
-            EVENT_OPPONENT_FIRST_TURN,
-            EVENT_DO_TURN
+                EVENT_OPPONENT_FIRST_TURN,
+                EVENT_DO_TURN
         ))
-            .ifPresent(e -> {
-              if (e.getType() == EVENT_OPPONENT_FIRST_TURN) {
-                this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
-                this.initStage(Stage.ENEMY_TURN);
-              } else if (e.getType() == EVENT_DO_TURN) {
-                this.initStage(Stage.PANEL_ENTER);
-              } else {
-                this.processUnexpectedEvent(e);
-              }
-            });
+                .ifPresent(e -> {
+                  if (e.getType() == EVENT_OPPONENT_FIRST_TURN) {
+                    this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+                    this.initStage(Stage.ENEMY_TURN);
+                  } else if (e.getType() == EVENT_DO_TURN) {
+                    this.initStage(Stage.PANEL_ENTER);
+                  } else {
+                    this.processUnexpectedEvent(e);
+                  }
+                });
       }
       break;
       case WAIT_FOR_TURN: {
         this.findGameEventInQueue(EnumSet.of(GameEventType.EVENT_DO_TURN))
-            .ifPresent(e -> {
-              if (e.getType() == EVENT_DO_TURN) {
-                this.initStage(Stage.PANEL_ENTER);
-              } else {
-                this.processUnexpectedEvent(e);
-              }
-            });
+                .ifPresent(e -> {
+                  if (e.getType() == EVENT_DO_TURN) {
+                    this.initStage(Stage.PANEL_ENTER);
+                  } else {
+                    this.processUnexpectedEvent(e);
+                  }
+                });
       }
       break;
       case PANEL_ENTER: {
@@ -574,7 +581,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case PLACING:
       case TARGET_SELECT: {
         this.findGameEventInQueue(Collections.emptySet())
-            .ifPresent(this::processUnexpectedEvent);
+                .ifPresent(this::processUnexpectedEvent);
       }
       break;
       case PANEL_EXIT: {
@@ -582,11 +589,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
           this.stageStep++;
         } else {
           final Point target = this.gameField.removeTarget()
-              .orElseThrow(() -> new Error("Target must be presented"));
+                  .orElseThrow(() -> new Error("Target must be presented"));
           final ShipType firingShip = this.activateShipFire();
           this.fireEventToOpponent(new BsGameEvent(
-              firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_MAIN : EVENT_SHOT_REGULAR,
-              target.x, target.y));
+                  firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_MAIN : EVENT_SHOT_REGULAR,
+                  target.x, target.y));
           this.initStage(Stage.FIRING);
         }
       }
@@ -601,16 +608,16 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case FIRING_RESULT: {
         if (this.activeDecorationSprite == null) {
           this.findGameEventInQueue(EnumSet
-              .of(GameEventType.EVENT_KILLED, EVENT_MISS, EVENT_HIT,
-                  EVENT_LOST)).ifPresent(e -> {
+                  .of(GameEventType.EVENT_KILLED, EVENT_MISS, EVENT_HIT,
+                          EVENT_LOST)).ifPresent(e -> {
             this.savedGameEvent.set(Optional.of(e));
             switch (e.getType()) {
               case EVENT_LOST:
               case EVENT_KILLED:
               case EVENT_HIT: {
                 this.activeDecorationSprite =
-                    new DecorationSprite(HORIZONS_EXPLOSION_COORDS, Animation.EXPLO_GOR,
-                        Sound.OUR_EXPLODE_ONLY);
+                        new DecorationSprite(HORIZONS_EXPLOSION_COORDS, Animation.EXPLO_GOR,
+                                Sound.OUR_EXPLODE_ONLY);
                 if (e.getType() != EVENT_HIT) {
                   Sound.BUBBLES.play();
                 }
@@ -618,8 +625,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
               break;
               case EVENT_MISS: {
                 this.activeDecorationSprite =
-                    new DecorationSprite(HORIZONS_SPLASH_COORDS, SPLASH_GOR,
-                        Sound.OUR_WATER_SPLASH_ONLY);
+                        new DecorationSprite(HORIZONS_SPLASH_COORDS, SPLASH_GOR,
+                                Sound.OUR_WATER_SPLASH_ONLY);
               }
               break;
               default:
@@ -646,14 +653,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                   this.gameField.setState(e.getX(), e.getY(), GameField.CellState.KILL);
                   // kill
                   final List<Point> removedShip =
-                      this.gameField.tryRemoveShipAt(new Point(e.getX(), e.getY()));
+                          this.gameField.tryRemoveShipAt(new Point(e.getX(), e.getY()));
                   if (removedShip.isEmpty()) {
                     this.fireEventToOpponent(
-                        new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+                            new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
                     throw new Error("Can't remove killed enemy ship from map: " + e);
                   } else {
                     removedShip
-                        .forEach(c -> this.gameField.setState(c.x, c.y, GameField.CellState.KILL));
+                            .forEach(c -> this.gameField.setState(c.x, c.y, GameField.CellState.KILL));
                     this.gameField.ensureBanAroundShips();
                   }
                 } else {
@@ -671,27 +678,27 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case ENEMY_TURN: {
         if (this.activeFallingObjectSprite == null) {
           this.findGameEventInQueue(
-              EnumSet.of(GameEventType.EVENT_SHOT_MAIN, GameEventType.EVENT_SHOT_REGULAR))
-              .ifPresent(e -> {
-                if (e.getType() == EVENT_SHOT_MAIN || e.getType() == EVENT_SHOT_REGULAR) {
-                  this.savedGameEvent.set(Optional.of(e));
-                  final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
-                  final Point targetCell = hitShip.map(
-                      FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
+                  EnumSet.of(GameEventType.EVENT_SHOT_MAIN, GameEventType.EVENT_SHOT_REGULAR))
+                  .ifPresent(e -> {
+                    if (e.getType() == EVENT_SHOT_MAIN || e.getType() == EVENT_SHOT_REGULAR) {
+                      this.savedGameEvent.set(Optional.of(e));
+                      final Optional<ShipSprite> hitShip = this.findShipForCell(e.getX(), e.getY());
+                      final Point targetCell = hitShip.map(
+                              FieldSprite::getActionCell).orElse(new Point(e.getX(), e.getY()));
 
-                  if (e.getType() == EVENT_SHOT_MAIN) {
-                    this.activeFallingObjectSprite =
-                        new FallingAirplaneSprite(hitShip, targetCell);
-                  } else {
-                    this.activeFallingObjectSprite =
-                        new FallingRocketSprite(hitShip, targetCell);
-                  }
-                  this.animatedSpriteField.add(this.activeFallingObjectSprite);
-                  Collections.sort(this.animatedSpriteField);
-                } else {
-                  this.processUnexpectedEvent(e);
-                }
-              });
+                      if (e.getType() == EVENT_SHOT_MAIN) {
+                        this.activeFallingObjectSprite =
+                                new FallingAirplaneSprite(hitShip, targetCell);
+                      } else {
+                        this.activeFallingObjectSprite =
+                                new FallingRocketSprite(hitShip, targetCell);
+                      }
+                      this.animatedSpriteField.add(this.activeFallingObjectSprite);
+                      Collections.sort(this.animatedSpriteField);
+                    } else {
+                      this.processUnexpectedEvent(e);
+                    }
+                  });
         } else if (this.activeFallingObjectSprite.isCompleted()) {
           this.animatedSpriteField.remove(this.activeFallingObjectSprite);
           Collections.sort(this.animatedSpriteField);
@@ -708,10 +715,10 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
             final ShipSprite hitShip = this.processEnemyShot(enemyShoot).orElse(null);
             if (hitShip == null) {
               enemyTurnResultEvent = new BsGameEvent(EVENT_MISS, enemyShoot.getX(),
-                  enemyShoot.getY());
+                      enemyShoot.getY());
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
-                  new Point(enemyShoot.getX(), enemyShoot.getY()), Optional.empty(),
-                  Animation.SPLASH);
+                      new Point(enemyShoot.getX(), enemyShoot.getY()), Optional.empty(),
+                      Animation.SPLASH);
               Sound.WATER_SPLASH01.play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
@@ -726,15 +733,15 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                   resultType = EVENT_LOST;
                 }
                 enemyTurnResultEvent = new BsGameEvent(resultType,
-                    enemyShoot.getX(),
-                    enemyShoot.getY());
+                        enemyShoot.getX(),
+                        enemyShoot.getY());
                 Sound.BUBBLES.play();
               } else {
                 enemyTurnResultEvent = new BsGameEvent(EVENT_HIT, enemyShoot.getX(),
-                    enemyShoot.getY());
+                        enemyShoot.getY());
               }
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
-                  hitShip.getActionCell(), Optional.of(hitShip), Animation.EXPLODE);
+                      hitShip.getActionCell(), Optional.of(hitShip), Animation.EXPLODE);
               Sound.EXPLODE01.play();
               this.animatedSpriteField.add(this.fieldWaterEffect);
               Collections.sort(this.animatedSpriteField);
@@ -759,7 +766,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                 this.fireSignal(SIGNAL_LOST);
               } else {
                 this.initStage(event.getType() == EVENT_MISS ? Stage.WAIT_FOR_TURN :
-                    Stage.ENEMY_TURN);
+                        Stage.ENEMY_TURN);
               }
             });
           }
@@ -795,20 +802,20 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   private boolean noAnyFiringShip() {
     return this.animatedSpriteField.stream()
-        .noneMatch(x -> x instanceof ShipSprite && ((ShipSprite) x).isFiring());
+            .noneMatch(x -> x instanceof ShipSprite && ((ShipSprite) x).isFiring());
   }
 
   private boolean isThereAnyAliveShip() {
     return this.animatedSpriteField.stream()
-        .anyMatch(s -> s instanceof ShipSprite && !((ShipSprite) s).isDestroyed());
+            .anyMatch(s -> s instanceof ShipSprite && !((ShipSprite) s).isDestroyed());
   }
 
   private Optional<ShipSprite> findShipForCell(final int x, final int y) {
     final Point cell = new Point(x, y);
     return this.animatedSpriteField.stream()
-        .filter(s -> s instanceof ShipSprite && s.containsCell(cell))
-        .map(s -> (ShipSprite) s)
-        .findFirst();
+            .filter(s -> s instanceof ShipSprite && s.containsCell(cell))
+            .map(s -> (ShipSprite) s)
+            .findFirst();
   }
 
   private Optional<ShipSprite> processEnemyShot(final BsGameEvent e) {
@@ -838,12 +845,12 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   private void drawFish(final Graphics2D g) {
     this.animatedSpriteField.stream().filter(x -> x instanceof FishSprite)
-        .forEach(x -> x.render(g));
+            .forEach(x -> x.render(g));
   }
 
   private void drawAllExcludeFish(final Graphics2D g) {
     this.animatedSpriteField.stream().filter(x -> !(x instanceof FishSprite))
-        .forEach(x -> x.render(g));
+            .forEach(x -> x.render(g));
   }
 
   @Override
@@ -869,9 +876,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         g2d.drawImage(E2_NEW.getLast(), null, 512, 0);
         this.currentStage.getBanner().render(g2d, BANNER_COORD);
         this.drawNumberOfShipsOnPanel(g2d, this.gameField.getShipsCount(ShipType.AIR_CARRIER),
-            this.gameField.getShipsCount(ShipType.DREADNOUGHT),
-            this.gameField.getShipsCount(ShipType.GUARD_SHIP),
-            this.gameField.getShipsCount(ShipType.U_BOAT), 100);
+                this.gameField.getShipsCount(ShipType.DREADNOUGHT),
+                this.gameField.getShipsCount(ShipType.GUARD_SHIP),
+                this.gameField.getShipsCount(ShipType.U_BOAT), 100);
         this.renderActionPanel(g2d, ACTION_PANEL_AREA.x, ACTION_PANEL_AREA.y, this.gameField, true);
       }
       break;
@@ -879,9 +886,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         final int dx = round((PANEL.getWidth() / (float) E1_NEW.getLength()) * this.stageStep);
         g2d.drawImage(PANEL.getLast(), null, -dx, 100);
         g2d.drawImage(E1_NEW.getFrame(E1_NEW.getLength() - this.stageStep - 1),
-            null, 0, 0);
+                null, 0, 0);
         g2d.drawImage(E2_NEW.getFrame(E1_NEW.getLength() - this.stageStep - 1),
-            null, 512, 0);
+                null, 512, 0);
       }
       break;
       case TARGET_SELECT: {
@@ -910,9 +917,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       break;
       case PANEL_EXIT: {
         g2d.drawImage(E1_NEW.getFrame(E1_NEW.getLength() - this.stageStep - 1),
-            null, 0, 0);
+                null, 0, 0);
         g2d.drawImage(E2_NEW.getFrame(E1_NEW.getLength() - this.stageStep - 1),
-            null, 512, 0);
+                null, 512, 0);
       }
       break;
       default: {
@@ -934,8 +941,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case AUTO:
       case DONE: {
         final BufferedImage controlImage =
-            this.selectedControl == ControlElement.DONE ? DONE_AUTO.getFirst() :
-                DONE_AUTO.getLast();
+                this.selectedControl == ControlElement.DONE ? DONE_AUTO.getFirst() :
+                        DONE_AUTO.getLast();
         g2d.drawImage(controlImage, null, 8, 0);
         g2d.drawImage(PAUSE_EXIT.getFrame(1), null, 544, 344);
       }
