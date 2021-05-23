@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>battleships-resurrection</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>battleships-client-pc</artifactId>
@@ -247,12 +247,12 @@
                                 </opts>
                             </jre>
                             <versionInfo>
-                                <fileVersion>0.1.0.2</fileVersion>
-                                <txtFileVersion>0.1.0.2</txtFileVersion>
+                                <fileVersion>0.1.0.3</fileVersion>
+                                <txtFileVersion>0.1.0.3</txtFileVersion>
                                 <fileDescription>battleship</fileDescription>
                                 <copyright>Copyright &#169; 2001</copyright>
-                                <productVersion>0.1.0.1</productVersion>
-                                <txtProductVersion>0.1.0.1</txtProductVersion>
+                                <productVersion>0.1.0.3</productVersion>
+                                <txtProductVersion>0.1.0.3</txtProductVersion>
                                 <productName>RuSoft BattleShip game</productName>
                                 <companyName>RuSoft</companyName>
                                 <internalName>${project.name}</internalName>
