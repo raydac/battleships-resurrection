@@ -15,58 +15,14 @@
 
 package com.igormaznitsa.battleships.gui.sprite;
 
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_ROK_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_ROK_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_TR_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_TR_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_V1_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_1_V1_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_1_SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_1_SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_TR_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_TR_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_V1_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_2_V1_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_1SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_1SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_2SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_2SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_TR_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_V1_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_V1_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_V2_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_3_V2_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_1SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_1SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_1VN_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_2SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_2SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_2VN_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_2VN_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_3SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_3SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_3VN_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_3VN_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_SP_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_SP_R;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_TR_L;
-import static com.igormaznitsa.battleships.gui.Animation.CELL_4_V1_R;
-import static com.igormaznitsa.battleships.utils.Utils.RND;
-
-
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.sound.Sound;
-import java.awt.AlphaComposite;
-import java.awt.Composite;
-import java.awt.Graphics2D;
-import java.awt.Point;
+
+import java.awt.*;
 import java.util.List;
+
+import static com.igormaznitsa.battleships.gui.Animation.*;
+import static com.igormaznitsa.battleships.utils.Utils.RND;
 
 public final class ShipSprite extends FieldSprite {
 
@@ -122,14 +78,14 @@ public final class ShipSprite extends FieldSprite {
     switch (this.shipType) {
       case U_BOAT: {
         if (toRight) {
-          this.animationNormal = new Animation[] {CELL_1_SP_L};
-          this.animationFirePrimary = new Animation[] {CELL_1_V1_L};
+          this.animationNormal = new Animation[]{CELL_1_SP_L};
+          this.animationFirePrimary = new Animation[]{CELL_1_V1_L};
           this.animationFireSecondary = null;
           this.animationDestroyed = CELL_1_TR_L;
           this.extendedFireAnimation = CELL_1_ROK_L;
         } else {
-          this.animationNormal = new Animation[] {CELL_1_SP_R};
-          this.animationFirePrimary = new Animation[] {CELL_1_V1_R};
+          this.animationNormal = new Animation[]{CELL_1_SP_R};
+          this.animationFirePrimary = new Animation[]{CELL_1_V1_R};
           this.animationFireSecondary = null;
           this.animationDestroyed = CELL_1_TR_R;
           this.extendedFireAnimation = CELL_1_ROK_R;
@@ -138,15 +94,15 @@ public final class ShipSprite extends FieldSprite {
       break;
       case GUARD_SHIP: {
         if (this.toRight) {
-          this.animationNormal = new Animation[] {CELL_2_1_SP_L, CELL_2_SP_L};
+          this.animationNormal = new Animation[]{CELL_2_1_SP_L, CELL_2_SP_L};
           this.animationFirePrimary =
-              new Animation[] {CELL_2_V1_L, CELL_2_V1_L};
+                  new Animation[]{CELL_2_V1_L, CELL_2_V1_L};
           this.animationFireSecondary = null;
           this.animationDestroyed = CELL_2_TR_L;
         } else {
-          this.animationNormal = new Animation[] {CELL_2_1_SP_R, CELL_2_SP_R};
+          this.animationNormal = new Animation[]{CELL_2_1_SP_R, CELL_2_SP_R};
           this.animationFirePrimary =
-              new Animation[] {CELL_2_V1_R, CELL_2_V1_R};
+                  new Animation[]{CELL_2_V1_R, CELL_2_V1_R};
           this.animationFireSecondary = null;
           this.animationDestroyed = CELL_2_TR_R;
         }
@@ -155,14 +111,14 @@ public final class ShipSprite extends FieldSprite {
       break;
       case DREADNOUGHT: {
         if (this.toRight) {
-          this.animationNormal = new Animation[] {CELL_3_2SP_L, CELL_3_1SP_L, CELL_3_SP_L};
-          this.animationFirePrimary = new Animation[] {CELL_3_V2_L, CELL_3_V2_L, CELL_3_V2_L};
-          this.animationFireSecondary = new Animation[] {CELL_3_V1_L, CELL_3_V1_L, CELL_3_V1_L};
+          this.animationNormal = new Animation[]{CELL_3_2SP_L, CELL_3_1SP_L, CELL_3_SP_L};
+          this.animationFirePrimary = new Animation[]{CELL_3_V2_L, CELL_3_V2_L, CELL_3_V2_L};
+          this.animationFireSecondary = new Animation[]{CELL_3_V1_L, CELL_3_V1_L, CELL_3_V1_L};
           this.animationDestroyed = Animation.CELL_3_TR_L;
         } else {
-          this.animationNormal = new Animation[] {CELL_3_2SP_R, CELL_3_1SP_R, CELL_3_SP_R};
-          this.animationFirePrimary = new Animation[] {CELL_3_V2_R, CELL_3_V2_R, CELL_3_V2_R};
-          this.animationFireSecondary = new Animation[] {CELL_3_V1_R, CELL_3_V1_R, CELL_3_V1_R};
+          this.animationNormal = new Animation[]{CELL_3_2SP_R, CELL_3_1SP_R, CELL_3_SP_R};
+          this.animationFirePrimary = new Animation[]{CELL_3_V2_R, CELL_3_V2_R, CELL_3_V2_R};
+          this.animationFireSecondary = new Animation[]{CELL_3_V1_R, CELL_3_V1_R, CELL_3_V1_R};
           this.animationDestroyed = CELL_3_TR_R;
         }
         this.extendedFireAnimation = null;
@@ -170,21 +126,21 @@ public final class ShipSprite extends FieldSprite {
       break;
       case AIR_CARRIER: {
         if (this.toRight) {
-          this.animationNormal = new Animation[] {CELL_4_3SP_L, CELL_4_2SP_L,
-              CELL_4_1SP_L, CELL_4_SP_L};
+          this.animationNormal = new Animation[]{CELL_4_3SP_L, CELL_4_2SP_L,
+                  CELL_4_1SP_L, CELL_4_SP_L};
           this.animationFirePrimary =
-              new Animation[] {CELL_4_1VN_L, CELL_4_1VN_L, CELL_4_1VN_L, CELL_4_1VN_L};
+                  new Animation[]{CELL_4_1VN_L, CELL_4_1VN_L, CELL_4_1VN_L, CELL_4_1VN_L};
           this.animationFireSecondary =
-              new Animation[] {CELL_4_3VN_L, CELL_4_3VN_L, CELL_4_3VN_L, CELL_4_3VN_L};
+                  new Animation[]{CELL_4_3VN_L, CELL_4_3VN_L, CELL_4_3VN_L, CELL_4_3VN_L};
           this.animationDestroyed = CELL_4_TR_L;
           this.extendedFireAnimation = CELL_4_2VN_L;
         } else {
           this.animationNormal =
-              new Animation[] {CELL_4_3SP_R, CELL_4_2SP_R, CELL_4_1SP_R, CELL_4_SP_R};
+                  new Animation[]{CELL_4_3SP_R, CELL_4_2SP_R, CELL_4_1SP_R, CELL_4_SP_R};
           this.animationFirePrimary =
-              new Animation[] {CELL_4_V1_R, CELL_4_V1_R, CELL_4_V1_R, CELL_4_V1_R};
+                  new Animation[]{CELL_4_V1_R, CELL_4_V1_R, CELL_4_V1_R, CELL_4_V1_R};
           this.animationFireSecondary =
-              new Animation[] {CELL_4_3VN_R, CELL_4_3VN_R, CELL_4_3VN_R, CELL_4_3VN_R};
+                  new Animation[]{CELL_4_3VN_R, CELL_4_3VN_R, CELL_4_3VN_R, CELL_4_3VN_R};
           this.animationDestroyed = CELL_4_TR_L;
           this.extendedFireAnimation = CELL_4_2VN_R;
         }
@@ -195,7 +151,7 @@ public final class ShipSprite extends FieldSprite {
     }
     this.fire = false;
     this.animation = this.animationNormal[this.activeCells - 1];
-    this.frame = RND.nextInt(this.animation.getLength());
+    this.frame = RND.nextInt((this.animation.getLength() / 2)) * 2;
     this.developmentLevel = this.developmentOnStart ? DEVELOPMENT_LEVELS : 0;
   }
 
@@ -243,7 +199,7 @@ public final class ShipSprite extends FieldSprite {
         this.fireFrame++;
         if (this.shipType == ShipType.AIR_CARRIER) {
           final int startExtendedAnimationFrame =
-              this.animationFirePrimary[this.activeCells - 1].getLength() / 2;
+                  this.animationFirePrimary[this.activeCells - 1].getLength() / 2;
           if (this.fireFrame >= startExtendedAnimationFrame) {
             this.extendedFireAnimationPoint = new Point(this.spritePoint.x, this.spritePoint.y);
             this.firingStage = FiringStage.MAIN_AND_EXTENDED;
@@ -258,7 +214,7 @@ public final class ShipSprite extends FieldSprite {
               if (this.shipType == ShipType.U_BOAT) {
                 this.stepY = -12;
                 this.extendedFireAnimationPoint =
-                    new Point(this.spritePoint.x, this.spritePoint.y + this.stepY);
+                        new Point(this.spritePoint.x, this.spritePoint.y + this.stepY);
               } else {
                 this.extendedFireAnimationPoint = new Point(this.spritePoint.x, this.spritePoint.y);
               }
@@ -277,14 +233,14 @@ public final class ShipSprite extends FieldSprite {
           } else {
             if (this.toRight) {
               this.extendedFireAnimationPoint.move(this.extendedFireAnimationPoint.x
-                      + airplaneStepOffsetX,
-                  this.extendedFireAnimationPoint.y
-                      - airplaneStepOffsetY);
+                              + airplaneStepOffsetX,
+                      this.extendedFireAnimationPoint.y
+                              - airplaneStepOffsetY);
             } else {
               this.extendedFireAnimationPoint.move(this.extendedFireAnimationPoint.x
-                      - airplaneStepOffsetX,
-                  this.extendedFireAnimationPoint.y
-                      - airplaneStepOffsetY);
+                              - airplaneStepOffsetX,
+                      this.extendedFireAnimationPoint.y
+                              - airplaneStepOffsetY);
             }
           }
         } else {
@@ -300,7 +256,7 @@ public final class ShipSprite extends FieldSprite {
         switch (this.shipType) {
           case U_BOAT: {
             this.extendedFireAnimationPoint.move(this.extendedFireAnimationPoint.x,
-                this.extendedFireAnimationPoint.y + this.stepY);
+                    this.extendedFireAnimationPoint.y + this.stepY);
             this.stepY <<= 1;
             if (this.extendedFireAnimationPoint.y < 0) {
               this.firingStage = FiringStage.NONE;
@@ -310,14 +266,14 @@ public final class ShipSprite extends FieldSprite {
           case AIR_CARRIER: {
             if (this.toRight) {
               this.extendedFireAnimationPoint.move(this.extendedFireAnimationPoint.x
-                      + airplaneStepOffsetX,
-                  this.extendedFireAnimationPoint.y
-                      - airplaneStepOffsetY);
+                              + airplaneStepOffsetX,
+                      this.extendedFireAnimationPoint.y
+                              - airplaneStepOffsetY);
             } else {
               this.extendedFireAnimationPoint.move(this.extendedFireAnimationPoint.x
-                      - airplaneStepOffsetX,
-                  this.extendedFireAnimationPoint.y
-                      - airplaneStepOffsetY);
+                              - airplaneStepOffsetX,
+                      this.extendedFireAnimationPoint.y
+                              - airplaneStepOffsetY);
             }
             if (this.extendedFireAnimationPoint.x < 0 || this.extendedFireAnimationPoint.y < 0) {
               this.firingStage = FiringStage.NONE;
@@ -340,7 +296,7 @@ public final class ShipSprite extends FieldSprite {
     if (this.activeCells > 0) {
       this.activeCells--;
       this.initAnimation(this.activeCells == 0 ? this.animationDestroyed :
-          this.animationNormal[this.activeCells - 1]);
+              this.animationNormal[this.activeCells - 1]);
     }
     return this.activeCells == 0;
   }
@@ -356,7 +312,7 @@ public final class ShipSprite extends FieldSprite {
     final Composite oldComposite = g2d.getComposite();
     if (this.developmentLevel > 0) {
       final AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-          (1.0f / DEVELOPMENT_LEVELS) * (DEVELOPMENT_LEVELS - this.developmentLevel));
+              (1.0f / DEVELOPMENT_LEVELS) * (DEVELOPMENT_LEVELS - this.developmentLevel));
       g2d.setComposite(alphaComposite);
     }
     switch (this.shipType) {
@@ -365,14 +321,14 @@ public final class ShipSprite extends FieldSprite {
         switch (this.firingStage) {
           case MAIN: {
             g2d.drawImage(this.animationFirePrimary[this.activeCells - 1].getFrame(this.fireFrame),
-                null,
-                x, y);
+                    null,
+                    x, y);
           }
           break;
           case EXTENDED: {
             g2d.drawImage(this.extendedFireAnimation.getFrame(this.fireFrame),
-                null,
-                this.extendedFireAnimationPoint.x, this.extendedFireAnimationPoint.y);
+                    null,
+                    this.extendedFireAnimationPoint.x, this.extendedFireAnimationPoint.y);
           }
           break;
           default: {
@@ -386,20 +342,20 @@ public final class ShipSprite extends FieldSprite {
         g2d.drawImage(this.animation.getFrame(this.frame), null, x, y);
         if (this.firingStage == FiringStage.MAIN) {
           g2d.drawImage(this.animationFirePrimary[this.activeCells - 1].getFrame(this.fireFrame),
-              null,
-              x, y);
+                  null,
+                  x, y);
         }
       }
       break;
       case DREADNOUGHT: {
         if (this.firingStage == FiringStage.MAIN) {
           g2d.drawImage(this.animationFirePrimary[this.activeCells - 1].getFrame(this.fireFrame),
-              null,
-              x, y);
+                  null,
+                  x, y);
           g2d.drawImage(this.animation.getFrame(this.frame), null, x, y);
           g2d.drawImage(this.animationFireSecondary[this.activeCells - 1].getFrame(this.fireFrame),
-              null,
-              x, y);
+                  null,
+                  x, y);
         } else {
           g2d.drawImage(this.animation.getFrame(this.frame), null, x, y);
         }
@@ -410,34 +366,34 @@ public final class ShipSprite extends FieldSprite {
         switch (this.firingStage) {
           case MAIN: {
             g2d.drawImage(this.animationFirePrimary[this.activeCells - 1].getFrame(this.fireFrame),
-                null,
-                x, y);
+                    null,
+                    x, y);
           }
           break;
           case MAIN_AND_EXTENDED: {
             g2d.drawImage(this.animationFirePrimary[this.activeCells - 1].getFrame(this.fireFrame),
-                null,
-                x, y);
+                    null,
+                    x, y);
             g2d.drawImage(this.extendedFireAnimation
-                    .getFrame(this.fireFrame % this.extendedFireAnimation.getLength()),
-                null,
-                this.extendedFireAnimationPoint.x, this.extendedFireAnimationPoint.y);
+                            .getFrame(this.fireFrame % this.extendedFireAnimation.getLength()),
+                    null,
+                    this.extendedFireAnimationPoint.x, this.extendedFireAnimationPoint.y);
           }
           break;
           case EXTENDED: {
             g2d.drawImage(this.extendedFireAnimation.getFrame(this.fireFrame),
-                null,
-                this.extendedFireAnimationPoint.x, this.extendedFireAnimationPoint.y);
+                    null,
+                    this.extendedFireAnimationPoint.x, this.extendedFireAnimationPoint.y);
             g2d.drawImage(this.animationFireSecondary[this.activeCells - 1].getFrame(this.frame),
-                null,
-                x, y);
+                    null,
+                    x, y);
           }
           break;
           default: {
             if (this.activeCells > 0) {
               g2d.drawImage(this.animationFireSecondary[this.activeCells - 1].getFrame(this.frame),
-                  null,
-                  x, y);
+                      null,
+                      x, y);
             }
           }
           break;

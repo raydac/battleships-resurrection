@@ -85,7 +85,6 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private long envTicksBeforeBirdSound = ENV_SOUNDS_TICKS_BIRD_SOUND;
   private long envTicksBeforeOtherSound = ENV_SOUNDS_TICKS_OTHER_SOUND;
   private List<FieldSprite> animatedSpriteField = Collections.emptyList();
-  private ShipType lastFiringShipType = ShipType.U_BOAT;
 
   public GamePanel(final StartOptions startOptions, final Optional<ScaleFactor> scaleFactor, final ImageCursor gameCursor) {
     super(startOptions, scaleFactor, gameCursor);
@@ -489,20 +488,23 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
             .map(x -> (ShipSprite) x)
             .filter(x -> !x.isDestroyed())
             .collect(Collectors.toCollection(ArrayList::new));
-    Collections.shuffle(foundAliveShips, RND);
     if (foundAliveShips.isEmpty()) {
       throw new Error("Unexpected fire request without alive ships");
     } else {
-      final Optional<ShipSprite> airCarrier = foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.AIR_CARRIER).findFirst();
-      final ShipSprite firingShip;
-      if (this.lastFiringShipType != ShipType.AIR_CARRIER && airCarrier.isPresent() && RND.nextBoolean()) {
-        firingShip = airCarrier.orElseThrow();
-      } else {
-        firingShip = foundAliveShips.remove(0);
-      }
-      this.lastFiringShipType = firingShip.getShipType();
+      foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.DREADNOUGHT)
+              .findFirst().ifPresent(dreadnought -> {
+        // increasing probability of dreadnought shot
+        IntStream.range(0, foundAliveShips.size() / 4).forEach(i -> foundAliveShips.add(dreadnought));
+      });
+      foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.AIR_CARRIER)
+              .findFirst().ifPresent(carrier -> {
+        // increasing probability of air-carrier shot
+        IntStream.range(0, foundAliveShips.size() / 4).forEach(i -> foundAliveShips.add(carrier));
+      });
+      Collections.shuffle(foundAliveShips, RND);
+      final ShipSprite firingShip = foundAliveShips.remove(0);
       firingShip.fire();
-      return this.lastFiringShipType;
+      return firingShip.getShipType();
     }
   }
 
