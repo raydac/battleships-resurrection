@@ -16,13 +16,16 @@
 package com.igormaznitsa.battleships.gui;
 
 import com.igormaznitsa.battleships.utils.GfxUtils;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
+
+import java.awt.*;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.prefs.Preferences;
 
 public class StartOptions {
+
+  private static final Preferences PREFERENCES = Preferences.userNodeForPackage(StartOptions.class);
+
   private final Optional<GraphicsConfiguration> graphicsConfiguration;
   private final Optional<String> gameTitle;
   private final Optional<Image> gameIcon;
@@ -52,6 +55,22 @@ public class StartOptions {
     this.fullScreen = fullScreen;
     this.hostName = hostName;
     this.hostPort = hostPort;
+  }
+
+  public void savePreferences() {
+    synchronized (PREFERENCES) {
+      PREFERENCES.putBoolean("multiPlayer", this.multiPlayer);
+      PREFERENCES.putBoolean("fullScreen", this.fullScreen);
+      PREFERENCES.putBoolean("withSound", this.withSound);
+      hostName.ifPresentOrElse(x -> PREFERENCES.put("hostName", x), () -> PREFERENCES.remove("hostName"));
+      hostPort.ifPresentOrElse(x -> PREFERENCES.putInt("hostPort", x), () -> PREFERENCES.remove("hostPort"));
+      PREFERENCES.putBoolean("useOldGfxClient", this.useOldGfxClient);
+      try {
+        PREFERENCES.flush();
+      } catch (Exception ex) {
+        // do nothing
+      }
+    }
   }
 
   public static Builder newBuilder() {
@@ -153,15 +172,27 @@ public class StartOptions {
       return this;
     }
 
+    public Builder loadPreferences() {
+      synchronized (PREFERENCES) {
+        this.multiPlayer = PREFERENCES.getBoolean("multiPlayer", this.multiPlayer);
+        this.fullScreen = PREFERENCES.getBoolean("fullScreen", this.fullScreen);
+        this.withSound = PREFERENCES.getBoolean("withSound", this.withSound);
+        this.hostName = Optional.of(PREFERENCES.get("hostName", "localhost"));
+        this.hostPort = OptionalInt.of(PREFERENCES.getInt("hostPort", 30000));
+        this.useOldGfxClient = PREFERENCES.getBoolean("useOldGfxClient", this.useOldGfxClient);
+        return this;
+      }
+    }
+
     public StartOptions build() {
       return new StartOptions(this.graphicsConfiguration,
-          this.gameTitle,
-          this.gameIcon,
-          this.multiPlayer,
-          this.fullScreen,
-          this.withSound,
-          this.hostName,
-          this.hostPort,
+              this.gameTitle,
+              this.gameIcon,
+              this.multiPlayer,
+              this.fullScreen,
+              this.withSound,
+              this.hostName,
+              this.hostPort,
           this.useOldGfxClient);
     }
 

@@ -16,8 +16,10 @@
 import com.igormaznitsa.battleships.gui.*;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
+import com.igormaznitsa.battleships.opponent.NetworkSingleSessionOpponent;
 import com.igormaznitsa.battleships.opponent.OldGfxBattleshipSingleSessionBot;
 import com.igormaznitsa.battleships.utils.GfxUtils;
+import com.igormaznitsa.battleships.utils.NetUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +42,7 @@ public class BattleShips {
         // ignoring
       }
 
-      final StartOptions startOptions = StartOptions.newBuilder().build();
+      final StartOptions startOptions = StartOptions.newBuilder().loadPreferences().build();
       final OpeningDialog openingDialog = new OpeningDialog(startOptions);
       GfxUtils.toScreenCenter(openingDialog);
       openingDialog.setVisible(true);
@@ -49,17 +51,32 @@ public class BattleShips {
       if (selectedData == null) {
         LOGGER.info("Exit for player request");
         System.exit(0);
+      } else {
+        LOGGER.info("Saving preferences");
+        selectedData.savePreferences();
       }
+
+      final NetUtils.NamedInetAddress chosenInetAddress = NetUtils.findAllNetworkInterfaces()
+              .stream().filter(x -> selectedData.getHostName().orElse("").equals(x.getName()))
+              .findFirst()
+              .orElseThrow(() -> new Error("Unexpectedly can't find interface for name: " + selectedData.getHostName().orElse("")));
+      final int chosenPort = selectedData.getHostPort().orElse(30000);
+      LOGGER.info("Creating client for: " + chosenInetAddress + " : " + chosenPort);
 
       final BattleshipsPlayer selectedOpponent;
       if (selectedData.isMultiPlayer()) {
         if (selectedData.isUseOldGfxClient()) {
-          selectedOpponent = new OldGfxBattleshipSingleSessionBot(selectedData).startPlayer();
+          selectedOpponent = new OldGfxBattleshipSingleSessionBot(chosenInetAddress, chosenPort).startPlayer();
         } else {
-          throw new UnsupportedOperationException("Not implemented yet");
+          selectedOpponent = new NetworkSingleSessionOpponent(chosenInetAddress, chosenPort).startPlayer();
         }
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
+      }
+
+      if (selectedOpponent == null) {
+        LOGGER.info("Opponent not selected");
+        System.exit(112233);
       }
 
       final WaitOpponentDialog waitOpponentDialog =

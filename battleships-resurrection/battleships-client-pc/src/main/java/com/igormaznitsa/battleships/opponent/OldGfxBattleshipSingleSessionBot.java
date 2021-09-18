@@ -15,20 +15,12 @@
 
 package com.igormaznitsa.battleships.opponent;
 
-import static com.igormaznitsa.battleships.utils.Utils.closeQuietly;
-import static java.util.Arrays.stream;
-
-
-import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.gui.panels.GameField;
+import com.igormaznitsa.battleships.utils.NetUtils;
 import com.igormaznitsa.battleships.utils.Utils;
-import java.awt.Point;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import java.awt.*;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,6 +37,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.igormaznitsa.battleships.utils.Utils.closeQuietly;
+import static java.util.Arrays.stream;
 
 public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, FirstMoveOrderProvider {
 
@@ -76,21 +71,20 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
   private final AtomicBoolean sessionReady = new AtomicBoolean(false);
 
-  private final int[] enemyShipNumber = new int[] {4, 3, 2, 1};
+  private final int[] enemyShipNumber = new int[]{4, 3, 2, 1};
 
-  public OldGfxBattleshipSingleSessionBot(final StartOptions startOptions) {
-    this.id = startOptions.getHostName().orElse("") + ':' + startOptions.getHostPort().orElse(-1);
+  public OldGfxBattleshipSingleSessionBot(final NetUtils.NamedInetAddress address, final int port) {
+    this.id = address.getAddress().getHostName() + ':' + port;
 
     final UUID uuid = UUID.randomUUID();
     this.playerId =
-        0x7FFFFFFF & (int) (uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
+            0x7FFFFFFF & (int) (uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
     LOGGER.info("Generated player ID: " + this.playerId);
     try {
-      final String host = startOptions.getHostName().orElse("localhost");
-      final int port = startOptions.getHostPort().orElse(30000);
+      final String host = address.getAddress().getHostAddress();
       LOGGER.info("Game server address: " + host + ':' + port);
       this.uriInput = new URI(String
-          .format("http://%s:%d/getoutstream", host, port));
+              .format("http://%s:%d/getoutstream", host, port));
       this.uriOutput = new URI(String
           .format("http://%s:%d/getinstream", host, port));
       this.uriTest = new URI(String

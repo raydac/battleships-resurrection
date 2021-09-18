@@ -15,10 +15,13 @@
 
 package com.igormaznitsa.battleships.utils;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Random;
 
 public final class Utils {
@@ -32,6 +35,19 @@ public final class Utils {
       }
     } catch (IOException ex) {
       // do nothing
+    }
+  }
+
+  @SafeVarargs
+  public static void setPanelEnabled(final JPanel panel, final boolean enabled, Class<? extends Component>... exclude) {
+    panel.setEnabled(enabled);
+    for (final Component component : panel.getComponents()) {
+      if (component instanceof JPanel) {
+        setPanelEnabled((JPanel) component, enabled, exclude);
+      }
+      if (Arrays.stream(exclude).noneMatch(x -> x.isAssignableFrom(component.getClass()))) {
+        component.setEnabled(enabled);
+      }
     }
   }
 

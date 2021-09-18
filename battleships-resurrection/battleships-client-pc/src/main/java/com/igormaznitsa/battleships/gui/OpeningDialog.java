@@ -16,12 +16,15 @@
 package com.igormaznitsa.battleships.gui;
 
 import com.igormaznitsa.battleships.utils.GfxUtils;
+import com.igormaznitsa.battleships.utils.NetUtils;
+import com.igormaznitsa.battleships.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.Box.Filler;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
@@ -37,7 +40,7 @@ public class OpeningDialog extends javax.swing.JDialog {
   private JPanel mainPanel;
   private JPanel modePanel;
   private JPanel networkPanel;
-  private JTextField textFieldHostName;
+  private JComboBox<NetUtils.NamedInetAddress> comboHostName;
   private JFormattedTextField textFieldPort;
   private Filler filler4;
   private Filler filler5;
@@ -54,9 +57,9 @@ public class OpeningDialog extends javax.swing.JDialog {
 
   public OpeningDialog(final StartOptions startOptions) {
     super((Frame) null, startOptions.getGameTitle().orElse("Battleship"), true,
-        startOptions.getGraphicsConfiguration().orElse(
-            getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                .getDefaultConfiguration()));
+            startOptions.getGraphicsConfiguration().orElse(
+                    getLocalGraphicsEnvironment().getDefaultScreenDevice()
+                            .getDefaultConfiguration()));
     startOptions.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
 
@@ -73,29 +76,26 @@ public class OpeningDialog extends javax.swing.JDialog {
     this.radioMultiPlayer.setSelected(startOptions.isMultiPlayer());
     this.radioWindow.setSelected(!startOptions.isFullScreen());
     this.radioFullScreen.setSelected(startOptions.isFullScreen());
-    startOptions.getHostName().ifPresent(x -> this.textFieldHostName.setText(x));
+    startOptions.getHostName().ifPresent(x -> {
+      final Optional<NetUtils.NamedInetAddress> selectedAddress = NetUtils.findAllNetworkInterfaces()
+              .stream()
+              .filter(y -> y.getName().equals(x))
+              .findFirst();
+      selectedAddress.ifPresentOrElse(
+              y -> this.comboHostName.setSelectedItem(y),
+              () -> this.comboHostName.setSelectedIndex(0)
+      );
+    });
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
     this.checkboxUseOldGfxClient.setSelected(startOptions.isUseOldGfxClient());
 
     this.radioSinglePlayer.addActionListener(e -> {
-      this.updateNetworkPanel();
+      networkPanel.setEnabled(this.radioMultiPlayer.isEnabled());
     });
 
     this.radioMultiPlayer.addActionListener(e -> {
-      if (this.radioMultiPlayer.isSelected()) {
-        if (this.textFieldHostName.getText().isBlank()) {
-          startOptions.getHostName().ifPresent(t -> {
-            this.textFieldHostName.setText(t);
-          });
-        }
-        if (this.textFieldPort.getText().isBlank()) {
-          startOptions.getHostPort().ifPresent(p -> {
-            this.textFieldPort.setText(Integer.toString(p));
-          });
-        }
-      }
-      this.updateNetworkPanel();
+      Utils.setPanelEnabled(networkPanel, radioMultiPlayer.isEnabled(), JRadioButton.class);
     });
 
     this.buttonGo.addActionListener(e -> {
@@ -105,15 +105,17 @@ public class OpeningDialog extends javax.swing.JDialog {
       } catch (Exception ex) {
         // ignoring
       }
+
       this.result = StartOptions.newBuilder()
-          .setGraphicsConfiguration(this.getGraphicsConfiguration())
-          .setGameTitle(startOptions.getGameTitle().orElse("Battleships"))
-          .setGameIcon(startOptions.getGameIcon().orElse(null))
-          .setFullScreen(this.radioFullScreen.isSelected())
-          .setMultiPlayer(this.radioMultiPlayer.isSelected())
-          .setHostPort(hostPort)
-          .setHostName(this.textFieldHostName.getText().trim())
-          .build();
+              .setGraphicsConfiguration(this.getGraphicsConfiguration())
+              .setGameTitle(startOptions.getGameTitle().orElse("Battleships"))
+              .setGameIcon(startOptions.getGameIcon().orElse(null))
+              .setFullScreen(this.radioFullScreen.isSelected())
+              .setMultiPlayer(this.radioMultiPlayer.isSelected())
+              .setUseOldGfxClient(this.checkboxUseOldGfxClient.isSelected())
+              .setHostPort(hostPort)
+              .setHostName(Objects.requireNonNull((NetUtils.NamedInetAddress) this.comboHostName.getSelectedItem()).getName())
+              .build();
       this.dispose();
     });
 
@@ -122,17 +124,8 @@ public class OpeningDialog extends javax.swing.JDialog {
       this.dispose();
     });
 
-    this.updateNetworkPanel();
     this.getContentPane().doLayout();
     this.pack();
-  }
-
-  private void updateNetworkPanel() {
-    final boolean enabled = this.radioMultiPlayer.isSelected();
-    this.textFieldHostName.setEnabled(enabled);
-    this.textFieldPort.setEnabled(enabled);
-
-    this.checkboxUseOldGfxClient.setEnabled(false); // todo replace when implementd another client
   }
 
   public Optional<StartOptions> getResult() {
@@ -153,32 +146,44 @@ public class OpeningDialog extends javax.swing.JDialog {
     radioMultiPlayer = new JRadioButton();
     labelServerHostName = new JLabel();
     labelServerPort = new JLabel();
-    textFieldHostName = new JTextField();
+
+    comboHostName = new JComboBox<>(NetUtils.findAllNetworkInterfaces().toArray(new NetUtils.NamedInetAddress[0])) {
+      @Override
+      public Dimension getMinimumSize() {
+        return new Dimension(10, 10);
+      }
+
+      @Override
+      public Dimension getPreferredSize() {
+        return this.getMinimumSize();
+      }
+    };
+
     textFieldPort = new JFormattedTextField(new NumberFormatter(new DecimalFormat("####")));
     buttonsPanel = new JPanel();
     buttonsPanel.setBorder(createEmptyBorder(0, 8, 16, 8));
     buttonGo = new JButton();
     buttonExit = new JButton();
     filler6 =
-        new Filler(new Dimension(32, 0), new Dimension(32, 0),
-            new Dimension(32, 32767));
+            new Filler(new Dimension(32, 0), new Dimension(32, 0),
+                    new Dimension(32, 32767));
     filler4 =
-        new Filler(new Dimension(0, 16), new Dimension(0, 16),
-            new Dimension(32767, 16));
+            new Filler(new Dimension(0, 16), new Dimension(0, 16),
+                    new Dimension(32767, 16));
     filler5 =
-        new Filler(new Dimension(0, 16), new Dimension(0, 16),
-            new Dimension(32767, 16));
+            new Filler(new Dimension(0, 16), new Dimension(0, 16),
+                    new Dimension(32767, 16));
 
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
     mainPanel.setLayout(new GridBagLayout());
 
     logoLabel.setIcon(
-        new ImageIcon(loadResImage("rusoft.png").getScaledInstance(400, 258, Image.SCALE_SMOOTH)));
+            new ImageIcon(loadResImage("rusoft.png").getScaledInstance(400, 258, Image.SCALE_SMOOTH)));
     mainPanel.add(logoLabel, new GridBagConstraints());
 
     modePanel
-        .setBorder(createCompoundBorder(createTitledBorder("Mode"), createEmptyBorder(8, 8, 8, 8)));
+            .setBorder(createCompoundBorder(createTitledBorder("Mode"), createEmptyBorder(8, 8, 8, 8)));
     modePanel.setLayout(new GridLayout(1, 0, 16, 0));
 
     radioWindow.setText("Window");
@@ -200,11 +205,12 @@ public class OpeningDialog extends javax.swing.JDialog {
     mainPanel.add(modePanel, gridBagConstraints);
 
     networkPanel.setBorder(
-        createCompoundBorder(createTitledBorder("Network"), createEmptyBorder(8, 8, 8, 8)));
+            createCompoundBorder(createTitledBorder("Network"), createEmptyBorder(8, 8, 8, 8)));
     networkPanel.setLayout(new GridLayout(6, 2, 16, 0));
 
     radioSinglePlayer.setText("Single Player");
     networkPanel.add(radioSinglePlayer);
+    radioSinglePlayer.addActionListener(e -> Utils.setPanelEnabled(networkPanel, !radioSinglePlayer.isEnabled(), JRadioButton.class));
 
     radioMultiPlayer.setText("Multi-Player");
     networkPanel.add(radioMultiPlayer);
@@ -213,17 +219,17 @@ public class OpeningDialog extends javax.swing.JDialog {
     gameTypeGroup.add(radioSinglePlayer);
     gameTypeGroup.add(radioMultiPlayer);
 
-    labelServerHostName.setText("Server host name:");
     networkPanel.add(labelServerHostName);
 
     labelServerPort.setText("Port:");
     networkPanel.add(labelServerPort);
-    networkPanel.add(textFieldHostName);
+    networkPanel.add(comboHostName);
     networkPanel.add(textFieldPort);
 
     networkPanel.add(Box.createHorizontalGlue());
     checkboxUseOldGfxClient.setText("Use old GFX client");
     checkboxUseOldGfxClient.setHorizontalAlignment(JCheckBox.LEFT);
+    checkboxUseOldGfxClient.addActionListener(x -> this.updateComboHostName());
     networkPanel.add(checkboxUseOldGfxClient);
 
     gridBagConstraints = new GridBagConstraints();
@@ -272,6 +278,16 @@ public class OpeningDialog extends javax.swing.JDialog {
     gridBagConstraints.gridy = 4;
     mainPanel.add(filler5, gridBagConstraints);
 
+    this.updateComboHostName();
+
     this.setContentPane(mainPanel);
+  }
+
+  private void updateComboHostName() {
+    if (this.checkboxUseOldGfxClient.isSelected()) {
+      this.labelServerHostName.setText("Server host name:");
+    } else {
+      this.labelServerHostName.setText("Network interface:");
+    }
   }
 }
