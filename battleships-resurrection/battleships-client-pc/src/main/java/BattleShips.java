@@ -16,7 +16,7 @@
 import com.igormaznitsa.battleships.gui.*;
 import com.igormaznitsa.battleships.opponent.AiBattleshipsSingleSessionBot;
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
-import com.igormaznitsa.battleships.opponent.NetworkSingleSessionOpponent;
+import com.igormaznitsa.battleships.opponent.NewNetSingleSessionOpponent;
 import com.igormaznitsa.battleships.opponent.OldGfxBattleshipSingleSessionBot;
 import com.igormaznitsa.battleships.utils.GfxUtils;
 import com.igormaznitsa.battleships.utils.NetUtils;
@@ -68,7 +68,7 @@ public class BattleShips {
         if (selectedData.isUseOldGfxClient()) {
           selectedOpponent = new OldGfxBattleshipSingleSessionBot(chosenInetAddress, chosenPort).startPlayer();
         } else {
-          selectedOpponent = new NetworkSingleSessionOpponent(chosenInetAddress, chosenPort).startPlayer();
+          selectedOpponent = new NewNetSingleSessionOpponent(selectedData, chosenInetAddress, chosenPort).startPlayer();
         }
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();

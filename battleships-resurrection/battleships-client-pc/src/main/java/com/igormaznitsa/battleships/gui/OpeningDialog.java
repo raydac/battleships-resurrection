@@ -31,7 +31,7 @@ import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
 import static java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment;
 import static javax.swing.BorderFactory.*;
 
-public class OpeningDialog extends javax.swing.JDialog {
+public class OpeningDialog extends JDialog {
 
   private JButton buttonExit;
   private JButton buttonGo;
