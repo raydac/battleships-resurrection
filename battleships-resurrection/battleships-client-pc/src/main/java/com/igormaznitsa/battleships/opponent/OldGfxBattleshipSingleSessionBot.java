@@ -16,12 +16,12 @@
 package com.igormaznitsa.battleships.opponent;
 
 import com.igormaznitsa.battleships.gui.panels.GameField;
-import com.igormaznitsa.battleships.utils.NetUtils;
 import com.igormaznitsa.battleships.utils.Utils;
 
 import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -46,7 +46,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   private static final int PACKET_HEADER = 0xFFCAFE00;
 
   private static final Logger LOGGER =
-      Logger.getLogger(OldGfxBattleshipSingleSessionBot.class.getName());
+          Logger.getLogger(OldGfxBattleshipSingleSessionBot.class.getName());
   private static final int MOVE_MISS = 5;
   private static final int MOVE_HIT = 3;
   private static final int MOVE_KILLED = 4;
@@ -60,7 +60,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   private final AtomicLong packetCounter = new AtomicLong();
   private final int playerId;
   private final AtomicReference<Optional<String>> sessionId =
-      new AtomicReference<>(Optional.empty());
+          new AtomicReference<>(Optional.empty());
   private final AtomicReference<Thread> threadInput = new AtomicReference<>();
   private final AtomicReference<Thread> threadOutput = new AtomicReference<>();
   private final AtomicReference<InputStream> openedInputStream = new AtomicReference<>();
@@ -73,22 +73,22 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
   private final int[] enemyShipNumber = new int[]{4, 3, 2, 1};
 
-  public OldGfxBattleshipSingleSessionBot(final NetUtils.NamedInetAddress address, final int port) {
-    this.id = address.getAddress().getHostName() + ':' + port;
+  public OldGfxBattleshipSingleSessionBot(final InetAddress address, final int port) {
+    this.id = address.getHostName() + ':' + port;
 
     final UUID uuid = UUID.randomUUID();
     this.playerId =
             0x7FFFFFFF & (int) (uuid.getLeastSignificantBits() ^ (uuid.getMostSignificantBits() * 31));
     LOGGER.info("Generated player ID: " + this.playerId);
     try {
-      final String host = address.getAddress().getHostAddress();
+      final String host = address.getHostAddress();
       LOGGER.info("Game server address: " + host + ':' + port);
       this.uriInput = new URI(String
               .format("http://%s:%d/getoutstream", host, port));
       this.uriOutput = new URI(String
-          .format("http://%s:%d/getinstream", host, port));
+              .format("http://%s:%d/getinstream", host, port));
       this.uriTest = new URI(String
-          .format("http://%s:%d/test", host, port));
+              .format("http://%s:%d/test", host, port));
     } catch (URISyntaxException ex) {
       LOGGER.log(Level.SEVERE, "URI syntax error", ex);
       throw new IllegalArgumentException("Wrong URI format", ex);
@@ -96,12 +96,12 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   }
 
   private static HttpURLConnection prepareConnection(
-      final String method,
-      final URI uri,
-      final int playerId,
-      final Optional<String> sessionId,
-      final boolean input,
-      final boolean output
+          final String method,
+          final URI uri,
+          final int playerId,
+          final Optional<String> sessionId,
+          final boolean input,
+          final boolean output
   ) throws IOException {
     final HttpURLConnection connection;
     try {
@@ -149,7 +149,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   public boolean doTestCall() {
     try {
       final HttpURLConnection connection =
-          prepareConnection("GET", this.uriTest, this.playerId, this.sessionId.get(), true, false);
+              prepareConnection("GET", this.uriTest, this.playerId, this.sessionId.get(), true, false);
       connection.connect();
       connection.getInputStream().close();
       connection.disconnect();
@@ -166,8 +166,8 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         final HttpURLConnection httpURLConnection;
         try {
           httpURLConnection =
-              prepareConnection("POST", this.uriInput, this.playerId, this.sessionId.get(), true,
-                  false);
+                  prepareConnection("POST", this.uriInput, this.playerId, this.sessionId.get(), true,
+                          false);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, "Can't prepare listening connection", ex);
           placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
@@ -247,7 +247,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         this.sessionReady.set(event == ProtocolEvent.JOIN_SESSION);
         this.myFirstTurn = packet[2] != 0;
         LOGGER.info((event == ProtocolEvent.NEW_SESSION ? "Created session " : "Joined session ") +
-            session + ", first turn is " + (myFirstTurn ? "MINE" : "OPPONENT'S"));
+                session + ", first turn is " + (myFirstTurn ? "MINE" : "OPPONENT'S"));
       }
       break;
       case OPPONENT_LOST:
@@ -277,7 +277,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
           }
 
           this.pushIntoOutput(
-              new BsGameEvent(shot, cellX, cellY));
+                  new BsGameEvent(shot, cellX, cellY));
         }
       }
       break;
@@ -286,27 +286,27 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         if (foundLastShot == null) {
           LOGGER.log(Level.SEVERE, "Got result but without shot");
           this.placeEventIntoInQueue(
-              new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, foundLastShot.getX(),
-                  foundLastShot.getY()));
+                  new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, foundLastShot.getX(),
+                          foundLastShot.getY()));
         } else {
           switch (packet[1]) {
             case 3: { // HIT
               this.gameField
-                  .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.HIT);
+                      .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.HIT);
               this.pushIntoOutput(
-                  new BsGameEvent(GameEventType.EVENT_HIT, foundLastShot.getX(),
-                      foundLastShot.getY()));
+                      new BsGameEvent(GameEventType.EVENT_HIT, foundLastShot.getX(),
+                              foundLastShot.getY()));
               this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
             }
             break;
             case 4: { // KILL
               this.gameField
-                  .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.KILL);
+                      .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.KILL);
               final List<Point> shipPoints =
-                  this.gameField
-                      .tryRemoveShipAt(new Point(foundLastShot.getX(), foundLastShot.getY()));
+                      this.gameField
+                              .tryRemoveShipAt(new Point(foundLastShot.getX(), foundLastShot.getY()));
               if (shipPoints.isEmpty() || shipPoints.size() > 4 ||
-                  this.enemyShipNumber[shipPoints.size() - 1] == 0) {
+                      this.enemyShipNumber[shipPoints.size() - 1] == 0) {
                 LOGGER.severe("Detected unexpected state of enemy map");
                 this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
               } else {
@@ -315,7 +315,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
                 if (Arrays.stream(this.enemyShipNumber).allMatch(x -> x == 0)) {
                   LOGGER.info("Detected all enemy ship destruction, ending game");
                   this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_LOST,
-                      foundLastShot.getX(), foundLastShot.getY()));
+                          foundLastShot.getX(), foundLastShot.getY()));
                   try {
                     this.sendDataPacketToServer(ProtocolEvent.EXIT, 0, 0, 0);
                   } catch (IOException ex) {
@@ -327,7 +327,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
                   }
                 } else {
                   this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_KILLED,
-                      foundLastShot.getX(), foundLastShot.getY()));
+                          foundLastShot.getX(), foundLastShot.getY()));
                   this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
                 }
               }
@@ -335,15 +335,15 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
             break;
             case 5: { // MISS
               this.gameField
-                  .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.MISS);
+                      .setState(foundLastShot.getX(), foundLastShot.getY(), GameField.CellState.MISS);
               this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_MISS,
-                  foundLastShot.getX(), foundLastShot.getY()));
+                      foundLastShot.getX(), foundLastShot.getY()));
             }
             break;
             default: {
               LOGGER.log(Level.SEVERE, "Unexpected turn result: " + packet[1]);
               this.placeEventIntoInQueue(
-                  new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
+                      new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
             }
             break;
           }
@@ -490,7 +490,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
   private void sendDataPacketToServer(final ProtocolEvent event, final int arg1, final int arg2,
                                       final int arg3)
-      throws IOException, InterruptedException {
+          throws IOException, InterruptedException {
 
     final ByteArrayOutputStream bufferStream = new ByteArrayOutputStream();
     final DataOutputStream dataStream = new DataOutputStream(bufferStream);
@@ -507,7 +507,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
     final byte[] data = bufferStream.toByteArray();
 
     final HttpURLConnection connection =
-        prepareConnection("POST", this.uriOutput, this.playerId, this.sessionId.get(), true, true);
+            prepareConnection("POST", this.uriOutput, this.playerId, this.sessionId.get(), true, true);
     connection.setRequestProperty("pn", Long.toString(this.packetCounter.get()));
 
     connection.connect();
@@ -519,8 +519,8 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
     LOGGER.info("Opened connection, got response code: " + responseCode);
     if (responseCode != 200) {
       LOGGER.log(Level.SEVERE,
-          "Can't send package to server, response status " + responseCode + ": " +
-              Arrays.toString(data));
+              "Can't send package to server, response status " + responseCode + ": " +
+                      Arrays.toString(data));
       throw new IOException("Error response code: " + responseCode);
     }
     connection.disconnect();
@@ -632,8 +632,8 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
     static ProtocolEvent findForCode(final int code) {
       return stream(ProtocolEvent.values())
-          .filter(e -> e.code == code)
-          .findFirst().orElse(NONE);
+              .filter(e -> e.code == code)
+              .findFirst().orElse(NONE);
     }
 
   }

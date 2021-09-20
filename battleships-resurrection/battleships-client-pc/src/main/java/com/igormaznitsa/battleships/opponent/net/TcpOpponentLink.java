@@ -5,7 +5,7 @@ import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -36,9 +36,9 @@ public class TcpOpponentLink {
   private final BlockingQueue<BsGameEvent> outgoingRecords = new ArrayBlockingQueue<>(256);
   private final AtomicReference<String> globalError = new AtomicReference<>();
 
-  public TcpOpponentLink(final OpponentRecord opponent, final InetAddress inetAddress, final int port) throws IOException {
+  public TcpOpponentLink(final OpponentRecord opponent, final InterfaceAddress interfaceAddress, final int port) throws IOException {
     this.opponentRecord = opponent;
-    this.serverSocket = new ServerSocket(port, 3, inetAddress).getChannel();
+    this.serverSocket = new ServerSocket(port, 3, interfaceAddress.getAddress()).getChannel();
     this.serverSocket.configureBlocking(false);
     this.name = this.serverSocket.toString();
   }

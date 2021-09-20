@@ -6,7 +6,7 @@ import com.igormaznitsa.battleships.opponent.net.TcpOpponentLink;
 import com.igormaznitsa.battleships.utils.NetUtils;
 
 import javax.swing.*;
-import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,14 +17,14 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
   private static final Logger LOGGER = Logger.getLogger(NewNetSingleSessionOpponent.class.getSimpleName());
 
   private final String uid;
-  private final InetAddress address;
+  private final InterfaceAddress interfaceAddress;
   private final int port;
   private final StartOptions startOptions;
   private final AtomicReference<TcpOpponentLink> opponentLink = new AtomicReference<>();
 
-  public NewNetSingleSessionOpponent(final StartOptions startOptions, final NetUtils.NamedInetAddress namedInetAddress, final int port) {
+  public NewNetSingleSessionOpponent(final StartOptions startOptions, final NetUtils.NamedInterfaceAddress namedInetAddress, final int port) {
     this.startOptions = Objects.requireNonNull(startOptions);
-    this.address = Objects.requireNonNull(namedInetAddress).getAddress();
+    this.interfaceAddress = Objects.requireNonNull(namedInetAddress).getInterfaceAddress();
     this.port = port;
     this.uid = NetUtils.makeNetworkUid();
     LOGGER.info("Network UID: " + this.uid);
@@ -44,7 +44,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
   @Override
   public BattleshipsPlayer startPlayer() {
     try {
-      final SelectNetOpponentDialog dialog = new SelectNetOpponentDialog(this.startOptions, this.uid, this.address, this.port).start();
+      final SelectNetOpponentDialog dialog = new SelectNetOpponentDialog(this.startOptions, this.uid, this.interfaceAddress, this.port).start();
       dialog.setVisible(true);
       final TcpOpponentLink opponentLink = dialog.getResult().orElse(null);
       if (opponentLink != null) {

@@ -23,6 +23,7 @@ import com.igormaznitsa.battleships.utils.NetUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.InetAddress;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -56,19 +57,32 @@ public class BattleShips {
         selectedData.savePreferences();
       }
 
-      final NetUtils.NamedInetAddress chosenInetAddress = NetUtils.findAllNetworkInterfaces()
-              .stream().filter(x -> selectedData.getHostName().orElse("").equals(x.getName()))
-              .findFirst()
-              .orElseThrow(() -> new Error("Unexpectedly can't find interface for name: " + selectedData.getHostName().orElse("")));
       final int chosenPort = selectedData.getHostPort().orElse(30000);
-      LOGGER.info("Creating client for: " + chosenInetAddress + " : " + chosenPort);
-
       final BattleshipsPlayer selectedOpponent;
       if (selectedData.isMultiPlayer()) {
         if (selectedData.isUseOldGfxClient()) {
-          selectedOpponent = new OldGfxBattleshipSingleSessionBot(chosenInetAddress, chosenPort).startPlayer();
+          InetAddress address = null;
+          try {
+            address = InetAddress.getByName(selectedData.getHostName().orElse("localhost"));
+          } catch (Exception ex) {
+            LOGGER.severe("Can't find host address: " + selectedData.getHostName());
+            JOptionPane.showMessageDialog(null, "Can't resolve address of host: " + selectedData.getHostName().orElse(""));
+            System.exit(556677);
+          }
+          LOGGER.info("Creating old client for: " + address + " : " + chosenPort);
+          selectedOpponent = new OldGfxBattleshipSingleSessionBot(address, chosenPort).startPlayer();
         } else {
-          selectedOpponent = new NewNetSingleSessionOpponent(selectedData, chosenInetAddress, chosenPort).startPlayer();
+          final String interfaceName = selectedData.getHostName().orElse("localhost");
+          final NetUtils.NamedInterfaceAddress selectedInterface = NetUtils.findAllNetworkInterfaces().stream()
+                  .filter(x -> x.getName().equals(interfaceName))
+                  .findFirst().orElse(null);
+          if (selectedInterface == null) {
+            LOGGER.severe("Can't find interface: " + selectedData.getHostName());
+            JOptionPane.showMessageDialog(null, "Can't find interface: " + selectedData.getHostName().orElse(""));
+            System.exit(556677);
+          }
+          LOGGER.info("Creating new client for: " + selectedInterface + " : " + chosenPort);
+          selectedOpponent = new NewNetSingleSessionOpponent(selectedData, selectedInterface, chosenPort).startPlayer();
         }
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();

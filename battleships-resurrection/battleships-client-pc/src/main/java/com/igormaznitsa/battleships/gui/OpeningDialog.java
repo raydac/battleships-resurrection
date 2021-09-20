@@ -24,7 +24,6 @@ import javax.swing.Box.Filler;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
@@ -40,7 +39,7 @@ public class OpeningDialog extends JDialog {
   private JPanel mainPanel;
   private JPanel modePanel;
   private JPanel networkPanel;
-  private JComboBox<NetUtils.NamedInetAddress> comboHostName;
+  private final java.util.List<NetUtils.NamedInterfaceAddress> networkInterfaces;
   private JFormattedTextField textFieldPort;
   private Filler filler4;
   private Filler filler5;
@@ -52,7 +51,7 @@ public class OpeningDialog extends JDialog {
   private JRadioButton radioSinglePlayer;
   private JRadioButton radioMultiPlayer;
   private JCheckBox checkboxUseOldGfxClient;
-
+  private JComboBox<String> comboInterfaceName;
   private StartOptions result;
 
   public OpeningDialog(final StartOptions startOptions) {
@@ -60,6 +59,9 @@ public class OpeningDialog extends JDialog {
             startOptions.getGraphicsConfiguration().orElse(
                     getLocalGraphicsEnvironment().getDefaultScreenDevice()
                             .getDefaultConfiguration()));
+
+    this.networkInterfaces = NetUtils.findAllNetworkInterfaces();
+
     startOptions.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
 
@@ -76,14 +78,15 @@ public class OpeningDialog extends JDialog {
     this.radioMultiPlayer.setSelected(startOptions.isMultiPlayer());
     this.radioWindow.setSelected(!startOptions.isFullScreen());
     this.radioFullScreen.setSelected(startOptions.isFullScreen());
+
     startOptions.getHostName().ifPresent(x -> {
-      final Optional<NetUtils.NamedInetAddress> selectedAddress = NetUtils.findAllNetworkInterfaces()
+      final Optional<NetUtils.NamedInterfaceAddress> selectedAddress = this.networkInterfaces
               .stream()
               .filter(y -> y.getName().equals(x))
               .findFirst();
       selectedAddress.ifPresentOrElse(
-              y -> this.comboHostName.setSelectedItem(y),
-              () -> this.comboHostName.setSelectedIndex(0)
+              y -> this.comboInterfaceName.setSelectedItem(y),
+              () -> this.comboInterfaceName.setSelectedIndex(0)
       );
     });
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
@@ -114,7 +117,7 @@ public class OpeningDialog extends JDialog {
               .setMultiPlayer(this.radioMultiPlayer.isSelected())
               .setUseOldGfxClient(this.checkboxUseOldGfxClient.isSelected())
               .setHostPort(hostPort)
-              .setHostName(Objects.requireNonNull((NetUtils.NamedInetAddress) this.comboHostName.getSelectedItem()).getName())
+              .setHostName(String.valueOf(this.comboInterfaceName.getSelectedItem()))
               .build();
       this.dispose();
     });
@@ -123,6 +126,8 @@ public class OpeningDialog extends JDialog {
       this.result = null;
       this.dispose();
     });
+
+    this.updateComboHostName();
 
     this.getContentPane().doLayout();
     this.pack();
@@ -147,7 +152,7 @@ public class OpeningDialog extends JDialog {
     labelServerHostName = new JLabel();
     labelServerPort = new JLabel();
 
-    comboHostName = new JComboBox<>(NetUtils.findAllNetworkInterfaces().toArray(new NetUtils.NamedInetAddress[0])) {
+    comboInterfaceName = new JComboBox<>(NetUtils.findAllNetworkInterfaces().stream().map(NetUtils.NamedInterfaceAddress::getName).toArray(String[]::new)) {
       @Override
       public Dimension getMinimumSize() {
         return new Dimension(10, 10);
@@ -223,7 +228,7 @@ public class OpeningDialog extends JDialog {
 
     labelServerPort.setText("Port:");
     networkPanel.add(labelServerPort);
-    networkPanel.add(comboHostName);
+    networkPanel.add(comboInterfaceName);
     networkPanel.add(textFieldPort);
 
     networkPanel.add(Box.createHorizontalGlue());
@@ -278,15 +283,17 @@ public class OpeningDialog extends JDialog {
     gridBagConstraints.gridy = 4;
     mainPanel.add(filler5, gridBagConstraints);
 
-    this.updateComboHostName();
-
     this.setContentPane(mainPanel);
   }
 
   private void updateComboHostName() {
     if (this.checkboxUseOldGfxClient.isSelected()) {
+      this.comboInterfaceName.setEditable(true);
       this.labelServerHostName.setText("Server host name:");
     } else {
+      this.comboInterfaceName.setEditable(false);
+      this.comboInterfaceName.removeAllItems();
+      this.networkInterfaces.forEach(x -> this.comboInterfaceName.addItem(x.getName()));
       this.labelServerHostName.setText("Network interface:");
     }
   }

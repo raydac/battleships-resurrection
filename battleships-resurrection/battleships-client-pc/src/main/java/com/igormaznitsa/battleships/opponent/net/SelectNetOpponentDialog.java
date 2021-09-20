@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.SocketException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -39,12 +39,12 @@ public class SelectNetOpponentDialog extends JDialog {
   private final List<OpponentRecord> recordList = new ArrayList<>();
   private final List<ListDataListener> listDataListenerList = new CopyOnWriteArrayList<>();
   private final AtomicReference<Pair<String, Long>> processingOffer = new AtomicReference<>();
-  private final InetAddress inetAddress;
+  private final InterfaceAddress interfaceAddress;
   private final int port;
 
-  public SelectNetOpponentDialog(final StartOptions startOptions, final String uid, final InetAddress address, final int port) throws Exception {
+  public SelectNetOpponentDialog(final StartOptions startOptions, final String uid, final InterfaceAddress address, final int port) throws Exception {
     super((JFrame) null, "Choose BattleShips opponent", true, startOptions.getGraphicsConfiguration().orElse(null));
-    this.inetAddress = address;
+    this.interfaceAddress = address;
     this.port = port;
     this.setIconImage(startOptions.getGameIcon().orElse(null));
     this.setAlwaysOnTop(true);
@@ -213,7 +213,8 @@ public class SelectNetOpponentDialog extends JDialog {
   private void startGameSession(final UdpMessage message) {
     LOGGER.info("starting game session with: " + message.getUid());
     try {
-      final TcpOpponentLink tcpOpponentLink = new TcpOpponentLink(new OpponentRecord(message), this.inetAddress, this.port);
+      this.udpBroadcasting.dispose();
+      final TcpOpponentLink tcpOpponentLink = new TcpOpponentLink(new OpponentRecord(message), this.interfaceAddress, this.port);
       if (this.createdLink.compareAndSet(null, tcpOpponentLink)) {
         LOGGER.info("created tcp link");
         this.closeWindow();
