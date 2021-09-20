@@ -200,10 +200,12 @@ public class SelectNetOpponentDialog extends JDialog {
       });
     }
 
-    if (!linkCompleted && this.processingOffer.get() != null && System.currentTimeMillis() - this.processingOffer.get().getRight() > MAX_AGREEMENT_WAIT.toMillis()) {
+    var currentOffer = this.processingOffer.get();
+
+    if (!linkCompleted && currentOffer != null && System.currentTimeMillis() - this.processingOffer.get().getRight() > MAX_AGREEMENT_WAIT.toMillis()) {
       LOGGER.info("Too long wait for agreement");
       this.processingOffer.set(null);
-      JOptionPane.showMessageDialog(this, "No response from: " + this.processingOffer.get().getLeft(), "No response", JOptionPane.WARNING_MESSAGE);
+      JOptionPane.showMessageDialog(this, "No response from: " + currentOffer.getLeft(), "No response", JOptionPane.WARNING_MESSAGE);
       this.buttonSendOffer.setEnabled(false);
       this.listAllowedPlayers.setEnabled(true);
       this.listAllowedPlayers.setSelectedIndex(-1);

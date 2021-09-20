@@ -5,8 +5,8 @@ import com.igormaznitsa.battleships.opponent.BsGameEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
@@ -38,8 +38,11 @@ public class TcpOpponentLink {
 
   public TcpOpponentLink(final OpponentRecord opponent, final InterfaceAddress interfaceAddress, final int port) throws IOException {
     this.opponentRecord = opponent;
-    this.serverSocket = new ServerSocket(port, 3, interfaceAddress.getAddress()).getChannel();
+
+    this.serverSocket = ServerSocketChannel.open();
+    this.serverSocket.bind(new InetSocketAddress(interfaceAddress.getAddress(), port));
     this.serverSocket.configureBlocking(false);
+
     this.name = this.serverSocket.toString();
   }
 

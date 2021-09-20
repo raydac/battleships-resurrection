@@ -1,5 +1,7 @@
 package com.igormaznitsa.battleships.utils;
 
+import java.util.Objects;
+
 public final class Pair<L, R> {
   private final L left;
   private final R right;
@@ -10,6 +12,10 @@ public final class Pair<L, R> {
   }
 
   public static <L, R> Pair<L, R> of(final L left, final R right) {
+    return new Pair<>(Objects.requireNonNull(left), Objects.requireNonNull(right));
+  }
+
+  public static <L, R> Pair<L, R> ofNullable(final L left, final R right) {
     return new Pair<>(left, right);
   }
 
