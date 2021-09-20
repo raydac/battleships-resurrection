@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
+public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMoveOrderProvider {
   private static final Logger LOGGER = Logger.getLogger(NewNetSingleSessionOpponent.class.getSimpleName());
 
   private final String uid;
@@ -52,6 +52,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
         if (!this.opponentLink.compareAndSet(null, opponentLink)) {
           throw new Error("Unexpected already existing opponent link");
         }
+        opponentLink.start();
         return this;
       }
     } catch (Exception ex) {
@@ -82,6 +83,11 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
 
   @Override
   public String getId() {
-    return null;
+    return this.uid;
+  }
+
+  @Override
+  public BattleshipsPlayer findFirstTurnPlayer(BattleshipsPlayer playerA, BattleshipsPlayer playerB) {
+    return (System.currentTimeMillis() % 100L) > 50L ? playerA : playerB;
   }
 }

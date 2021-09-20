@@ -85,6 +85,11 @@ final class BattleshipsCommDaemon {
         opponent.pushGameEvent(event);
       }
       break;
+      case EVENT_OPPONENT_FIRST_TURN: {
+        LOGGER.info("Incoming opponent first turn");
+        opponent.pushGameEvent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+      }
+      break;
       default: {
         LOGGER.severe(String.format("Got unexpected event '%s' from '%s'", event, source.getId()));
         opponent.pushGameEvent(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
@@ -126,8 +131,8 @@ final class BattleshipsCommDaemon {
 
   private void checkPlayersReady() {
     if ("ok".equals(this.playerSessionRecords.get(this.playerA.getId()).getOrDefault("ready", "no"))
-        && "ok".equals(
-        this.playerSessionRecords.get(this.playerB.getId()).getOrDefault("ready", "no"))) {
+            && "ok".equals(
+            this.playerSessionRecords.get(this.playerB.getId()).getOrDefault("ready", "no"))) {
 
       LOGGER.info("Both players ready signals collected");
 
@@ -144,7 +149,7 @@ final class BattleshipsCommDaemon {
       }
 
       final BattleshipsPlayer firstTurnPlayer = Objects
-          .requireNonNull(firstMoveOrderProvider.findFirstTurnPlayer(this.playerA, this.playerB));
+              .requireNonNull(firstMoveOrderProvider.findFirstTurnPlayer(this.playerA, this.playerB));
       LOGGER.info("first turn player is " + (firstTurnPlayer == this.playerA ? "A" : "B"));
       if (this.playerA == firstTurnPlayer) {
         this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));

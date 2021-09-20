@@ -160,6 +160,10 @@ public class SelectNetOpponentDialog extends JDialog {
           if (this.processingOffer.compareAndSet(null, newOffer)) {
             if (JOptionPane.showConfirmDialog(this, "Let's play! I am " + newOffer.getLeft(), "Opponent request", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
               this.udpBroadcasting.sendEvent(nextData.getUid(), UdpMessage.Event.LETS_PLAY);
+              this.udpBroadcasting.flush();
+              LOGGER.info("Starting session with " + newOffer.getLeft());
+              linkCompleted = true;
+              this.startGameSession(nextData);
             } else {
               this.udpBroadcasting.sendEvent(nextData.getUid(), UdpMessage.Event.NO);
               this.processingOffer.set(null);
@@ -169,6 +173,7 @@ public class SelectNetOpponentDialog extends JDialog {
               LOGGER.info("player " + newOffer.getLeft() + " sent agreement");
               linkCompleted = true;
               this.startGameSession(nextData);
+              this.udpBroadcasting.flush();
             } else {
               LOGGER.info("sending auto-reject player " + newOffer.getLeft() + " because already in processing of offer");
               this.udpBroadcasting.sendEvent(nextData.getUid(), UdpMessage.Event.NO);

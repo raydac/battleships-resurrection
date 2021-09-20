@@ -59,7 +59,7 @@ public final class BsGameEvent implements Comparable<BsGameEvent> {
   }
 
   public byte[] asArray() throws IOException {
-    final ByteArrayOutputStream buffer = new ByteArrayOutputStream(512);
+    final ByteArrayOutputStream buffer = new ByteArrayOutputStream(256);
     final DataOutputStream out = new DataOutputStream(buffer);
 
     out.write(PREFIX);

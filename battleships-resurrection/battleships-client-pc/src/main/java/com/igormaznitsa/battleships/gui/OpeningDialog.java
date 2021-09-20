@@ -79,16 +79,7 @@ public class OpeningDialog extends JDialog {
     this.radioWindow.setSelected(!startOptions.isFullScreen());
     this.radioFullScreen.setSelected(startOptions.isFullScreen());
 
-    startOptions.getHostName().ifPresent(x -> {
-      final Optional<NetUtils.NamedInterfaceAddress> selectedAddress = this.networkInterfaces
-              .stream()
-              .filter(y -> y.getName().equals(x))
-              .findFirst();
-      selectedAddress.ifPresentOrElse(
-              y -> this.comboInterfaceName.setSelectedItem(y),
-              () -> this.comboInterfaceName.setSelectedIndex(0)
-      );
-    });
+    startOptions.getHostName().ifPresent(x -> this.comboInterfaceName.setSelectedItem(x));
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
     this.checkboxUseOldGfxClient.setSelected(startOptions.isUseOldGfxClient());
@@ -287,6 +278,7 @@ public class OpeningDialog extends JDialog {
   }
 
   private void updateComboHostName() {
+    final String selected = (String) this.comboInterfaceName.getSelectedItem();
     if (this.checkboxUseOldGfxClient.isSelected()) {
       this.comboInterfaceName.setEditable(true);
       this.labelServerHostName.setText("Server host name:");
@@ -296,5 +288,6 @@ public class OpeningDialog extends JDialog {
       this.networkInterfaces.forEach(x -> this.comboInterfaceName.addItem(x.getName()));
       this.labelServerHostName.setText("Network interface:");
     }
+    this.comboInterfaceName.setSelectedItem(selected);
   }
 }

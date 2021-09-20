@@ -1,9 +1,12 @@
 package com.igormaznitsa.battleships.utils;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -13,6 +16,19 @@ import java.util.stream.Stream;
 public final class NetUtils {
   private NetUtils() {
 
+  }
+
+  public static int readData(final SocketChannel socketChannel, final byte[] buffer) throws IOException {
+    final ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+    byteBuffer.clear();
+    int offset = 0;
+    while (offset < buffer.length) {
+      int read = socketChannel.read(byteBuffer);
+      if (read < 0) break;
+      offset += read;
+    }
+    byteBuffer.flip();
+    return byteBuffer.limit();
   }
 
   public static List<NamedInterfaceAddress> findAllNetworkInterfaces() {

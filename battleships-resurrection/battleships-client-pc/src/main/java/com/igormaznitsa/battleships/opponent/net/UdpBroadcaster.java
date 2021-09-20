@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.*;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,10 +54,12 @@ public class UdpBroadcaster {
   }
 
   public void sendEvent(final String uid, final UdpMessage.Event event) {
-    if (event == null) {
-      this.mapEventsToSend.remove(uid);
-    } else {
-      this.mapEventsToSend.put(uid, event);
+    synchronized (mapEventsToSend) {
+      if (event == null) {
+        this.mapEventsToSend.remove(uid);
+      } else {
+        this.mapEventsToSend.put(uid, event);
+      }
     }
   }
 
@@ -65,7 +68,7 @@ public class UdpBroadcaster {
     try {
       final byte[] buffer = new byte[BUFFER_SIZE];
       final DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-      while (!Thread.currentThread().isInterrupted()) {
+      while (!Thread.currentThread().isInterrupted() && !this.udpSocket.isClosed()) {
         try {
           this.udpSocket.receive(packet);
           final byte[] incomingData = Arrays.copyOf(packet.getData(), packet.getLength());
@@ -93,11 +96,28 @@ public class UdpBroadcaster {
         } catch (SocketTimeoutException ex) {
           // do nothing
         } catch (IOException e) {
-          LOGGER.log(Level.SEVERE, "IO error during receiving", e);
+          if (e.getMessage() != null && !e.getMessage().toLowerCase(Locale.ENGLISH).contains("closed")) {
+            LOGGER.log(Level.SEVERE, "IO error during receiving", e);
+          }
         }
       }
     } finally {
       LOGGER.info("receiving loop completed");
+    }
+  }
+
+  public void flush() {
+    LOGGER.info("flush events");
+    while (!Thread.currentThread().isInterrupted() && this.threadSending.isAlive()) {
+      synchronized (this.mapEventsToSend) {
+        if (this.mapEventsToSend.isEmpty()) break;
+      }
+      try {
+        Thread.sleep(50L);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+        break;
+      }
     }
   }
 
@@ -108,7 +128,7 @@ public class UdpBroadcaster {
         try {
           final byte[] body = new UdpMessage(VERSION, this.uid, UdpMessage.Event.WAITING, this.interfaceAddress.getAddress().getHostAddress(), this.port, System.currentTimeMillis()).asArray();
           this.udpSocket.send(new DatagramPacket(body, body.length, this.interfaceAddress.getBroadcast(), this.port));
-          LOGGER.info("Broadcast message on air");
+          LOGGER.info("broadcast message sent");
         } catch (IOException ex) {
           LOGGER.log(Level.SEVERE, "io exception during broadcast send", ex);
         }
