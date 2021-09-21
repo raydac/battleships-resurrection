@@ -150,16 +150,20 @@ final class BattleshipsCommDaemon {
           this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
         }
       } else {
-        if (isPlayerAFirstTurn(readyFromA, readyFromB)) {
+        final BattleshipsPlayer firstTurnPlayer = this.playerA.findFirstTurnPlayer(this.playerA, this.playerB)
+                .orElseGet(() -> this.playerB.findFirstTurnPlayer(this.playerA, this.playerB)
+                        .orElseGet(() -> isPlayerAFirstTurn(readyFromA, readyFromB) ? this.playerA : this.playerB));
+
+        if (firstTurnPlayer == this.playerA) {
+          LOGGER.info("sending first turn goes A");
           if (this.playerA.isRemote()) {
-            LOGGER.info("sending first turn signal to A");
             this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
           } else {
             LOGGER.info("skip first turn signal to A because it is local");
           }
         } else {
+          LOGGER.info("sending first turn goes B");
           if (this.playerB.isRemote()) {
-            LOGGER.info("sending first turn signal to B");
             this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
           } else {
             LOGGER.info("skip first turn signal to B because it is local");

@@ -352,6 +352,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
         } else {
           // game has started
           this.readyAlreadySent = true;
+          LOGGER.info("Ready for game session");
           this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, Utils.RND.nextInt(), Utils.RND.nextInt()));
         }
       }
@@ -593,6 +594,17 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
     }
   }
 
+  @Override
+  public Optional<BattleshipsPlayer> findFirstTurnPlayer(final BattleshipsPlayer playerA, final BattleshipsPlayer playerB) {
+    final BattleshipsPlayer result;
+    if (this.myFirstTurn) {
+      result = this == playerA ? playerA : playerB;
+    } else {
+      result = this != playerA ? playerA : playerB;
+    }
+    return Optional.of(result);
+  }
+
   private enum ProtocolEvent {
     UNKNOWN(-1),
     NONE(1),
@@ -626,6 +638,5 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
               .filter(e -> e.code == code)
               .findFirst().orElse(NONE);
     }
-
   }
 }

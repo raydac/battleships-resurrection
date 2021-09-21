@@ -35,4 +35,8 @@ public interface BattleshipsPlayer {
 
   boolean isRemote();
 
+  default Optional<BattleshipsPlayer> findFirstTurnPlayer(BattleshipsPlayer playerA, BattleshipsPlayer playerB) {
+    return Optional.empty();
+  }
+
 }

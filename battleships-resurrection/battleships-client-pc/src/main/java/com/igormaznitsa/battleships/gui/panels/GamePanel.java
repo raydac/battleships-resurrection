@@ -37,8 +37,8 @@ import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
@@ -69,8 +69,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private final BufferedImage background;
   private final Timer timer;
   private final GameField gameField;
-  private final BlockingQueue<BsGameEvent> incomingQueue = new ArrayBlockingQueue<>(10);
-  private final BlockingQueue<BsGameEvent> outgoingQueue = new ArrayBlockingQueue<>(10);
+  private final BlockingDeque<BsGameEvent> incomingQueue = new LinkedBlockingDeque<>(256);
+  private final BlockingDeque<BsGameEvent> outgoingQueue = new LinkedBlockingDeque<>(256);
   private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
           new AtomicReference<>(Optional.empty());
   private final AtomicReference<ShipType> lastFiringShipType = new AtomicReference<>();
@@ -300,8 +300,12 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   @Override
   public void pushGameEvent(final BsGameEvent event) {
     if (event != null && !this.incomingQueue.offer(event)) {
-      throw new Error("Can't place event into queue for long time: " + event + " queue.size="
-              + this.incomingQueue.size());
+      if (this.incomingQueue.offer(event)) {
+        LOGGER.info("queued: " + event);
+      } else {
+        LOGGER.severe("Can't place event into queue for long time: " + event + " queue.size=");
+        this.incomingQueue.offer(new BsGameEvent(EVENT_FAILURE, 0, 0));
+      }
     }
   }
 
@@ -404,16 +408,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     final Set<UUID> alreadyMet = new HashSet<>();
     while (!Thread.currentThread().isInterrupted()) {
       result = this.incomingQueue.poll();
-      if (result != null) {
-        LOGGER.info("incoming event: " + result);
-      }
       if (result == null) {
         break;
       } else if (result.getType().isForced() || expected.contains(result.getType())) {
         break;
       } else {
-        if (!this.incomingQueue.offer(result)) {
-          throw new Error("Can't return event back into queue: " + result);
+        if (!this.incomingQueue.offerLast(result)) {
+          LOGGER.severe("can't place event back : " + result);
+          this.incomingQueue.offerFirst(new BsGameEvent(EVENT_FAILURE, 0, 0));
         }
         if (alreadyMet.contains(result.getUuid())) {
           result = null;
@@ -983,6 +985,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         this.doSelectControl(ControlElement.NONE);
         this.animatedSpriteField = this.gameField.moveFieldToShipSprites();
         this.gameField.reset();
+        LOGGER.info("Ready");
         this.fireEventToOpponent(new BsGameEvent(EVENT_READY, RND.nextInt(), RND.nextInt()));
         this.initStage(Stage.PLACEMENT_END_ANIMATION);
       }

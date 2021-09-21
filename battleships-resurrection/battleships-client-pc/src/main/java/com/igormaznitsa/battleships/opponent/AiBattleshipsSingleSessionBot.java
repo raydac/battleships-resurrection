@@ -56,7 +56,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
     this.counterOfEnemyShips = new int[]{4, 3, 2, 1};
     range(0, FIELD_EDGE * FIELD_EDGE).forEach(x -> this.enemyMap.add(MapItem.EMPTY));
     this.thread = new Thread(() -> {
-      LOGGER.info("Field prepared for game session");
+      LOGGER.info("AI player ready for game session");
       this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, Utils.RND.nextInt(), Utils.RND.nextInt()));
       while (!Thread.currentThread().isInterrupted()) {
         try {
