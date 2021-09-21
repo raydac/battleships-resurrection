@@ -156,6 +156,7 @@ public class SelectNetOpponentDialog extends JDialog {
     this.progressBarOfferWait.setString(uid);
     this.contentPanel.add(this.panelWaitForOffer, BorderLayout.NORTH);
     this.contentPanel.doLayout();
+    this.contentPanel.revalidate();
     this.contentPanel.repaint();
 
     this.listAllowedPlayers.setEnabled(false);
@@ -165,6 +166,7 @@ public class SelectNetOpponentDialog extends JDialog {
   private void hideOfferProgressPanel() {
     this.contentPanel.remove(this.panelWaitForOffer);
     this.contentPanel.doLayout();
+    this.contentPanel.revalidate();
     this.contentPanel.repaint();
 
     this.listAllowedPlayers.setEnabled(true);

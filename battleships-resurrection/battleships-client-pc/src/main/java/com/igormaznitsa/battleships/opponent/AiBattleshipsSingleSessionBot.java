@@ -15,30 +15,26 @@
 
 package com.igormaznitsa.battleships.opponent;
 
-import static java.util.Collections.shuffle;
-import static java.util.List.of;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.IntStream.range;
-
+import com.igormaznitsa.battleships.utils.Utils;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.shuffle;
+import static java.util.List.of;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.IntStream.range;
+
 public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
 
   private static final Logger LOGGER =
-      Logger.getLogger(AiBattleshipsSingleSessionBot.class.getName());
+          Logger.getLogger(AiBattleshipsSingleSessionBot.class.getName());
 
   private static final int FIELD_EDGE = 10;
   private final Random random = new Random(System.currentTimeMillis());
@@ -56,12 +52,12 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   public AiBattleshipsSingleSessionBot() {
     super();
     this.placeShipsOnGameField();
-    this.counterOfMyShips = new int[] {4, 3, 2, 1};
-    this.counterOfEnemyShips = new int[] {4, 3, 2, 1};
+    this.counterOfMyShips = new int[]{4, 3, 2, 1};
+    this.counterOfEnemyShips = new int[]{4, 3, 2, 1};
     range(0, FIELD_EDGE * FIELD_EDGE).forEach(x -> this.enemyMap.add(MapItem.EMPTY));
     this.thread = new Thread(() -> {
       LOGGER.info("Field prepared for game session");
-      this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, 0, 0));
+      this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, Utils.RND.nextInt(), Utils.RND.nextInt()));
       while (!Thread.currentThread().isInterrupted()) {
         try {
           final BsGameEvent nextEvent = this.inQueue.take();
@@ -185,6 +181,11 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   }
 
   @Override
+  public boolean isRemote() {
+    return false;
+  }
+
+  @Override
   public String getId() {
     return "local-ai-battleships-clients";
   }
@@ -248,53 +249,53 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
     final int vMax = (int) verticalCounter;
 
     return range(0, 4)
-        .filter(i -> this.counterOfEnemyShips[i] > 0)
-        .map(i -> i + 1)
-        .anyMatch(cells -> cells <= hMax || cells <= vMax);
+            .filter(i -> this.counterOfEnemyShips[i] > 0)
+            .map(i -> i + 1)
+            .anyMatch(cells -> cells <= hMax || cells <= vMax);
   }
 
   private int offerTargetOffset() {
     final List<Integer> hitOffsets = range(0, this.enemyMap.size())
-        .filter(x -> this.enemyMap.get(x) == MapItem.HIT).boxed().collect(Collectors.toList());
+            .filter(x -> this.enemyMap.get(x) == MapItem.HIT).boxed().collect(Collectors.toList());
     if (hitOffsets.isEmpty()) {
       final List<Integer> freeCells = range(0, this.enemyMap.size())
-          .filter(i -> this.enemyMap.get(i) == MapItem.EMPTY)
-          .boxed()
-          .collect(Collectors.toCollection(ArrayList::new));
+              .filter(i -> this.enemyMap.get(i) == MapItem.EMPTY)
+              .boxed()
+              .collect(Collectors.toCollection(ArrayList::new));
       shuffle(freeCells, random);
       if (freeCells.isEmpty()) {
         throw new Error("Unexpected state, there is no empty cell but game not completed");
       }
       return freeCells.stream().filter(i ->
-          this.canCellContainEnemyShip(i % FIELD_EDGE, i / FIELD_EDGE)
+              this.canCellContainEnemyShip(i % FIELD_EDGE, i / FIELD_EDGE)
       ).findFirst().orElseThrow(() -> new Error("Can't find any free cell for enemy ship"));
     } else {
       return hitOffsets.stream().map(hitOffset -> {
-        final int cx = hitOffset % FIELD_EDGE;
-        final int cy = hitOffset / FIELD_EDGE;
-        final List<int[]> directions;
-        if (isShipCell(cx - 1, cy, this.enemyMap)
-            || isShipCell(cx + 1, cy, this.enemyMap)) {
-          // horizontal
-          directions = new ArrayList<>(of(new int[] {-1, 0}, new int[] {1, 0}));
-        } else if (isShipCell(cx, cy - 1, this.enemyMap)
-            || isShipCell(cx, cy + 1, this.enemyMap)) {
-          // vertical
-          directions = new ArrayList<>(of(new int[] {0, -1}, new int[] {0, 1}));
-        } else {
-          // any
-          directions = new ArrayList<>(
-              of(new int[] {1, 0}, new int[] {0, 1}, new int[] {-1, 0}, new int[] {0, -1}));
-        }
-        shuffle(directions, random);
-        return directions.stream().filter(d -> {
-          final int px = d[0] + cx;
-          final int py = d[1] + cy;
-          return isValid(px, py)
-              && this.enemyMap.get(offset(px, py)) == MapItem.EMPTY;
-        }).map(d -> offset(cx + d[0], cy + d[1])).findFirst();
-      }).flatMap(Optional::stream).findFirst()
-          .orElseThrow(() -> new Error("Unexpected situation! Can't find empty position to shot!"));
+                final int cx = hitOffset % FIELD_EDGE;
+                final int cy = hitOffset / FIELD_EDGE;
+                final List<int[]> directions;
+                if (isShipCell(cx - 1, cy, this.enemyMap)
+                        || isShipCell(cx + 1, cy, this.enemyMap)) {
+                  // horizontal
+                  directions = new ArrayList<>(of(new int[]{-1, 0}, new int[]{1, 0}));
+                } else if (isShipCell(cx, cy - 1, this.enemyMap)
+                        || isShipCell(cx, cy + 1, this.enemyMap)) {
+                  // vertical
+                  directions = new ArrayList<>(of(new int[]{0, -1}, new int[]{0, 1}));
+                } else {
+                  // any
+                  directions = new ArrayList<>(
+                          of(new int[]{1, 0}, new int[]{0, 1}, new int[]{-1, 0}, new int[]{0, -1}));
+                }
+                shuffle(directions, random);
+                return directions.stream().filter(d -> {
+                  final int px = d[0] + cx;
+                  final int py = d[1] + cy;
+                  return isValid(px, py)
+                          && this.enemyMap.get(offset(px, py)) == MapItem.EMPTY;
+                }).map(d -> offset(cx + d[0], cy + d[1])).findFirst();
+              }).flatMap(Optional::stream).findFirst()
+              .orElseThrow(() -> new Error("Unexpected situation! Can't find empty position to shot!"));
     }
   }
 
@@ -305,7 +306,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
       this.counterOfEnemyShips[allShipCells.size() - 1]--;
     } else {
       throw new IllegalStateException(
-          "Killed a ship which instances already all gone: " + allShipCells);
+              "Killed a ship which instances already all gone: " + allShipCells);
     }
     allShipCells.forEach(i -> {
       this.enemyMap.set(i, MapItem.KILLED);
@@ -340,7 +341,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
   private void markEnemyShipAsHit(final int x, final int y) {
     this.enemyMap.set(offset(x, y), MapItem.HIT);
     if (isShipCell(x - 1, y, this.enemyMap)
-        || isShipCell(x + 1, y, this.enemyMap)) {
+            || isShipCell(x + 1, y, this.enemyMap)) {
       // horizontal
       if (y > 0) {
         this.enemyMap.set(offset(x, y - 1), MapItem.BANNED);
@@ -349,7 +350,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
         this.enemyMap.set(offset(x, y + 1), MapItem.BANNED);
       }
     } else if (isShipCell(x, y - 1, this.enemyMap)
-        || isShipCell(x, y + 1, this.enemyMap)) {
+            || isShipCell(x, y + 1, this.enemyMap)) {
       // vertical
       if (x > 0) {
         this.enemyMap.set(offset(x - 1, y), MapItem.BANNED);
@@ -360,87 +361,91 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
     }
   }
 
-  private synchronized void onIncomingGameEvent(BsGameEvent event) {
-      switch (requireNonNull(event).getType()) {
-        case EVENT_OPPONENT_FIRST_TURN: {
-          LOGGER.info("Opponent starts");
-          pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
-        }
-        break;
-        case EVENT_SHOT_MAIN:
-        case EVENT_SHOT_REGULAR: {
-          final int cellOffset = offset(event.getX(), event.getY());
-          GameEventType result = GameEventType.EVENT_MISS;
-          if (this.myMap.get(cellOffset) == MapItem.SHIP) {
-            this.myMap.set(cellOffset, MapItem.HIT);
-            final List<Integer> shipOffsets =
-                allShipOffsets(event.getX(), event.getY(), this.myMap);
-            if (shipOffsets.stream().anyMatch(x -> this.myMap.get(x) == MapItem.SHIP)) {
-              result = GameEventType.EVENT_HIT;
+  private synchronized void onIncomingGameEvent(final BsGameEvent event) {
+    switch (requireNonNull(event).getType()) {
+      case EVENT_OPPONENT_FIRST_TURN: {
+        LOGGER.info("Opponent starts");
+        pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+      }
+      break;
+      case EVENT_READY: {
+        LOGGER.info("incoming ready event: " + event);
+      }
+      break;
+      case EVENT_SHOT_MAIN:
+      case EVENT_SHOT_REGULAR: {
+        final int cellOffset = offset(event.getX(), event.getY());
+        GameEventType result = GameEventType.EVENT_MISS;
+        if (this.myMap.get(cellOffset) == MapItem.SHIP) {
+          this.myMap.set(cellOffset, MapItem.HIT);
+          final List<Integer> shipOffsets =
+                  allShipOffsets(event.getX(), event.getY(), this.myMap);
+          if (shipOffsets.stream().anyMatch(x -> this.myMap.get(x) == MapItem.SHIP)) {
+            result = GameEventType.EVENT_HIT;
+          } else {
+            shipOffsets.forEach(x -> this.myMap.set(x, MapItem.KILLED));
+            this.counterOfMyShips[shipOffsets.size() - 1]--;
+            if (this.isThereAnyAliveShip()) {
+              result = GameEventType.EVENT_KILLED;
             } else {
-              shipOffsets.forEach(x -> this.myMap.set(x, MapItem.KILLED));
-              this.counterOfMyShips[shipOffsets.size() - 1]--;
-              if (this.isThereAnyAliveShip()) {
-                result = GameEventType.EVENT_KILLED;
-              } else {
-                result = GameEventType.EVENT_LOST;
-                this.thread.interrupt();
-              }
+              result = GameEventType.EVENT_LOST;
+              this.thread.interrupt();
             }
           }
-          this.pushIntoOutput(new BsGameEvent(result, event.getX(), event.getY()));
-          if (!(result == GameEventType.EVENT_MISS || result == GameEventType.EVENT_LOST)) {
-            this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
-          }
         }
-        break;
-        case EVENT_DO_TURN: {
-          final int targetCell = this.offerTargetOffset();
-          if (this.enemyMap.get(targetCell) != MapItem.EMPTY) {
-            LOGGER.severe(String.format("Detected choice of non-empty cell (%d,%d)%n%n%s%n%n",
-                (targetCell % FIELD_EDGE), (targetCell / FIELD_EDGE), asString(this.enemyMap)));
-            throw new Error(
-                "Detected choice of non-empty cell: x=" + (targetCell % FIELD_EDGE) + ",y="
-                    + (targetCell / FIELD_EDGE));
-          }
-          final int firingShip = this.selectShipToFire();
-          this.pushIntoOutput(
-              new BsGameEvent(
-                  firingShip == 4 ? GameEventType.EVENT_SHOT_MAIN :
-                      GameEventType.EVENT_SHOT_REGULAR,
-                  targetCell % FIELD_EDGE, targetCell / FIELD_EDGE));
-        }
-        break;
-        case EVENT_KILLED: {
-          this.markEnemyShipAsKilled(event.getX(), event.getY());
-        }
-        break;
-        case EVENT_HIT: {
-          this.markEnemyShipAsHit(event.getX(), event.getY());
-        }
-        break;
-        case EVENT_MISS: {
-          this.markEnemyCellAsMiss(event.getX(), event.getY());
+        this.pushIntoOutput(new BsGameEvent(result, event.getX(), event.getY()));
+        if (!(result == GameEventType.EVENT_MISS || result == GameEventType.EVENT_LOST)) {
           this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
         }
-        break;
-        case EVENT_LOST:
-        case EVENT_CONNECTION_ERROR: {
-          this.thread.interrupt();
-        }
-        break;
-        case EVENT_ARRANGEMENT_COMPLETED:
-        case EVENT_PAUSE:
-        case EVENT_RESUME: {
-          // means nothing for AI bot
-        }
-        break;
-        default: {
-          LOGGER.severe("Unexpected event: " + event);
-          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 1, 0));
-          throw new Error("Unexpected game event: " + event.getType());
-        }
       }
+      break;
+      case EVENT_DO_TURN: {
+        final int targetCell = this.offerTargetOffset();
+        if (this.enemyMap.get(targetCell) != MapItem.EMPTY) {
+          LOGGER.severe(String.format("Detected choice of non-empty cell (%d,%d)%n%n%s%n%n",
+                  (targetCell % FIELD_EDGE), (targetCell / FIELD_EDGE), asString(this.enemyMap)));
+          throw new Error(
+                  "Detected choice of non-empty cell: x=" + (targetCell % FIELD_EDGE) + ",y="
+                          + (targetCell / FIELD_EDGE));
+        }
+        final int firingShip = this.selectShipToFire();
+        this.pushIntoOutput(
+                new BsGameEvent(
+                        firingShip == 4 ? GameEventType.EVENT_SHOT_MAIN :
+                                GameEventType.EVENT_SHOT_REGULAR,
+                        targetCell % FIELD_EDGE, targetCell / FIELD_EDGE));
+      }
+      break;
+      case EVENT_KILLED: {
+        this.markEnemyShipAsKilled(event.getX(), event.getY());
+      }
+      break;
+      case EVENT_HIT: {
+        this.markEnemyShipAsHit(event.getX(), event.getY());
+      }
+      break;
+      case EVENT_MISS: {
+        this.markEnemyCellAsMiss(event.getX(), event.getY());
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
+      }
+      break;
+      case EVENT_LOST:
+      case EVENT_CONNECTION_ERROR: {
+        this.thread.interrupt();
+      }
+      break;
+      case EVENT_ARRANGEMENT_COMPLETED:
+      case EVENT_PAUSE:
+      case EVENT_RESUME: {
+        // means nothing for AI bot
+      }
+      break;
+      default: {
+        LOGGER.severe("Unexpected event: " + event);
+        this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_FAILURE, 1, 0));
+        throw new Error("Unexpected game event: " + event.getType());
+      }
+    }
   }
 
   @Override
@@ -460,10 +465,10 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
 
   private int selectShipToFire() {
     final List<Long> foundAliveShipTypes =
-        range(0, 4).filter(i -> this.counterOfMyShips[i] > 0)
-            .mapToLong(i -> i + 1)
-            .boxed()
-            .collect(Collectors.toCollection(ArrayList::new));
+            range(0, 4).filter(i -> this.counterOfMyShips[i] > 0)
+                    .mapToLong(i -> i + 1)
+                    .boxed()
+                    .collect(Collectors.toCollection(ArrayList::new));
     if (foundAliveShipTypes.isEmpty()) {
       throw new Error("Unexpected situation, there is no any alive ship!");
     }
@@ -490,67 +495,67 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
     synchronized (this.myMap) {
       this.myMap.clear();
       range(0, FIELD_EDGE * FIELD_EDGE).forEach(x -> this.myMap.add(MapItem.EMPTY));
-      final int[] counterOfShips = new int[] {4, 3, 2, 1};
+      final int[] counterOfShips = new int[]{4, 3, 2, 1};
       final List<Integer> shipIndexes = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
       shuffle(shipIndexes, random);
       shipIndexes.forEach(i -> {
         final int shipIndex = i;
         final int cellsNumber = i + 1;
         final List<Integer> freePositions = range(0, this.myMap.size())
-            .filter(x -> this.myMap.get(x) == MapItem.EMPTY)
-            .boxed()
-            .collect(toCollection(ArrayList::new));
+                .filter(x -> this.myMap.get(x) == MapItem.EMPTY)
+                .boxed()
+                .collect(toCollection(ArrayList::new));
         shuffle(freePositions, this.random);
         while (counterOfShips[shipIndex] > 0 && !freePositions.isEmpty()) {
           final List<int[]> directions = new ArrayList<>(Arrays
-              .asList(new int[] {1, 0}, new int[] {0, 1}, new int[] {-1, 0}, new int[] {0, -1}));
+                  .asList(new int[]{1, 0}, new int[]{0, 1}, new int[]{-1, 0}, new int[]{0, -1}));
           shuffle(directions, random);
           freePositions.stream()
-              .filter(offset -> {
-                final int baseX = offset % FIELD_EDGE;
-                final int baseY = offset / FIELD_EDGE;
-                final Optional<int[]> shipCompatibleDirection = directions.stream().filter(d ->
-                    // check that free cells in direction meet the ship size
-                    range(0, cellsNumber)
-                        .filter(sc -> {
-                          final int px = baseX + sc * d[0];
-                          final int py = baseY + sc * d[1];
-                          return isValid(px, py)
-                              && this.myMap.get(px + py * FIELD_EDGE) == MapItem.EMPTY;
-                        }).count() == cellsNumber).findFirst();
+                  .filter(offset -> {
+                    final int baseX = offset % FIELD_EDGE;
+                    final int baseY = offset / FIELD_EDGE;
+                    final Optional<int[]> shipCompatibleDirection = directions.stream().filter(d ->
+                            // check that free cells in direction meet the ship size
+                            range(0, cellsNumber)
+                                    .filter(sc -> {
+                                      final int px = baseX + sc * d[0];
+                                      final int py = baseY + sc * d[1];
+                                      return isValid(px, py)
+                                              && this.myMap.get(px + py * FIELD_EDGE) == MapItem.EMPTY;
+                                    }).count() == cellsNumber).findFirst();
 
-                return shipCompatibleDirection.map(foundDirection -> {
-                  // fill ship cells
-                  range(0, cellsNumber).forEach(sc -> {
-                    final int px = baseX + sc * foundDirection[0];
-                    final int py = baseY + sc * foundDirection[1];
-                    this.myMap.set(px + py * FIELD_EDGE, MapItem.SHIP);
-                  });
-                  // ensure ban around placed ship
-                  range(0, this.myMap.size())
-                      .filter(x -> this.myMap.get(x) == MapItem.SHIP)
-                      .forEach(foundShipOffset -> {
-                        final int sx = foundShipOffset % FIELD_EDGE;
-                        final int sy = foundShipOffset / FIELD_EDGE;
-                        for (int dx = -1; dx < 2; dx++) {
-                          for (int dy = -1; dy < 2; dy++) {
-                            if (dx == 0 && dy == 0) {
-                              continue;
-                            }
-                            final int cx = sx + dx;
-                            final int cy = sy + dy;
-                            if (isValid(cx, cy)) {
-                              final int cOffset = cx + cy * FIELD_EDGE;
-                              if (this.myMap.get(cOffset) == MapItem.EMPTY) {
-                                this.myMap.set(cOffset, MapItem.BANNED);
-                              }
-                            }
-                          }
-                        }
+                    return shipCompatibleDirection.map(foundDirection -> {
+                      // fill ship cells
+                      range(0, cellsNumber).forEach(sc -> {
+                        final int px = baseX + sc * foundDirection[0];
+                        final int py = baseY + sc * foundDirection[1];
+                        this.myMap.set(px + py * FIELD_EDGE, MapItem.SHIP);
                       });
-                  return true;
-                }).orElse(false);
-              }).findFirst().ifPresent(x -> counterOfShips[shipIndex]--);
+                      // ensure ban around placed ship
+                      range(0, this.myMap.size())
+                              .filter(x -> this.myMap.get(x) == MapItem.SHIP)
+                              .forEach(foundShipOffset -> {
+                                final int sx = foundShipOffset % FIELD_EDGE;
+                                final int sy = foundShipOffset / FIELD_EDGE;
+                                for (int dx = -1; dx < 2; dx++) {
+                                  for (int dy = -1; dy < 2; dy++) {
+                                    if (dx == 0 && dy == 0) {
+                                      continue;
+                                    }
+                                    final int cx = sx + dx;
+                                    final int cy = sy + dy;
+                                    if (isValid(cx, cy)) {
+                                      final int cOffset = cx + cy * FIELD_EDGE;
+                                      if (this.myMap.get(cOffset) == MapItem.EMPTY) {
+                                        this.myMap.set(cOffset, MapItem.BANNED);
+                                      }
+                                    }
+                                  }
+                                }
+                              });
+                      return true;
+                    }).orElse(false);
+                  }).findFirst().ifPresent(x -> counterOfShips[shipIndex]--);
         }
       });
       if (Arrays.stream(counterOfShips).anyMatch(x -> x != 0)) {

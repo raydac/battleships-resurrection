@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 import static com.igormaznitsa.battleships.utils.Utils.closeQuietly;
 import static java.util.Arrays.stream;
 
-public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, FirstMoveOrderProvider {
+public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private static final int PACKET_HEADER = 0xFFCAFE00;
 
@@ -72,6 +72,11 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
   private final AtomicBoolean sessionReady = new AtomicBoolean(false);
 
   private final int[] enemyShipNumber = new int[]{4, 3, 2, 1};
+
+  @Override
+  public boolean isRemote() {
+    return true;
+  }
 
   public OldGfxBattleshipSingleSessionBot(final InetAddress address, final int port) {
     this.id = address.getHostName() + ':' + port;
@@ -127,21 +132,6 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         throw new IOException(ex);
       }
     }
-  }
-
-  @Override
-  public BattleshipsPlayer findFirstTurnPlayer(final BattleshipsPlayer playerA,
-                                               final BattleshipsPlayer playerB) {
-    final BattleshipsPlayer me;
-    final BattleshipsPlayer opponent;
-    if (this == playerA) {
-      me = playerB;
-      opponent = playerA;
-    } else {
-      me = playerA;
-      opponent = playerB;
-    }
-    return this.myFirstTurn ? me : opponent;
   }
 
   @Override
@@ -362,7 +352,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         } else {
           // game has started
           this.readyAlreadySent = true;
-          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, 0, 0));
+          this.pushIntoOutput(new BsGameEvent(GameEventType.EVENT_READY, Utils.RND.nextInt(), Utils.RND.nextInt()));
         }
       }
       break;

@@ -32,4 +32,7 @@ public interface BattleshipsPlayer {
   boolean isReadyForGame();
 
   String getId();
+
+  boolean isRemote();
+
 }

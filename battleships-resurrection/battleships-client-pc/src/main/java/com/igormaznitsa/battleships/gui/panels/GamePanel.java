@@ -404,6 +404,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     final Set<UUID> alreadyMet = new HashSet<>();
     while (!Thread.currentThread().isInterrupted()) {
       result = this.incomingQueue.poll();
+      if (result != null) {
+        LOGGER.info("incoming event: " + result);
+      }
       if (result == null) {
         break;
       } else if (result.getType().isForced() || expected.contains(result.getType())) {
@@ -472,6 +475,11 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   @Override
   public String getId() {
     return "battleships-main-game-panel";
+  }
+
+  @Override
+  public boolean isRemote() {
+    return false;
   }
 
   private void sendFireNotificationForTargetCell(final ShipType shipType) {
@@ -974,9 +982,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case DONE: {
         this.doSelectControl(ControlElement.NONE);
         this.animatedSpriteField = this.gameField.moveFieldToShipSprites();
-        //this.fillEmptyCellsByFish();
         this.gameField.reset();
-        this.fireEventToOpponent(new BsGameEvent(EVENT_READY, 0, 0));
+        this.fireEventToOpponent(new BsGameEvent(EVENT_READY, RND.nextInt(), RND.nextInt()));
         this.initStage(Stage.PLACEMENT_END_ANIMATION);
       }
       break;

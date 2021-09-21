@@ -17,14 +17,12 @@ package com.igormaznitsa.battleships.gui;
 
 import com.igormaznitsa.battleships.opponent.BattleshipsPlayer;
 import com.igormaznitsa.battleships.opponent.BsGameEvent;
-import com.igormaznitsa.battleships.opponent.FirstMoveOrderProvider;
 import com.igormaznitsa.battleships.opponent.GameEventType;
 import com.igormaznitsa.battleships.utils.Utils;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -36,7 +34,7 @@ final class BattleshipsCommDaemon {
   private final BattleshipsPlayer playerA;
   private final BattleshipsPlayer playerB;
 
-  private final Map<String, Map<String, String>> playerSessionRecords = new HashMap<>();
+  private final Map<String, Map<String, BsGameEvent>> playerSessionRecords = new HashMap<>();
 
   BattleshipsCommDaemon(final BattleshipsPlayer playerA, final BattleshipsPlayer playerB) {
     this.playerSessionRecords.put(playerA.getId(), new HashMap<>());
@@ -61,11 +59,48 @@ final class BattleshipsCommDaemon {
     }
   }
 
+  private static boolean isPlayerAFirstTurn(final BsGameEvent readyA, final BsGameEvent readyB) {
+    final int hashA = (readyA.getX() ^ readyA.getY()) & 0x7FFFFFFF;
+    final int hashB = (readyB.getX() ^ readyB.getY()) & 0x7FFFFFFF;
+    return hashA > hashB;
+  }
+
+  private void doRun() {
+    LOGGER.info("Comm-Daemon started");
+    while (!Thread.currentThread().isInterrupted()) {
+      try {
+        Optional<BsGameEvent> event = this.playerA.pollGameEvent(Duration.ofMillis(100));
+        event.ifPresent(e -> {
+          LOGGER.info("Message from A: " + e);
+          if (e.getType().isNotification()) {
+            this.onServiceEvent(this.playerA, e);
+          } else {
+            this.playerB.pushGameEvent(e);
+          }
+        });
+        event = this.playerB.pollGameEvent(Duration.ofMillis(100));
+        event.ifPresent(e -> {
+          LOGGER.info("Message from B: " + e);
+          if (e.getType().isNotification()) {
+            this.onServiceEvent(this.playerB, e);
+          } else {
+            this.playerA.pushGameEvent(e);
+          }
+        });
+      } catch (InterruptedException ex) {
+        LOGGER.info("Comm-daemon has detected interruption");
+        Thread.currentThread().interrupt();
+      }
+    }
+    LOGGER.info("Comm-Daemon stopped");
+  }
+
   private void onServiceEvent(final BattleshipsPlayer source, final BsGameEvent event) {
     final BattleshipsPlayer opponent = source == this.playerA ? this.playerB : this.playerA;
     switch (event.getType()) {
       case EVENT_READY: {
-        this.playerSessionRecords.get(source.getId()).put("ready", "ok");
+        this.playerSessionRecords.get(source.getId()).put("ready", event);
+        opponent.pushGameEvent(event);
         this.checkPlayersReady();
       }
       break;
@@ -99,62 +134,37 @@ final class BattleshipsCommDaemon {
     }
   }
 
-  private void doRun() {
-    LOGGER.info("Comm-Daemon started");
-    while (!Thread.currentThread().isInterrupted()) {
-      try {
-        Optional<BsGameEvent> event = this.playerA.pollGameEvent(Duration.ofMillis(100));
-        event.ifPresent(e -> {
-          LOGGER.info("Message from A: " + e);
-          if (e.getType().isNotification()) {
-            this.onServiceEvent(this.playerA, e);
-          } else {
-            this.playerB.pushGameEvent(e);
-          }
-        });
-        event = this.playerB.pollGameEvent(Duration.ofMillis(100));
-        event.ifPresent(e -> {
-          LOGGER.info("Message from B: " + e);
-          if (e.getType().isNotification()) {
-            this.onServiceEvent(this.playerB, e);
-          } else {
-            this.playerA.pushGameEvent(e);
-          }
-        });
-      } catch (InterruptedException ex) {
-        LOGGER.info("Comm-daemon has detected interruption");
-        Thread.currentThread().interrupt();
-      }
-    }
-    LOGGER.info("Comm-Daemon stopped");
-  }
-
   private void checkPlayersReady() {
-    if ("ok".equals(this.playerSessionRecords.get(this.playerA.getId()).getOrDefault("ready", "no"))
-            && "ok".equals(
-            this.playerSessionRecords.get(this.playerB.getId()).getOrDefault("ready", "no"))) {
+    final BsGameEvent readyFromA = this.playerSessionRecords.get(this.playerA.getId()).getOrDefault("ready", null);
+    final BsGameEvent readyFromB = this.playerSessionRecords.get(this.playerB.getId()).getOrDefault("ready", null);
+    if (readyFromA != null && readyFromB != null) {
+      LOGGER.info("both players ready signals have been collected");
 
-      LOGGER.info("Both players ready signals collected");
-
-      final FirstMoveOrderProvider firstMoveOrderProvider;
-      if (this.playerA instanceof FirstMoveOrderProvider) {
-        LOGGER.info("Player A is first turn order provider");
-        firstMoveOrderProvider = (FirstMoveOrderProvider) this.playerA;
-      } else if (this.playerB instanceof FirstMoveOrderProvider) {
-        LOGGER.info("Player B is first turn order provider");
-        firstMoveOrderProvider = (FirstMoveOrderProvider) this.playerB;
+      if (!this.playerA.isRemote() && !this.playerB.isRemote()) {
+        LOGGER.info("local game");
+        if (Utils.RND.nextBoolean()) {
+          LOGGER.info("chosen first turn for A");
+          this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+        } else {
+          LOGGER.info("chosen first turn for B");
+          this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+        }
       } else {
-        LOGGER.info("Using internal dice to choose first turn player");
-        firstMoveOrderProvider = (playerA, playerB) -> Utils.RND.nextBoolean() ? playerA : playerB;
-      }
-
-      final BattleshipsPlayer firstTurnPlayer = Objects
-              .requireNonNull(firstMoveOrderProvider.findFirstTurnPlayer(this.playerA, this.playerB));
-      LOGGER.info("first turn player is " + (firstTurnPlayer == this.playerA ? "A" : "B"));
-      if (this.playerA == firstTurnPlayer) {
-        this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
-      } else {
-        this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+        if (isPlayerAFirstTurn(readyFromA, readyFromB)) {
+          if (this.playerA.isRemote()) {
+            LOGGER.info("sending first turn signal to A");
+            this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+          } else {
+            LOGGER.info("skip first turn signal to A because it is local");
+          }
+        } else {
+          if (this.playerB.isRemote()) {
+            LOGGER.info("sending first turn signal to B");
+            this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+          } else {
+            LOGGER.info("skip first turn signal to B because it is local");
+          }
+        }
       }
     }
   }

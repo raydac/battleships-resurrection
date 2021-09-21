@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
-public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMoveOrderProvider {
+public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
   private static final Logger LOGGER = Logger.getLogger(NewNetSingleSessionOpponent.class.getSimpleName());
 
   private final String uid;
@@ -82,12 +82,12 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMove
   }
 
   @Override
-  public String getId() {
-    return this.uid;
+  public boolean isRemote() {
+    return true;
   }
 
   @Override
-  public BattleshipsPlayer findFirstTurnPlayer(BattleshipsPlayer playerA, BattleshipsPlayer playerB) {
-    return (System.currentTimeMillis() % 100L) > 50L ? playerA : playerB;
+  public String getId() {
+    return this.uid;
   }
 }
