@@ -125,7 +125,7 @@ public class StartOptions {
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
     private boolean withSound = true;
-    private boolean useOldGfxClient = true;
+    private boolean useOldGfxClient = false;
     private Optional<String> hostName = Optional.of("localhost");
     private OptionalInt hostPort = OptionalInt.of(30000);
 

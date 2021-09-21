@@ -62,7 +62,7 @@ public class SelectNetOpponentDialog extends JDialog {
 
     this.panelWaitForOffer.add(this.progressBarOfferWait, BorderLayout.CENTER);
 
-    JButton buttonCancelOffer = new JButton("Cancel offer");
+    JButton buttonCancelOffer = new JButton("STOP");
     buttonCancelOffer.addActionListener(e -> this.onButtonCancelOffer());
     this.panelWaitForOffer.add(buttonCancelOffer, BorderLayout.EAST);
 

@@ -241,6 +241,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
 
   @Override
   public void onSignal(final BasePanel source, final String signal) {
+    LOGGER.info("internal signal : " + signal);
     switch (signal) {
       case LoadingPanel.SIGNAL_LOADING_COMPLETED: {
         this.doLoadingCompleted();

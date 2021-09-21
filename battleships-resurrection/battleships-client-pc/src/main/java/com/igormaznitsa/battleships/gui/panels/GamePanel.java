@@ -69,8 +69,8 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private final BufferedImage background;
   private final Timer timer;
   private final GameField gameField;
-  private final BlockingDeque<BsGameEvent> incomingQueue = new LinkedBlockingDeque<>(256);
-  private final BlockingDeque<BsGameEvent> outgoingQueue = new LinkedBlockingDeque<>(256);
+  private final BlockingDeque<BsGameEvent> queueToMe = new LinkedBlockingDeque<>(256);
+  private final BlockingDeque<BsGameEvent> queueToOpponent = new LinkedBlockingDeque<>(256);
   private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
           new AtomicReference<>(Optional.empty());
   private final AtomicReference<ShipType> lastFiringShipType = new AtomicReference<>();
@@ -299,12 +299,12 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   @Override
   public void pushGameEvent(final BsGameEvent event) {
-    if (event != null && !this.incomingQueue.offer(event)) {
-      if (this.incomingQueue.offer(event)) {
+    if (event != null && !this.queueToMe.offer(event)) {
+      if (this.queueToMe.offer(event)) {
         LOGGER.info("queued: " + event);
       } else {
         LOGGER.severe("Can't place event into queue for long time: " + event + " queue.size=");
-        this.incomingQueue.offer(new BsGameEvent(EVENT_FAILURE, 0, 0));
+        this.queueToMe.offer(new BsGameEvent(EVENT_FAILURE, 0, 0));
       }
     }
   }
@@ -312,7 +312,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   @Override
   public Optional<BsGameEvent> pollGameEvent(final Duration duration) throws InterruptedException {
     return Optional
-            .ofNullable(this.outgoingQueue.poll(duration.toMillis(), TimeUnit.MILLISECONDS));
+            .ofNullable(this.queueToOpponent.poll(duration.toMillis(), TimeUnit.MILLISECONDS));
   }
 
   private void renderActionPanel(final Graphics2D g, final int offsetX, final int offsetY,
@@ -397,9 +397,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   }
 
   private void fireEventToOpponent(final BsGameEvent event) {
-    if (!this.outgoingQueue.offer(Objects.requireNonNull(event))) {
+    if (!this.queueToOpponent.offer(Objects.requireNonNull(event))) {
       throw new Error(
-              "Can't queue output game event: " + event + " (size=" + this.outgoingQueue.size() + ')');
+              "Can't queue output game event: " + event + " (size=" + this.queueToOpponent.size() + ')');
     }
   }
 
@@ -407,15 +407,15 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     BsGameEvent result = null;
     final Set<UUID> alreadyMet = new HashSet<>();
     while (!Thread.currentThread().isInterrupted()) {
-      result = this.incomingQueue.poll();
+      result = this.queueToMe.poll();
       if (result == null) {
         break;
       } else if (result.getType().isForced() || expected.contains(result.getType())) {
         break;
       } else {
-        if (!this.incomingQueue.offerLast(result)) {
+        if (!this.queueToMe.offerLast(result)) {
           LOGGER.severe("can't place event back : " + result);
-          this.incomingQueue.offerFirst(new BsGameEvent(EVENT_FAILURE, 0, 0));
+          this.queueToMe.offerFirst(new BsGameEvent(EVENT_FAILURE, 0, 0));
         }
         if (alreadyMet.contains(result.getUuid())) {
           result = null;
@@ -430,6 +430,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   }
 
   private void initStage(final Stage stage) {
+    LOGGER.info("game stage: " + stage);
     this.currentStage = stage;
     this.stageStep = 0;
     this.refreshUi();

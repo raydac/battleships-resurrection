@@ -104,9 +104,14 @@ final class BattleshipsCommDaemon {
         this.checkPlayersReady();
       }
       break;
-      case EVENT_FAILURE:
-      case EVENT_CONNECTION_ERROR: {
+      case EVENT_FAILURE: {
+        LOGGER.info("Server or player '" + source.getId() + "' in system troubles");
         opponent.pushGameEvent(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
+      }
+      break;
+      case EVENT_CONNECTION_ERROR: {
+        LOGGER.info("Server or player '" + source.getId() + "' lost connection");
+        opponent.pushGameEvent(new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
       }
       break;
       case EVENT_GAME_ROOM_CLOSED: {
@@ -144,10 +149,10 @@ final class BattleshipsCommDaemon {
         LOGGER.info("local game");
         if (Utils.RND.nextBoolean()) {
           LOGGER.info("chosen first turn for A");
-          this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+          this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
         } else {
           LOGGER.info("chosen first turn for B");
-          this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
+          this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
         }
       } else {
         final BattleshipsPlayer firstTurnPlayer = this.playerA.findFirstTurnPlayer(this.playerA, this.playerB)
@@ -156,18 +161,10 @@ final class BattleshipsCommDaemon {
 
         if (firstTurnPlayer == this.playerA) {
           LOGGER.info("sending first turn goes A");
-          if (this.playerA.isRemote()) {
-            this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
-          } else {
-            LOGGER.info("skip first turn signal to A because it is local");
-          }
+          this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
         } else {
           LOGGER.info("sending first turn goes B");
-          if (this.playerB.isRemote()) {
-            this.playerB.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
-          } else {
-            LOGGER.info("skip first turn signal to B because it is local");
-          }
+          this.playerA.pushGameEvent(new BsGameEvent(GameEventType.EVENT_OPPONENT_FIRST_TURN, 0, 0));
         }
       }
     }

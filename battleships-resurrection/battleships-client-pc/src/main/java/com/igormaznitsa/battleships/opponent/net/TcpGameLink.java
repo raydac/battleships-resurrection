@@ -210,12 +210,18 @@ public class TcpGameLink {
             if (this.sendData(nextEvent.asArray())) {
               lastPacketOutTime = System.currentTimeMillis();
               LOGGER.info("game event has been sent: " + nextEvent);
+            } else {
+              this.incomingRecords.offer(new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
+              break;
             }
           } else if ((System.currentTimeMillis() - lastPacketOutTime) >= ALIVE_SEND_DELAY.toMillis()) {
             LOGGER.info("sending ALIVE packet");
             if (this.sendData(alivePacket)) {
               lastPacketOutTime = System.currentTimeMillis();
               LOGGER.info("ALIVE packet has been sent");
+            } else {
+              this.incomingRecords.offer(new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, 0, 0));
+              break;
             }
           }
         } catch (IOException ex) {
