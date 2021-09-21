@@ -3,6 +3,7 @@ package com.igormaznitsa.battleships.utils;
 import java.awt.*;
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public final class ImageCursor {
   private final Image cursorImage;
   private final int hotX;

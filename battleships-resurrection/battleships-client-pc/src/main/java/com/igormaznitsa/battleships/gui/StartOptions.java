@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.prefs.Preferences;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class StartOptions {
 
   private static final Preferences PREFERENCES = Preferences.userNodeForPackage(StartOptions.class);
@@ -113,13 +114,14 @@ public class StartOptions {
     return this.useOldGfxClient;
   }
 
+  @SuppressWarnings("unused")
   public static class Builder {
     private Optional<GraphicsConfiguration> graphicsConfiguration =
-        Optional.of(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-            .getDefaultConfiguration());
+            Optional.of(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+                    .getDefaultConfiguration());
     private Optional<String> gameTitle = Optional.of("BattleShips");
     private Optional<Image> gameIcon =
-        Optional.of(GfxUtils.loadResImage("icon3.png"));
+            Optional.of(GfxUtils.loadResImage("icon3.png"));
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
     private boolean withSound = true;
@@ -193,7 +195,7 @@ public class StartOptions {
               this.withSound,
               this.hostName,
               this.hostPort,
-          this.useOldGfxClient);
+              this.useOldGfxClient);
     }
 
   }

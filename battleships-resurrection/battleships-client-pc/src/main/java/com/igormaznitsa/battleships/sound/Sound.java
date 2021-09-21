@@ -17,6 +17,7 @@ package com.igormaznitsa.battleships.sound;
 
 import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public enum Sound {
   AIR_CRASH1("AirCrash01.wav"),
   AIR_CRASH2("AirCrash03.wav"),
@@ -91,6 +92,7 @@ public enum Sound {
     this.clip = Optional.empty();
   }
 
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   public synchronized boolean isPlaying() {
     return this.clip.map(SoundClip::isPlaying).orElse(false);
   }

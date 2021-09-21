@@ -2,7 +2,7 @@ package com.igormaznitsa.battleships.opponent;
 
 import com.igormaznitsa.battleships.gui.StartOptions;
 import com.igormaznitsa.battleships.opponent.net.SelectNetOpponentDialog;
-import com.igormaznitsa.battleships.opponent.net.TcpOpponentLink;
+import com.igormaznitsa.battleships.opponent.net.TcpGameLink;
 import com.igormaznitsa.battleships.utils.NetUtils;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMove
   private final InterfaceAddress interfaceAddress;
   private final int port;
   private final StartOptions startOptions;
-  private final AtomicReference<TcpOpponentLink> opponentLink = new AtomicReference<>();
+  private final AtomicReference<TcpGameLink> opponentLink = new AtomicReference<>();
 
   public NewNetSingleSessionOpponent(final StartOptions startOptions, final NetUtils.NamedInterfaceAddress namedInetAddress, final int port) {
     this.startOptions = Objects.requireNonNull(startOptions);
@@ -31,8 +31,8 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMove
   }
 
   @Override
-  public Optional<BsGameEvent> pollGameEvent(Duration duration) throws InterruptedException {
-    final TcpOpponentLink link = this.opponentLink.get();
+  public Optional<BsGameEvent> pollGameEvent(Duration duration) {
+    final TcpGameLink link = this.opponentLink.get();
     return link == null ? Optional.empty() : link.pollIncomingEvent();
   }
 
@@ -46,7 +46,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMove
     try {
       final SelectNetOpponentDialog dialog = new SelectNetOpponentDialog(this.startOptions, this.uid, this.interfaceAddress, this.port).start();
       dialog.setVisible(true);
-      final TcpOpponentLink opponentLink = dialog.getResult().orElse(null);
+      final TcpGameLink opponentLink = dialog.getResult().orElse(null);
       if (opponentLink != null) {
         LOGGER.info("created link with " + opponentLink.getOpponentRecord().getUid());
         if (!this.opponentLink.compareAndSet(null, opponentLink)) {
@@ -64,7 +64,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMove
 
   @Override
   public void disposePlayer() {
-    final TcpOpponentLink opponentLink = this.opponentLink.getAndSet(null);
+    final TcpGameLink opponentLink = this.opponentLink.getAndSet(null);
     if (opponentLink != null) {
       opponentLink.dispose();
     }
@@ -72,7 +72,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer, FirstMove
 
   @Override
   public boolean isAvailable() {
-    final TcpOpponentLink opponentLink = this.opponentLink.get();
+    final TcpGameLink opponentLink = this.opponentLink.get();
     return opponentLink != null && opponentLink.isActive();
   }
 

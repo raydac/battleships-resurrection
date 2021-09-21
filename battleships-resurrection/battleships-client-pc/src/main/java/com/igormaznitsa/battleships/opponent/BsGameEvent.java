@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public final class BsGameEvent implements Comparable<BsGameEvent> {
   private static final byte[] PREFIX = "BATTLESHIPS_2.0\n".getBytes(StandardCharsets.UTF_8);
   private final UUID uuid;

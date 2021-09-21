@@ -63,7 +63,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
           new AtomicReference<>(Optional.empty());
   private final AtomicReference<Thread> threadInput = new AtomicReference<>();
   private final AtomicReference<Thread> threadOutput = new AtomicReference<>();
-  private final AtomicReference<InputStream> openedInputStream = new AtomicReference<>();
+  private static final Duration DELAY_BETWEEN_RECONNECT_ATTEMPT = Duration.ofSeconds(3);
   private volatile BsGameEvent lastShot = null;
   private volatile boolean readyAlreadySent = false;
 
@@ -95,6 +95,9 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
     }
   }
 
+  private final AtomicReference<HttpURLConnection> openedHttpConnection = new AtomicReference<>();
+
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   private static HttpURLConnection prepareConnection(
           final String method,
           final URI uri,
@@ -159,6 +162,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
     }
   }
 
+  @SuppressWarnings("BusyWait")
   private void doRunIn() {
     try {
       LOGGER.info("Processing of incoming network packets started");
@@ -179,18 +183,15 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         } catch (IOException ex) {
           LOGGER.warning("Can't open connection: " + ex.getMessage());
           try {
-            Thread.sleep(3000);
+            Thread.sleep(DELAY_BETWEEN_RECONNECT_ATTEMPT.toMillis());
           } catch (InterruptedException ix) {
             Thread.currentThread().interrupt();
           }
           continue;
         }
 
-        DataInputStream inputStream = null;
-        try {
-          inputStream = new DataInputStream(httpURLConnection.getInputStream());
-          this.openedInputStream.set(inputStream);
-
+        this.openedHttpConnection.set(httpURLConnection);
+        try (final DataInputStream inputStream = new DataInputStream(httpURLConnection.getInputStream())) {
           final int[] packetBuffer = new int[5];
           int bufferPointer = -10;
 
@@ -227,8 +228,9 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
             }
           }
         } catch (IOException ex) {
-          closeQuietly(inputStream);
-          this.openedInputStream.set(null);
+          LOGGER.log(Level.SEVERE, "io error during loop", ex);
+        } finally {
+          closeQuietly(this.openedHttpConnection.getAndSet(null));
         }
       }
     } finally {
@@ -286,8 +288,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
         if (foundLastShot == null) {
           LOGGER.log(Level.SEVERE, "Got result but without shot");
           this.placeEventIntoInQueue(
-                  new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, foundLastShot.getX(),
-                          foundLastShot.getY()));
+                  new BsGameEvent(GameEventType.EVENT_CONNECTION_ERROR, -1, -1));
         } else {
           switch (packet[1]) {
             case 3: { // HIT
@@ -581,7 +582,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer, Firs
 
   @Override
   public void disposePlayer() {
-    closeQuietly(this.openedInputStream.get());
+    closeQuietly(this.openedHttpConnection.get());
     Thread foundThread = this.threadInput.getAndSet(null);
     if (foundThread != null) {
       foundThread.interrupt();

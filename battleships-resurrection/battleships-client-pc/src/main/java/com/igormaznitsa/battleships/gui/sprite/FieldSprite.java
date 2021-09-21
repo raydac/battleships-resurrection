@@ -15,13 +15,11 @@
 
 package com.igormaznitsa.battleships.gui.sprite;
 
+import java.awt.*;
+import java.util.List;
+
 import static com.igormaznitsa.battleships.gui.panels.GamePanel.findShipRenderPositionForCell;
 import static java.util.List.copyOf;
-
-
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.util.List;
 
 public abstract class FieldSprite implements Comparable<FieldSprite> {
   protected static final int DEVELOPMENT_LEVELS = 25;
@@ -49,16 +47,16 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
   }
 
   private static Point findRenderPointInMiddleOfPosition(final List<Point> cells) {
-    final int x1 = cells.stream().mapToInt(c -> c.x).min().getAsInt();
-    final int y1 = cells.stream().mapToInt(c -> c.y).min().getAsInt();
-    final int x2 = cells.stream().mapToInt(c -> c.x).max().getAsInt();
-    final int y2 = cells.stream().mapToInt(c -> c.y).max().getAsInt();
+    final int x1 = cells.stream().mapToInt(c -> c.x).min().orElse(-1);
+    final int y1 = cells.stream().mapToInt(c -> c.y).min().orElse(-1);
+    final int x2 = cells.stream().mapToInt(c -> c.x).max().orElse(-1);
+    final int y2 = cells.stream().mapToInt(c -> c.y).max().orElse(-1);
 
     final Point renderA = findShipRenderPositionForCell(x1, y1);
     final Point renderB = findShipRenderPositionForCell(x2, y2);
 
     return new Point(renderA.x + (renderB.x - renderA.x) / 2,
-        renderA.y + (renderB.y - renderA.y) / 2);
+            renderA.y + (renderB.y - renderA.y) / 2);
   }
 
   private static Point findMiddleCell(final List<Point> cells) {
@@ -72,8 +70,8 @@ public abstract class FieldSprite implements Comparable<FieldSprite> {
   }
 
   private static Point findMinCell(final List<Point> cells) {
-    int x = cells.stream().mapToInt(c -> c.x).min().getAsInt();
-    int y = cells.stream().mapToInt(c -> c.y).min().getAsInt();
+    int x = cells.stream().mapToInt(c -> c.x).min().orElse(-1);
+    int y = cells.stream().mapToInt(c -> c.y).min().orElse(-1);
     return new Point(x, y);
   }
 

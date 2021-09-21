@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
 import static java.util.Objects.requireNonNull;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class BattleshipsFrame extends JFrame implements BasePanel.SignalListener {
 
   private static final Logger LOGGER = Logger.getLogger(BattleshipsFrame.class.getName());
@@ -197,7 +198,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
     }
   }
 
-  protected void onExit() {
+  private void onExit() {
     this.doCloseWindow();
   }
 
@@ -226,7 +227,7 @@ public final class BattleshipsFrame extends JFrame implements BasePanel.SignalLi
             newPanel.getApplicationBadgeTitle());
   }
 
-  protected void doLoadingCompleted() {
+  private void doLoadingCompleted() {
     final GamePanel gamePanel = new GamePanel(this.startOptions, this.scaleFactor, this.gameCursor);
 
     final BattleshipsCommDaemon newCommDaemon = new BattleshipsCommDaemon(gamePanel, this.opponent);

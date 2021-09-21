@@ -16,13 +16,15 @@
 package com.igormaznitsa.battleships.sound;
 
 import com.igormaznitsa.battleships.utils.Utils;
-import java.io.ByteArrayInputStream;
-import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
+import java.io.ByteArrayInputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+@SuppressWarnings({"unused"})
 public final class SoundClip implements AutoCloseable {
 
   private final AtomicBoolean playing = new AtomicBoolean();
@@ -33,7 +35,7 @@ public final class SoundClip implements AutoCloseable {
       final byte[] data = Utils.readResourceAsBytes("/assets/snd/" + resource);
       this.clip = AudioSystem.getClip();
       final AudioInputStream audioStream =
-          AudioSystem.getAudioInputStream(new ByteArrayInputStream(data));
+              AudioSystem.getAudioInputStream(new ByteArrayInputStream(data));
       this.clip.addLineListener(event -> {
         if (event.getType() == LineEvent.Type.STOP) {
           playing.set(false);

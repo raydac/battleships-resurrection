@@ -21,12 +21,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Random;
 
 public final class Utils {
 
   public static final Random RND = new Random(System.currentTimeMillis());
+
+  private Utils() {
+
+  }
 
   public static void closeQuietly(final Closeable closeable) {
     try {
@@ -35,6 +40,25 @@ public final class Utils {
       }
     } catch (IOException ex) {
       // do nothing
+    }
+  }
+
+  public static void closeQuietly(final ThrowingSupplier<Closeable> supplier) {
+    try {
+      final Closeable closeable = supplier.get();
+      if (closeable != null) {
+        closeable.close();
+      }
+    } catch (Exception ex) {
+      // do nothing
+    }
+  }
+
+  public static void closeQuietly(final HttpURLConnection closeable) {
+    if (closeable != null) {
+      closeQuietly(closeable::getInputStream);
+      closeQuietly(closeable::getOutputStream);
+      closeable.disconnect();
     }
   }
 
@@ -71,7 +95,8 @@ public final class Utils {
     }
   }
 
-  private Utils() {
-
+  @FunctionalInterface
+  public interface ThrowingSupplier<T> {
+    T get() throws Exception;
   }
 }

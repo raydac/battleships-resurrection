@@ -5,7 +5,7 @@ public class OpponentRecord implements Comparable<OpponentRecord> {
   private final UdpMessage incomingData;
 
   OpponentRecord(final UdpMessage incomingData) {
-    this.uid = incomingData.getUid();
+    this.uid = incomingData.getPlayerUid();
     this.incomingData = incomingData;
   }
 
@@ -27,7 +27,7 @@ public class OpponentRecord implements Comparable<OpponentRecord> {
 
   @Override
   public String toString() {
-    return String.format("%s (%s)", this.uid, this.getAddress().toString());
+    return String.format("%s (%s)", this.uid, this.getAddress());
   }
 
   @Override

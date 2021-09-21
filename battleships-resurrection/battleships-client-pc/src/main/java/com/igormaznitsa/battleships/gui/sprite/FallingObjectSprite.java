@@ -17,11 +17,12 @@ package com.igormaznitsa.battleships.gui.sprite;
 
 import com.igormaznitsa.battleships.gui.Animation;
 import com.igormaznitsa.battleships.sound.Sound;
-import java.awt.Graphics2D;
-import java.awt.Point;
+
+import java.awt.*;
 import java.util.Collections;
 import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class FallingObjectSprite extends FieldSprite {
 
   private final Animation animation;
@@ -68,7 +69,7 @@ public abstract class FallingObjectSprite extends FieldSprite {
   public void render(final Graphics2D g2d) {
     if (!this.completed) {
       g2d.drawImage(this.animation.getFrame(this.frame), null, this.realSpritePoint.x,
-          Math.min(this.maxAllowedY, (int) Math.round(this.drawY)));
+              Math.min(this.maxAllowedY, (int) Math.round(this.drawY)));
     }
   }
 }

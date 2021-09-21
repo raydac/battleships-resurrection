@@ -15,15 +15,16 @@
 
 package com.igormaznitsa.battleships.gui;
 
-import static com.igormaznitsa.battleships.utils.GfxUtils.loadGfxImageAsType;
-
-
 import com.igormaznitsa.battleships.utils.GfxUtils;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.igormaznitsa.battleships.utils.GfxUtils.loadGfxImageAsType;
+
+@SuppressWarnings("unused")
 public enum Animation {
   CELL_1_ROK_L("1_CELL_ROK_L$$$$", 100, 1.5d),
   CELL_1_ROK_R("1_CELL_ROK_R$$$$", 100, 1.5d),
@@ -155,15 +156,15 @@ public enum Animation {
   public synchronized void load() {
     if (this.maxFrameIndex < 0) {
       this.frames = Collections.singletonList(
-          loadGfxImageAsType(this.animationFileNameTemplate + ".png", BufferedImage.TYPE_INT_ARGB,
-              this.scale));
+              loadGfxImageAsType(this.animationFileNameTemplate + ".png", BufferedImage.TYPE_INT_ARGB,
+                      this.scale));
     } else {
       final ArrayList<BufferedImage> frameList = new ArrayList<>();
       for (int i = 0; i <= this.maxFrameIndex; i++) {
         final String fileName = makeFileName(this.animationFileNameTemplate, i);
         if (GfxUtils.hasGfxImage(fileName)) {
           final BufferedImage frame =
-              loadGfxImageAsType(fileName, BufferedImage.TYPE_INT_ARGB, this.scale);
+                  loadGfxImageAsType(fileName, BufferedImage.TYPE_INT_ARGB, this.scale);
           frameList.add(frame);
         }
       }

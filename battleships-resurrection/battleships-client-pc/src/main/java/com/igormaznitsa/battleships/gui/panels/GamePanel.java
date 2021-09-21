@@ -50,6 +50,7 @@ import static com.igormaznitsa.battleships.opponent.GameEventType.*;
 import static com.igormaznitsa.battleships.utils.Utils.RND;
 import static java.lang.Math.round;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   public static final Duration INTER_FRAME_DELAY = Duration.ofMillis(70);
@@ -72,6 +73,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
   private final BlockingQueue<BsGameEvent> outgoingQueue = new ArrayBlockingQueue<>(10);
   private final AtomicReference<Optional<BsGameEvent>> savedGameEvent =
           new AtomicReference<>(Optional.empty());
+  private final AtomicReference<ShipType> lastFiringShipType = new AtomicReference<>();
   private Stage currentStage;
   private int stageStep;
   private ControlElement selectedControl;
@@ -472,6 +474,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     return "battleships-main-game-panel";
   }
 
+  private void sendFireNotificationForTargetCell(final ShipType shipType) {
+    final Point target = this.gameField.removeTarget()
+            .orElseThrow(() -> new Error("Target must be presented"));
+    this.fireEventToOpponent(new BsGameEvent(
+            shipType == ShipType.AIR_CARRIER ? EVENT_SHOT_MAIN : EVENT_SHOT_REGULAR,
+            target.x, target.y));
+  }
+
   @Override
   protected void doStart() {
     this.selectedControl = ControlElement.NONE;
@@ -493,14 +503,14 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
     } else {
       foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.DREADNOUGHT)
               .findFirst().ifPresent(dreadnought -> {
-        // increasing probability of dreadnought shot
-        IntStream.range(0, foundAliveShips.size() / 4).forEach(i -> foundAliveShips.add(dreadnought));
-      });
+                // increasing probability of dreadnought shot
+                IntStream.range(0, foundAliveShips.size() / 4).forEach(i -> foundAliveShips.add(dreadnought));
+              });
       foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.AIR_CARRIER)
               .findFirst().ifPresent(carrier -> {
-        // increasing probability of air-carrier shot
-        IntStream.range(0, foundAliveShips.size() / 4).forEach(i -> foundAliveShips.add(carrier));
-      });
+                // increasing probability of air-carrier shot
+                IntStream.range(0, foundAliveShips.size() / 4).forEach(i -> foundAliveShips.add(carrier));
+              });
       Collections.shuffle(foundAliveShips, RND);
       final ShipSprite firingShip = foundAliveShips.remove(0);
       firingShip.fire();
@@ -546,9 +556,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       break;
       case PLACEMENT_COMPLETED: {
         this.findGameEventInQueue(EnumSet.of(
-                EVENT_OPPONENT_FIRST_TURN,
-                EVENT_DO_TURN
-        ))
+                        EVENT_OPPONENT_FIRST_TURN,
+                        EVENT_DO_TURN
+                ))
                 .ifPresent(e -> {
                   if (e.getType() == EVENT_OPPONENT_FIRST_TURN) {
                     this.fireEventToOpponent(new BsGameEvent(GameEventType.EVENT_DO_TURN, 0, 0));
@@ -590,12 +600,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
         if (this.stageStep < E1_NEW.getLength() - 1) {
           this.stageStep++;
         } else {
-          final Point target = this.gameField.removeTarget()
-                  .orElseThrow(() -> new Error("Target must be presented"));
-          final ShipType firingShip = this.activateShipFire();
-          this.fireEventToOpponent(new BsGameEvent(
-                  firingShip == ShipType.AIR_CARRIER ? EVENT_SHOT_MAIN : EVENT_SHOT_REGULAR,
-                  target.x, target.y));
+          this.lastFiringShipType.set(this.activateShipFire());
           this.initStage(Stage.FIRING);
         }
       }
@@ -603,6 +608,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case FIRING: {
         this.activeDecorationSprite = null;
         if (this.noAnyFiringShip()) {
+          this.sendFireNotificationForTargetCell(this.lastFiringShipType.get());
           this.initStage(Stage.FIRING_RESULT);
         }
       }
@@ -680,7 +686,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       case ENEMY_TURN: {
         if (this.activeFallingObjectSprite == null) {
           this.findGameEventInQueue(
-                  EnumSet.of(GameEventType.EVENT_SHOT_MAIN, GameEventType.EVENT_SHOT_REGULAR))
+                          EnumSet.of(GameEventType.EVENT_SHOT_MAIN, GameEventType.EVENT_SHOT_REGULAR))
                   .ifPresent(e -> {
                     if (e.getType() == EVENT_SHOT_MAIN || e.getType() == EVENT_SHOT_REGULAR) {
                       this.savedGameEvent.set(Optional.of(e));

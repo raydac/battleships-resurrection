@@ -38,18 +38,16 @@ public final class GfxUtils {
   private GfxUtils() {
   }
 
-  public static boolean tryMacOsFullScreen(final Window frame) {
-    boolean result = true;
+  public static void tryMacOsFullScreen(final Window frame) {
     try {
-      Class<? extends Object> fsu = Class.forName("com.apple.eawt.FullScreenUtilities");
-      fsu.getMethod("setWindowCanFullScreen", Window.class, Boolean.TYPE).invoke(null, frame, true);
-      Class<? extends Object> app = Class.forName("com.apple.eawt.Application");
-      Object geta = app.getMethod("getApplication").invoke(null);
-      geta.getClass().getMethod("requestToggleFullScreen", Window.class).invoke(geta, frame);
+      final Class<?> fullScreenUtilitiesClass = Class.forName("com.apple.eawt.FullScreenUtilities");
+      fullScreenUtilitiesClass.getMethod("setWindowCanFullScreen", Window.class, Boolean.TYPE).invoke(null, frame, true);
+      final Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
+      final Object getApplicationResult = applicationClass.getMethod("getApplication").invoke(null);
+      getApplicationResult.getClass().getMethod("requestToggleFullScreen", Window.class).invoke(getApplicationResult, frame);
     } catch (Exception e) {
-      result = false;
+      // do nothing
     }
-    return result;
   }
 
   public static void setApplicationTaskbarTitle(final Image taskBarIcon, final String taskBarBadgeTitle) {
@@ -178,7 +176,7 @@ public final class GfxUtils {
         for (int i = 0; i < container.getComponentCount(); i++) {
           final Component child = container.getComponent(i);
           if (child instanceof Container) {
-            setCursorForAll((Container) child, cursor);
+            setCursorForAll(child, cursor);
           } else {
             child.setCursor(cursor);
           }
