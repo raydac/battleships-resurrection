@@ -25,20 +25,22 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
+
 public class SelectNetOpponentDialog extends JDialog {
 
   private static final Logger LOGGER = Logger.getLogger(SelectNetOpponentDialog.class.getSimpleName());
   private static final Duration DELAY_BROADCAST_CHECK = Duration.ofSeconds(3);
-  private static final Duration MAX_AGREEMENT_WAIT = Duration.ofSeconds(10);
+  private static final Duration MAX_AGREEMENT_WAIT = Duration.ofMinutes(1);
   private final JList<OpponentRecord> listAllowedPlayers;
-  private final JButton buttonSendOffer;
+  private final JButton buttonSendInvite;
   private final UdpBroadcastingServer udpBroadcasting;
   private final AtomicReference<TcpGameLink> createdLink = new AtomicReference<>();
   private final BlockingQueue<UdpMessage> incomingUdpRecordQueue = new ArrayBlockingQueue<>(4096);
   private final Timer timer;
   private final List<OpponentRecord> recordList = new ArrayList<>();
   private final List<ListDataListener> listDataListenerList = new CopyOnWriteArrayList<>();
-  private final AtomicReference<Pair<String, Long>> processingOffer = new AtomicReference<>();
+  private final AtomicReference<Pair<String, Long>> processingInvite = new AtomicReference<>();
   private final InterfaceAddress interfaceAddress;
   private final int port;
   private final JPanel panelWaitForOffer;
@@ -47,7 +49,7 @@ public class SelectNetOpponentDialog extends JDialog {
 
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public SelectNetOpponentDialog(final StartOptions startOptions, final String uid, final InterfaceAddress address, final int port) throws Exception {
-    super((JFrame) null, "Choose BattleShips opponent", true, startOptions.getGraphicsConfiguration().orElse(null));
+    super((JFrame) null, "Select BattleShips network player", true, startOptions.getGraphicsConfiguration().orElse(null));
     this.interfaceAddress = address;
     this.port = port;
     this.setIconImage(startOptions.getGameIcon().orElse(null));
@@ -62,9 +64,10 @@ public class SelectNetOpponentDialog extends JDialog {
 
     this.panelWaitForOffer.add(this.progressBarOfferWait, BorderLayout.CENTER);
 
-    JButton buttonCancelOffer = new JButton("STOP");
-    buttonCancelOffer.addActionListener(e -> this.onButtonCancelOffer());
-    this.panelWaitForOffer.add(buttonCancelOffer, BorderLayout.EAST);
+    final JButton buttonCancelInvite = new JButton(new ImageIcon(loadResImage("cancel.png")));
+    buttonCancelInvite.setToolTipText("Cancel invite");
+    buttonCancelInvite.addActionListener(e -> this.onButtonCancelOffer());
+    this.panelWaitForOffer.add(buttonCancelInvite, BorderLayout.EAST);
 
     this.contentPanel = new JPanel(new BorderLayout());
 
@@ -97,40 +100,40 @@ public class SelectNetOpponentDialog extends JDialog {
 
     this.udpBroadcasting = new UdpBroadcastingServer(uid, DELAY_BROADCAST_CHECK, address, port, this.incomingUdpRecordQueue::offer);
 
-    this.buttonSendOffer = new JButton("Invite for round");
-    this.buttonSendOffer.setEnabled(false);
-    this.buttonSendOffer.addActionListener(e -> {
+    this.buttonSendInvite = new JButton("Invite", new ImageIcon(loadResImage("events.png")));
+    this.buttonSendInvite.setEnabled(false);
+    this.buttonSendInvite.addActionListener(e -> {
       final int selectedOpponentIndex = this.listAllowedPlayers.getSelectedIndex();
       if (selectedOpponentIndex < 0) {
-        this.buttonSendOffer.setEnabled(false);
+        this.buttonSendInvite.setEnabled(false);
       } else {
         final OpponentRecord opponentRecord = this.recordList.get(selectedOpponentIndex);
         final Pair<String, Long> offerRecord = Pair.of(opponentRecord.getUid(), System.currentTimeMillis());
-        if (this.processingOffer.compareAndSet(null, offerRecord)) {
+        if (this.processingInvite.compareAndSet(null, offerRecord)) {
           this.showOfferProgressPanel(offerRecord.getLeft());
           this.udpBroadcasting.sendEvent(offerRecord.getLeft(), UdpMessage.Event.LETS_PLAY);
         } else {
-          LOGGER.severe("detected still active offer processing: " + this.processingOffer.get());
+          LOGGER.severe("detected still active offer processing: " + this.processingInvite.get());
         }
       }
     });
 
-    JButton buttonCancel = new JButton("Cancel");
-    buttonCancel.addActionListener(e -> {
+    final JButton buttonExit = new JButton("Exit", new ImageIcon(loadResImage("door_open.png")));
+    buttonExit.addActionListener(e -> {
       var link = this.createdLink.getAndSet(null);
       if (link != null) link.dispose();
       closeWindow();
     });
 
-    buttonPanel.add(this.buttonSendOffer);
-    buttonPanel.add(buttonCancel);
+    buttonPanel.add(this.buttonSendInvite);
+    buttonPanel.add(buttonExit);
 
     this.listAllowedPlayers.addListSelectionListener(e ->
-            this.buttonSendOffer.setEnabled(this.listAllowedPlayers.getSelectedIndex() >= 0)
+            this.buttonSendInvite.setEnabled(this.listAllowedPlayers.getSelectedIndex() >= 0)
     );
 
     final JScrollPane listPanel = new JScrollPane(this.listAllowedPlayers);
-    listPanel.setBorder(new TitledBorder("List of detected players"));
+    listPanel.setBorder(new TitledBorder("List of found players"));
 
     contentPanel.add(listPanel, BorderLayout.CENTER);
 
@@ -160,7 +163,9 @@ public class SelectNetOpponentDialog extends JDialog {
     this.contentPanel.repaint();
 
     this.listAllowedPlayers.setEnabled(false);
-    this.buttonSendOffer.setEnabled(false);
+    this.listAllowedPlayers.repaint();
+    this.buttonSendInvite.setEnabled(false);
+    this.buttonSendInvite.repaint();
   }
 
   private void hideOfferProgressPanel() {
@@ -170,12 +175,14 @@ public class SelectNetOpponentDialog extends JDialog {
     this.contentPanel.repaint();
 
     this.listAllowedPlayers.setEnabled(true);
-    this.listAllowedPlayers.setSelectedIndex(-1);
-    this.buttonSendOffer.setEnabled(false);
+    this.listAllowedPlayers.setSelectedValue(null, false);
+    this.buttonSendInvite.setEnabled(false);
+    this.listAllowedPlayers.repaint();
+    this.buttonSendInvite.repaint();
   }
 
   private void onButtonCancelOffer() {
-    final Pair<String, Long> currentOffer = this.processingOffer.getAndSet(null);
+    final Pair<String, Long> currentOffer = this.processingInvite.getAndSet(null);
     this.hideOfferProgressPanel();
     if (currentOffer != null) {
       LOGGER.info("Canceling offer for Player " + currentOffer.getLeft());
@@ -207,43 +214,43 @@ public class SelectNetOpponentDialog extends JDialog {
         break;
         case LETS_PLAY: {
           LOGGER.info("Detected incoming play offer from: " + nextData.getPlayerUid());
-          final Pair<String, Long> newOffer = Pair.of(nextData.getPlayerUid(), System.currentTimeMillis());
-          if (this.processingOffer.compareAndSet(null, newOffer)) {
-            if (JOptionPane.showConfirmDialog(this, "Let's play! I am " + newOffer.getLeft(), "Opponent request", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-              if (this.checkForIncomingNo(newOffer.getLeft())) {
-                this.processingOffer.set(null);
-                JOptionPane.showMessageDialog(this, String.format("Player %s has canceled offer!", newOffer.getLeft()), "Offer canceled", JOptionPane.WARNING_MESSAGE);
+          final Pair<String, Long> newInvite = Pair.of(nextData.getPlayerUid(), System.currentTimeMillis());
+          if (this.processingInvite.compareAndSet(null, newInvite)) {
+            if (JOptionPane.showConfirmDialog(this, "Let's play! I am " + newInvite.getLeft(), "Invite!", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+              if (this.checkForIncomingNo(newInvite.getLeft())) {
+                this.processingInvite.set(null);
+                JOptionPane.showMessageDialog(this, String.format("Player %s has canceled invite!", newInvite.getLeft()), "Offer canceled", JOptionPane.WARNING_MESSAGE);
               } else {
                 this.udpBroadcasting.sendEvent(nextData.getPlayerUid(), UdpMessage.Event.LETS_PLAY);
                 this.udpBroadcasting.flush();
-                LOGGER.info("Starting session with " + newOffer.getLeft());
+                LOGGER.info("Starting session with " + newInvite.getLeft());
                 linkCompleted = true;
                 this.beginGame(nextData);
               }
             } else {
               this.udpBroadcasting.sendEvent(nextData.getPlayerUid(), UdpMessage.Event.NO);
-              this.processingOffer.set(null);
+              this.processingInvite.set(null);
             }
           } else {
-            if (this.processingOffer.get().getLeft().equals(newOffer.getLeft())) {
-              LOGGER.info("player " + newOffer.getLeft() + " sent agreement");
+            if (this.processingInvite.get().getLeft().equals(newInvite.getLeft())) {
+              LOGGER.info("player " + newInvite.getLeft() + " sent invite");
               linkCompleted = true;
               this.beginGame(nextData);
               this.udpBroadcasting.flush();
             } else {
-              LOGGER.info("sending auto-reject player " + newOffer.getLeft() + " because already in processing of offer");
+              LOGGER.info("sending auto-reject player " + newInvite.getLeft() + " because already in invite processing");
               this.udpBroadcasting.sendEvent(nextData.getPlayerUid(), UdpMessage.Event.NO);
             }
           }
         }
         break;
         case NO: {
-          LOGGER.info("Detected incoming reject play offer from: " + nextData.getPlayerUid());
-          final Pair<String, Long> offer = this.processingOffer.get();
-          if (offer != null && nextData.getPlayerUid().equals(offer.getLeft())) {
-            LOGGER.info("Player " + nextData.getPlayerUid() + " has rejected offer");
+          LOGGER.info("Detected incoming invite reject from: " + nextData.getPlayerUid());
+          final Pair<String, Long> invite = this.processingInvite.get();
+          if (invite != null && nextData.getPlayerUid().equals(invite.getLeft())) {
+            LOGGER.info("Player " + nextData.getPlayerUid() + " has rejected invite");
             this.hideOfferProgressPanel();
-            this.processingOffer.set(null);
+            this.processingInvite.set(null);
           } else {
             LOGGER.severe("Incoming event " + nextData.getEvent() + " from unexpected player " + nextData.getPlayerUid());
           }
@@ -260,11 +267,11 @@ public class SelectNetOpponentDialog extends JDialog {
       this.listDataListenerList.forEach(x -> x.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, 0)));
     }
 
-    var currentOffer = this.processingOffer.get();
+    var currentOffer = this.processingInvite.get();
 
-    if (!linkCompleted && currentOffer != null && System.currentTimeMillis() - this.processingOffer.get().getRight() > MAX_AGREEMENT_WAIT.toMillis()) {
+    if (!linkCompleted && currentOffer != null && System.currentTimeMillis() - this.processingInvite.get().getRight() > MAX_AGREEMENT_WAIT.toMillis()) {
       LOGGER.info("Too long wait for agreement");
-      this.processingOffer.set(null);
+      this.processingInvite.set(null);
       JOptionPane.showMessageDialog(this, "No response from: " + currentOffer.getLeft(), "No response", JOptionPane.WARNING_MESSAGE);
       this.hideOfferProgressPanel();
       this.listAllowedPlayers.setSelectedIndex(-1);
