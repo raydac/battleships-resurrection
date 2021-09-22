@@ -132,6 +132,8 @@ public class OpeningDialog extends JDialog {
 
     this.updateComboHostName();
 
+    Utils.setPanelEnabled(this.networkPanel, this.radioMultiPlayer.isSelected(), JRadioButton.class);
+
     this.getContentPane().doLayout();
     this.pack();
   }
