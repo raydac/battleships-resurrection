@@ -79,7 +79,19 @@ public class OpeningDialog extends JDialog {
     this.radioWindow.setSelected(!startOptions.isFullScreen());
     this.radioFullScreen.setSelected(startOptions.isFullScreen());
 
-    startOptions.getHostName().ifPresent(x -> this.comboInterfaceName.setSelectedItem(x));
+    startOptions.getHostName().ifPresent(x -> {
+      boolean found = false;
+      for (int i = 0; i < this.comboInterfaceName.getItemCount(); i++) {
+        if (x.equals(this.comboInterfaceName.getItemAt(i))) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        this.comboInterfaceName.addItem(x);
+      }
+      this.comboInterfaceName.setSelectedItem(x);
+    });
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
     this.checkboxUseOldGfxClient.setSelected(startOptions.isUseOldGfxClient());
@@ -143,7 +155,8 @@ public class OpeningDialog extends JDialog {
     labelServerHostName = new JLabel();
     labelServerPort = new JLabel();
 
-    comboInterfaceName = new JComboBox<>(NetUtils.findAllNetworkInterfaces().stream().map(NetUtils.NamedInterfaceAddress::getName).toArray(String[]::new)) {
+    String[] interfaceNames = NetUtils.findAllNetworkInterfaces().stream().map(NetUtils.NamedInterfaceAddress::getName).toArray(String[]::new);
+    comboInterfaceName = new JComboBox<>(interfaceNames) {
       @Override
       public Dimension getMinimumSize() {
         return new Dimension(10, 10);

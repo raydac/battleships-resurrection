@@ -251,6 +251,7 @@ public class SelectNetOpponentDialog extends JDialog {
             LOGGER.info("Player " + nextData.getPlayerUid() + " has rejected invite");
             this.hideOfferProgressPanel();
             this.processingInvite.set(null);
+            JOptionPane.showMessageDialog(this, "Player " + invite.getLeft() + " has rejected invite!", "Invite rejected", JOptionPane.WARNING_MESSAGE);
           } else {
             LOGGER.severe("Incoming event " + nextData.getEvent() + " from unexpected player " + nextData.getPlayerUid());
           }
