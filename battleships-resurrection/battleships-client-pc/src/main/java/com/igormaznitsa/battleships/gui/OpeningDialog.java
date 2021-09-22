@@ -237,6 +237,8 @@ public class OpeningDialog extends JDialog {
 
     networkPanel.add(Box.createHorizontalGlue());
     checkboxUseOldGfxClient.setText("Use old GFX client");
+    checkboxUseOldGfxClient.setToolTipText("<html><b>ON</b> - GFX playroom server is required for a game session<br><b>OFF</b> - serverless game mode</html>");
+
     checkboxUseOldGfxClient.setHorizontalAlignment(JCheckBox.LEFT);
     checkboxUseOldGfxClient.addActionListener(x -> this.updateComboHostName());
     networkPanel.add(checkboxUseOldGfxClient);
@@ -294,9 +296,11 @@ public class OpeningDialog extends JDialog {
     final String selected = (String) this.comboInterfaceName.getSelectedItem();
     if (this.checkboxUseOldGfxClient.isSelected()) {
       this.comboInterfaceName.setEditable(true);
+      this.comboInterfaceName.setToolTipText("Host where old GFX playroom server has been started");
       this.labelServerHostName.setText("Server host name:");
     } else {
       this.comboInterfaceName.setEditable(false);
+      this.comboInterfaceName.setToolTipText("Network interface to public port (both UDP and TCP)");
       this.comboInterfaceName.removeAllItems();
       this.networkInterfaces.forEach(x -> this.comboInterfaceName.addItem(x.getName()));
       this.labelServerHostName.setText("Network interface:");
