@@ -15,7 +15,6 @@
 
 package com.igormaznitsa.battleships.utils;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -63,16 +62,20 @@ public final class Utils {
   }
 
   @SafeVarargs
-  public static void setPanelEnabled(final JPanel panel, final boolean enabled, Class<? extends Component>... exclude) {
-    panel.setEnabled(enabled);
-    for (final Component component : panel.getComponents()) {
-      if (component instanceof JPanel) {
-        setPanelEnabled((JPanel) component, enabled, exclude);
-      }
+  public static void setContainerEnabled(final Container container, final boolean enabled, Class<? extends Component>... exclude) {
+    container.setEnabled(enabled);
+    for (final Component component : container.getComponents()) {
       if (Arrays.stream(exclude).noneMatch(x -> x.isAssignableFrom(component.getClass()))) {
         component.setEnabled(enabled);
+        if (component instanceof Container) {
+          setContainerEnabled((Container) component, enabled, exclude);
+        }
+        component.revalidate();
+        component.repaint();
       }
     }
+    container.revalidate();
+    container.repaint();
   }
 
   public static byte[] readResourceAsBytes(final String resource) throws IOException {

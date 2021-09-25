@@ -24,6 +24,7 @@ import javax.swing.Box.Filler;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.igormaznitsa.battleships.utils.GfxUtils.loadResImage;
@@ -32,25 +33,17 @@ import static javax.swing.BorderFactory.*;
 
 public class OpeningDialog extends JDialog {
 
+  private final java.util.List<NetUtils.NamedInterfaceAddress> networkInterfaces;
   private JButton buttonExit;
   private JButton buttonGo;
-  private JPanel buttonsPanel;
-  private JLabel logoLabel;
-  private JPanel mainPanel;
-  private JPanel modePanel;
   private JPanel networkPanel;
-  private final java.util.List<NetUtils.NamedInterfaceAddress> networkInterfaces;
   private JFormattedTextField textFieldPort;
-  private Filler filler4;
-  private Filler filler5;
-  private Filler filler6;
   private JLabel labelServerHostName;
-  private JLabel labelServerPort;
   private JRadioButton radioWindow;
   private JRadioButton radioFullScreen;
   private JRadioButton radioSinglePlayer;
   private JRadioButton radioMultiPlayer;
-  private JCheckBox checkboxUseOldGfxClient;
+  private JComboBox<MultiPlayerMode> comboBoxMultiPlayerMode;
   private JComboBox<String> comboInterfaceName;
   private StartOptions result;
 
@@ -60,7 +53,7 @@ public class OpeningDialog extends JDialog {
                     getLocalGraphicsEnvironment().getDefaultScreenDevice()
                             .getDefaultConfiguration()));
 
-    this.networkInterfaces = NetUtils.findAllNetworkInterfaces();
+    this.networkInterfaces = NetUtils.findAllIp4NetworkInterfacesWithBroadcast();
 
     startOptions.getGameIcon().ifPresent(this::setIconImage);
     initComponents();
@@ -79,7 +72,7 @@ public class OpeningDialog extends JDialog {
     this.radioWindow.setSelected(!startOptions.isFullScreen());
     this.radioFullScreen.setSelected(startOptions.isFullScreen());
 
-    startOptions.getHostName().ifPresent(x -> {
+    startOptions.getHostName().ifPresentOrElse(x -> {
       boolean found = false;
       for (int i = 0; i < this.comboInterfaceName.getItemCount(); i++) {
         if (x.equals(this.comboInterfaceName.getItemAt(i))) {
@@ -91,18 +84,17 @@ public class OpeningDialog extends JDialog {
         this.comboInterfaceName.addItem(x);
       }
       this.comboInterfaceName.setSelectedItem(x);
-    });
+    }, () -> NetUtils.findLanInterface(this.networkInterfaces)
+            .ifPresent(y -> this.comboInterfaceName.setSelectedItem(y.getName())));
+
     startOptions.getHostPort().ifPresent(x -> this.textFieldPort.setText(Integer.toString(x)));
 
-    this.checkboxUseOldGfxClient.setSelected(startOptions.isUseOldGfxClient());
+    this.comboBoxMultiPlayerMode.setSelectedItem(startOptions.getMultiPlayerMode());
 
-    this.radioSinglePlayer.addActionListener(e -> {
-      networkPanel.setEnabled(this.radioMultiPlayer.isEnabled());
-    });
+    this.radioSinglePlayer.addActionListener(e -> networkPanel.setEnabled(this.radioMultiPlayer.isEnabled()));
 
-    this.radioMultiPlayer.addActionListener(e -> {
-      Utils.setPanelEnabled(networkPanel, radioMultiPlayer.isEnabled(), JRadioButton.class);
-    });
+    this.radioMultiPlayer.addActionListener(e ->
+            Utils.setContainerEnabled(this.networkPanel, this.radioMultiPlayer.isEnabled(), JRadioButton.class));
 
     this.buttonGo.addActionListener(e -> {
       int hostPort = -1;
@@ -118,7 +110,7 @@ public class OpeningDialog extends JDialog {
               .setGameIcon(startOptions.getGameIcon().orElse(null))
               .setFullScreen(this.radioFullScreen.isSelected())
               .setMultiPlayer(this.radioMultiPlayer.isSelected())
-              .setUseOldGfxClient(this.checkboxUseOldGfxClient.isSelected())
+              .setMultiPlayerMode((MultiPlayerMode) this.comboBoxMultiPlayerMode.getSelectedItem())
               .setHostPort(hostPort)
               .setHostName(String.valueOf(this.comboInterfaceName.getSelectedItem()))
               .build();
@@ -130,9 +122,8 @@ public class OpeningDialog extends JDialog {
       this.dispose();
     });
 
+    Utils.setContainerEnabled(this.networkPanel, this.radioMultiPlayer.isSelected(), JRadioButton.class);
     this.updateComboHostName();
-
-    Utils.setPanelEnabled(this.networkPanel, this.radioMultiPlayer.isSelected(), JRadioButton.class);
 
     this.getContentPane().doLayout();
     this.pack();
@@ -142,52 +133,111 @@ public class OpeningDialog extends JDialog {
     return Optional.ofNullable(this.result);
   }
 
+  @Override
+  public void setVisible(final boolean flag) {
+    // workaround for a swing bug, to update look of disabled elements
+    if (flag) {
+      SwingUtilities.invokeLater(() -> {
+        if (this.radioMultiPlayer.isSelected()) {
+          this.radioMultiPlayer.doClick();
+        } else {
+          this.radioSinglePlayer.doClick();
+        }
+      });
+    }
+    super.setVisible(flag);
+  }
+
+  private JPanel makeNetworkPanel() {
+    final JPanel resultPanel = new JPanel(new GridBagLayout());
+
+    resultPanel.setBorder(
+            createCompoundBorder(createTitledBorder("Network"), createEmptyBorder(8, 8, 8, 8)));
+
+    this.radioSinglePlayer = new JRadioButton("Single Player");
+    this.radioMultiPlayer = new JRadioButton("Multi-Player");
+    this.labelServerHostName = new JShrinkableLabel("");
+    JLabel labelServerPort = new JShrinkableLabel("Port:");
+
+    this.textFieldPort = new JFormattedTextField(new NumberFormatter(new DecimalFormat("####")));
+
+    this.comboBoxMultiPlayerMode = new JComboBox<>(new DefaultComboBoxModel<>(MultiPlayerMode.values()));
+    this.comboBoxMultiPlayerMode.setToolTipText("Selected network game mode");
+    this.comboBoxMultiPlayerMode.addActionListener(x -> this.updateComboHostName());
+
+    this.comboInterfaceName = new JShrinkableComboBox<>(NetUtils.findAllIp4NetworkInterfacesWithBroadcast().stream().map(NetUtils.NamedInterfaceAddress::getName).toArray(String[]::new));
+
+    final GridBagConstraints gbc = new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(8, 4, 0, 4), 0, 0);
+
+    resultPanel.add(this.radioSinglePlayer, gbc);
+    this.radioSinglePlayer.addActionListener(e -> {
+      this.textFieldPort.setEditable(!this.radioSinglePlayer.isEnabled());
+      Utils.setContainerEnabled(resultPanel, !this.radioSinglePlayer.isEnabled(), JRadioButton.class);
+    });
+
+    gbc.gridx = 1;
+    resultPanel.add(radioMultiPlayer, gbc);
+
+    final ButtonGroup gameTypeGroup = new ButtonGroup();
+    gameTypeGroup.add(this.radioSinglePlayer);
+    gameTypeGroup.add(this.radioMultiPlayer);
+
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+
+    resultPanel.add(this.labelServerHostName, gbc);
+
+    gbc.gridx = 1;
+
+    resultPanel.add(labelServerPort, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = 2;
+
+    resultPanel.add(this.comboInterfaceName, gbc);
+
+    gbc.gridx = 1;
+
+    resultPanel.add(this.textFieldPort, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = 3;
+
+    resultPanel.add(Box.createHorizontalGlue(), gbc);
+
+    gbc.gridx = 0;
+    gbc.gridwidth = 2;
+
+    final JPanel multiPlayerModePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    multiPlayerModePanel.add(new JLabel("Server mode: "));
+    multiPlayerModePanel.add(this.comboBoxMultiPlayerMode);
+    resultPanel.add(multiPlayerModePanel, gbc);
+
+    return resultPanel;
+  }
+
   private void initComponents() {
     GridBagConstraints gridBagConstraints;
 
-    mainPanel = new JPanel();
-    logoLabel = new JLabel();
-    modePanel = new JPanel();
+    JPanel mainPanel = new JPanel(new GridBagLayout());
+    JLabel logoLabel = new JLabel();
+    JPanel modePanel = new JPanel();
     radioWindow = new JRadioButton();
     radioFullScreen = new JRadioButton();
-    checkboxUseOldGfxClient = new JCheckBox();
-    networkPanel = new JPanel();
-    radioSinglePlayer = new JRadioButton();
-    radioMultiPlayer = new JRadioButton();
-    labelServerHostName = new JLabel();
-    labelServerPort = new JLabel();
+    networkPanel = this.makeNetworkPanel();
 
-    String[] interfaceNames = NetUtils.findAllNetworkInterfaces().stream().map(NetUtils.NamedInterfaceAddress::getName).toArray(String[]::new);
-    comboInterfaceName = new JComboBox<>(interfaceNames) {
-      @Override
-      public Dimension getMinimumSize() {
-        return new Dimension(10, 10);
-      }
-
-      @Override
-      public Dimension getPreferredSize() {
-        return this.getMinimumSize();
-      }
-    };
-
-    textFieldPort = new JFormattedTextField(new NumberFormatter(new DecimalFormat("####")));
-    buttonsPanel = new JPanel();
+    JPanel buttonsPanel = new JPanel();
     buttonsPanel.setBorder(createEmptyBorder(0, 8, 16, 8));
     buttonGo = new JButton();
     buttonExit = new JButton();
-    filler6 =
-            new Filler(new Dimension(32, 0), new Dimension(32, 0),
-                    new Dimension(32, 32767));
-    filler4 =
-            new Filler(new Dimension(0, 16), new Dimension(0, 16),
-                    new Dimension(32767, 16));
-    filler5 =
-            new Filler(new Dimension(0, 16), new Dimension(0, 16),
-                    new Dimension(32767, 16));
+    Filler filler6 = new Filler(new Dimension(32, 0), new Dimension(32, 0),
+            new Dimension(32, 32767));
+    Filler filler4 = new Filler(new Dimension(0, 16), new Dimension(0, 16),
+            new Dimension(32767, 16));
+    Filler filler5 = new Filler(new Dimension(0, 16), new Dimension(0, 16),
+            new Dimension(32767, 16));
 
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
-    mainPanel.setLayout(new GridBagLayout());
 
     logoLabel.setIcon(
             new ImageIcon(loadResImage("rusoft.png").getScaledInstance(400, 258, Image.SCALE_SMOOTH)));
@@ -214,43 +264,6 @@ public class OpeningDialog extends JDialog {
     gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = GridBagConstraints.WEST;
     mainPanel.add(modePanel, gridBagConstraints);
-
-    networkPanel.setBorder(
-            createCompoundBorder(createTitledBorder("Network"), createEmptyBorder(8, 8, 8, 8)));
-    networkPanel.setLayout(new GridLayout(6, 2, 16, 0));
-
-    radioSinglePlayer.setText("Single Player");
-    networkPanel.add(radioSinglePlayer);
-    radioSinglePlayer.addActionListener(e -> Utils.setPanelEnabled(networkPanel, !radioSinglePlayer.isEnabled(), JRadioButton.class));
-
-    radioMultiPlayer.setText("Multi-Player");
-    networkPanel.add(radioMultiPlayer);
-
-    final ButtonGroup gameTypeGroup = new ButtonGroup();
-    gameTypeGroup.add(radioSinglePlayer);
-    gameTypeGroup.add(radioMultiPlayer);
-
-    networkPanel.add(labelServerHostName);
-
-    labelServerPort.setText("Port:");
-    networkPanel.add(labelServerPort);
-    networkPanel.add(comboInterfaceName);
-    networkPanel.add(textFieldPort);
-
-    networkPanel.add(Box.createHorizontalGlue());
-    checkboxUseOldGfxClient.setText("Use old GFX client");
-    checkboxUseOldGfxClient.setToolTipText("<html><b>ON</b> - GFX playroom server is required for a game session<br><b>OFF</b> - serverless game mode</html>");
-
-    checkboxUseOldGfxClient.setHorizontalAlignment(JCheckBox.LEFT);
-    checkboxUseOldGfxClient.addActionListener(x -> this.updateComboHostName());
-    networkPanel.add(checkboxUseOldGfxClient);
-
-    gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.anchor = GridBagConstraints.WEST;
-    mainPanel.add(networkPanel, gridBagConstraints);
 
     buttonsPanel.setLayout(new GridBagLayout());
 
@@ -288,25 +301,74 @@ public class OpeningDialog extends JDialog {
 
     gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = GridBagConstraints.BOTH;
+    gridBagConstraints.anchor = GridBagConstraints.CENTER;
+    mainPanel.add(networkPanel, gridBagConstraints);
+
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;
+    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = GridBagConstraints.WEST;
     mainPanel.add(filler5, gridBagConstraints);
 
-    this.setContentPane(mainPanel);
+    this.setContentPane(new JScrollPane(mainPanel));
   }
 
   private void updateComboHostName() {
     final String selected = (String) this.comboInterfaceName.getSelectedItem();
-    if (this.checkboxUseOldGfxClient.isSelected()) {
-      this.comboInterfaceName.setEditable(true);
-      this.comboInterfaceName.setToolTipText("Host where old GFX playroom server has been started");
-      this.labelServerHostName.setText("Server host name:");
-    } else {
-      this.comboInterfaceName.setEditable(false);
-      this.comboInterfaceName.setToolTipText("Network interface to public port (both UDP and TCP)");
-      this.comboInterfaceName.removeAllItems();
-      this.networkInterfaces.forEach(x -> this.comboInterfaceName.addItem(x.getName()));
-      this.labelServerHostName.setText("Network interface:");
-    }
+
+    final MultiPlayerMode multiPlayerMode = (MultiPlayerMode) Objects.requireNonNull(this.comboBoxMultiPlayerMode.getSelectedItem());
+    this.labelServerHostName.setText(multiPlayerMode.getInterfacesFieldTitle() + ": ");
+    this.comboInterfaceName.setEditable(multiPlayerMode.isInterfacesEditable());
+    this.comboInterfaceName.setToolTipText(multiPlayerMode.getInterfacesFieldTooltip());
+    this.comboInterfaceName.removeAllItems();
+
+    this.comboInterfaceName.removeAllItems();
+    this.networkInterfaces.forEach(x -> this.comboInterfaceName.addItem(x.getName()));
+
+    this.networkPanel.doLayout();
+    this.networkPanel.invalidate();
+    this.networkPanel.repaint();
+
     this.comboInterfaceName.setSelectedItem(selected);
+
+    this.doLayout();
+    this.repaint();
+  }
+
+  private static class JShrinkableComboBox<T> extends JComboBox<T> {
+
+    public JShrinkableComboBox(T[] items) {
+      super(items);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+      return new Dimension(10, super.getMinimumSize().height);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+      return this.getMinimumSize();
+    }
+  }
+
+  private static class JShrinkableLabel extends JLabel {
+
+    public JShrinkableLabel(final String text) {
+      super(text);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+      return new Dimension(10, super.getMinimumSize().height);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+      return this.getMinimumSize();
+    }
   }
 }

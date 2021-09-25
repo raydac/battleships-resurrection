@@ -24,7 +24,9 @@ import com.igormaznitsa.battleships.utils.NetUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.net.InetAddress;
+import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,29 +62,36 @@ public class BattleShips {
       final int chosenPort = selectedData.getHostPort().orElse(30000);
       final BattleshipsPlayer selectedOpponent;
       if (selectedData.isMultiPlayer()) {
-        if (selectedData.isUseOldGfxClient()) {
-          InetAddress address = null;
-          try {
-            address = InetAddress.getByName(selectedData.getHostName().orElse("localhost"));
-          } catch (Exception ex) {
-            LOGGER.severe("Can't find host address: " + selectedData.getHostName());
-            JOptionPane.showMessageDialog(null, "Can't resolve address of host: " + selectedData.getHostName().orElse(""));
-            System.exit(556677);
+        switch (selectedData.getMultiPlayerMode()) {
+          case GFX_PLAYROOM: {
+            InetAddress address = null;
+            try {
+              address = InetAddress.getByName(NetUtils.removeInterfaceNameIfFound(selectedData.getHostName().orElseThrow(NullPointerException::new)));
+            } catch (Exception ex) {
+              LOGGER.severe("Can't find host address: " + selectedData.getHostName());
+              JOptionPane.showMessageDialog(null, "Can't resolve address of host: " + selectedData.getHostName().orElse("<not provided>"));
+              System.exit(556677);
+            }
+            LOGGER.info("Creating old client for: " + address + " : " + chosenPort);
+            selectedOpponent = new OldGfxBattleshipSingleSessionBot(address, chosenPort).startPlayer();
           }
-          LOGGER.info("Creating old client for: " + address + " : " + chosenPort);
-          selectedOpponent = new OldGfxBattleshipSingleSessionBot(address, chosenPort).startPlayer();
-        } else {
-          final String interfaceName = selectedData.getHostName().orElse("localhost");
-          final NetUtils.NamedInterfaceAddress selectedInterface = NetUtils.findAllNetworkInterfaces().stream()
-                  .filter(x -> x.getName().equals(interfaceName))
-                  .findFirst().orElse(null);
-          if (selectedInterface == null) {
-            LOGGER.severe("Can't find interface: " + selectedData.getHostName());
-            JOptionPane.showMessageDialog(null, "Can't find interface: " + selectedData.getHostName().orElse(""));
-            System.exit(556677);
+          break;
+          case LAN_P2P: {
+            final String interfaceName = selectedData.getHostName().orElse("localhost");
+            final NetUtils.NamedInterfaceAddress selectedInterface = NetUtils.findAllIp4NetworkInterfacesWithBroadcast().stream()
+                    .filter(x -> x.getName().equals(interfaceName))
+                    .findFirst().orElse(null);
+            if (selectedInterface == null) {
+              LOGGER.severe("Can't find interface: " + selectedData.getHostName());
+              JOptionPane.showMessageDialog(null, "Can't find interface: " + selectedData.getHostName().orElse(""));
+              System.exit(556677);
+            }
+            LOGGER.info("Creating new client for: " + selectedInterface + " : " + chosenPort);
+            selectedOpponent = new NewNetSingleSessionOpponent(selectedData, selectedInterface, chosenPort).startPlayer();
           }
-          LOGGER.info("Creating new client for: " + selectedInterface + " : " + chosenPort);
-          selectedOpponent = new NewNetSingleSessionOpponent(selectedData, selectedInterface, chosenPort).startPlayer();
+          break;
+          default:
+            throw new Error("Unexpected multi-player mode");
         }
       } else {
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
@@ -94,14 +103,22 @@ public class BattleShips {
       }
 
       final WaitOpponentDialog waitOpponentDialog =
-              new WaitOpponentDialog(selectedData.getGraphicsConfiguration().orElse(null),
+              new WaitOpponentDialog(
+                      Duration.ofSeconds(30),
+                      selectedData.getGraphicsConfiguration().orElse(null),
                       selectedData.getGameTitle().orElse("BattleShips"),
                       selectedData.getGameIcon().orElse(null), selectedOpponent);
-      if (waitOpponentDialog.start()) {
-        LOGGER.info("Waiting is completed");
-      } else {
-        LOGGER.warning("Wait was interrupted by user");
-        System.exit(1);
+      try {
+        if (waitOpponentDialog.start()) {
+          LOGGER.info("Waiting is completed");
+        } else {
+          LOGGER.warning("Wait was interrupted by user");
+          System.exit(1);
+        }
+      } catch (TimeoutException ex) {
+        LOGGER.log(Level.SEVERE, "Timeout during server and opponent wait", ex);
+        JOptionPane.showMessageDialog(null, "Timeout for opponent and server wait!", "Timeout", JOptionPane.WARNING_MESSAGE);
+        System.exit(2233);
       }
 
       if (!selectedOpponent.isAvailable()) {

@@ -23,21 +23,29 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public class WaitOpponentDialog extends JDialog {
   private final BattleshipsPlayer player;
   private final JProgressBar progressBar;
   private final Timer timer;
   private boolean completed;
+  private final Duration maxWaitTime;
+  private boolean timeOut;
+  private long startTime;
 
-  public WaitOpponentDialog(final GraphicsConfiguration configuration,
+  public WaitOpponentDialog(final Duration maxWaitTime,
+                            final GraphicsConfiguration configuration,
                             final String title,
                             final Image icon,
                             final BattleshipsPlayer player) {
     super(null, title, ModalityType.APPLICATION_MODAL, configuration);
 
     GfxUtils.setApplicationTaskbarTitle(icon, title);
+
+    this.maxWaitTime = maxWaitTime;
 
     this.setAlwaysOnTop(true);
     this.player = Objects.requireNonNull(player);
@@ -73,16 +81,21 @@ public class WaitOpponentDialog extends JDialog {
   }
 
   private void check(final ActionEvent action) {
-    if (!this.player.isAvailable()) {
-      this.completed = false;
-      this.progressBar.setString("Waiting for server");
-    } else if (!this.player.isReadyForGame()) {
-      this.completed = false;
-      this.progressBar.setString("Waiting for opponent");
-    } else {
-      this.completed = true;
-      this.progressBar.setString("");
+    if (System.currentTimeMillis() - this.startTime > maxWaitTime.toMillis()) {
+      this.timeOut = true;
       this.disposeWindow();
+    } else {
+      if (!this.player.isAvailable()) {
+        this.completed = false;
+        this.progressBar.setString("Waiting for server");
+      } else if (!this.player.isReadyForGame()) {
+        this.completed = false;
+        this.progressBar.setString("Waiting for opponent");
+      } else {
+        this.completed = true;
+        this.progressBar.setString("");
+        this.disposeWindow();
+      }
     }
   }
 
@@ -91,14 +104,18 @@ public class WaitOpponentDialog extends JDialog {
     this.dispose();
   }
 
-  public boolean start() {
+  public boolean start() throws TimeoutException {
     this.completed = false;
+    this.startTime = System.currentTimeMillis();
     if (this.player.isAvailable() && this.player.isReadyForGame()) {
       this.completed = true;
     } else {
       this.timer.start();
       GfxUtils.toScreenCenter(this);
       this.setVisible(true);
+      if (this.timeOut) {
+        throw new TimeoutException();
+      }
     }
     this.disposeWindow();
     return this.completed;

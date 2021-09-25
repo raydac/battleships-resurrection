@@ -33,7 +33,7 @@ public class StartOptions {
   private final boolean multiPlayer;
   private final boolean fullScreen;
   private final boolean withSound;
-  private final boolean useOldGfxClient;
+  private final MultiPlayerMode multiPlayerMode;
   private final Optional<String> hostName;
   private final OptionalInt hostPort;
 
@@ -45,10 +45,10 @@ public class StartOptions {
                        final boolean withSound,
                        final Optional<String> hostName,
                        final OptionalInt hostPort,
-                       final boolean useOldGfxClient
+                       final MultiPlayerMode multiPlayerMode
   ) {
     this.graphicsConfiguration = graphicsConfiguration;
-    this.useOldGfxClient = useOldGfxClient;
+    this.multiPlayerMode = multiPlayerMode;
     this.gameTitle = gameTitle;
     this.withSound = withSound;
     this.gameIcon = gameIcon;
@@ -65,7 +65,7 @@ public class StartOptions {
       PREFERENCES.putBoolean("withSound", this.withSound);
       hostName.ifPresentOrElse(x -> PREFERENCES.put("hostName", x), () -> PREFERENCES.remove("hostName"));
       hostPort.ifPresentOrElse(x -> PREFERENCES.putInt("hostPort", x), () -> PREFERENCES.remove("hostPort"));
-      PREFERENCES.putBoolean("useOldGfxClient", this.useOldGfxClient);
+      PREFERENCES.put("multiPlayerMode", this.multiPlayerMode.name());
       try {
         PREFERENCES.flush();
       } catch (Exception ex) {
@@ -110,8 +110,8 @@ public class StartOptions {
     return this.hostPort;
   }
 
-  public boolean isUseOldGfxClient() {
-    return this.useOldGfxClient;
+  public MultiPlayerMode getMultiPlayerMode() {
+    return this.multiPlayerMode;
   }
 
   @SuppressWarnings("unused")
@@ -125,8 +125,8 @@ public class StartOptions {
     private boolean multiPlayer = false;
     private boolean fullScreen = false;
     private boolean withSound = true;
-    private boolean useOldGfxClient = false;
-    private Optional<String> hostName = Optional.of("localhost");
+    private MultiPlayerMode multiPlayerMode = MultiPlayerMode.LAN_P2P;
+    private Optional<String> hostName = Optional.empty();
     private OptionalInt hostPort = OptionalInt.of(30000);
 
     public Builder setWithSound(final boolean value) {
@@ -139,8 +139,8 @@ public class StartOptions {
       return this;
     }
 
-    public Builder setUseOldGfxClient(final boolean value) {
-      this.useOldGfxClient = value;
+    public Builder setMultiPlayerMode(final MultiPlayerMode value) {
+      this.multiPlayerMode = value == null ? MultiPlayerMode.LAN_P2P : value;
       return this;
     }
 
@@ -179,9 +179,9 @@ public class StartOptions {
         this.multiPlayer = PREFERENCES.getBoolean("multiPlayer", this.multiPlayer);
         this.fullScreen = PREFERENCES.getBoolean("fullScreen", this.fullScreen);
         this.withSound = PREFERENCES.getBoolean("withSound", this.withSound);
-        this.hostName = Optional.of(PREFERENCES.get("hostName", "localhost"));
+        this.hostName = Optional.ofNullable(PREFERENCES.get("hostName", null));
         this.hostPort = OptionalInt.of(PREFERENCES.getInt("hostPort", 30000));
-        this.useOldGfxClient = PREFERENCES.getBoolean("useOldGfxClient", this.useOldGfxClient);
+        this.multiPlayerMode = MultiPlayerMode.safeValueOf(PREFERENCES.get("multiPlayerMode", MultiPlayerMode.LAN_P2P.name()), MultiPlayerMode.LAN_P2P);
         return this;
       }
     }
@@ -195,7 +195,7 @@ public class StartOptions {
               this.withSound,
               this.hostName,
               this.hostPort,
-              this.useOldGfxClient);
+              this.multiPlayerMode);
     }
 
   }

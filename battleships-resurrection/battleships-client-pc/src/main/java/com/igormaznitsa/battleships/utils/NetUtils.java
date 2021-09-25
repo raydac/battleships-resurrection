@@ -7,11 +7,11 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class NetUtils {
   private NetUtils() {
@@ -31,22 +31,36 @@ public final class NetUtils {
     return byteBuffer.limit();
   }
 
-  public static List<NamedInterfaceAddress> findAllNetworkInterfaces() {
-    try {
-      final InetAddress loopback = InetAddress.getLoopbackAddress();
+  public static Optional<NamedInterfaceAddress> findLanInterface(final Collection<NamedInterfaceAddress> interfaceSet) {
+    NamedInterfaceAddress result = null;
 
-      var allInterfaces = NetworkInterface.networkInterfaces()
-              .flatMap(x -> x.getInterfaceAddresses().stream())
-              .filter(x -> !loopback.equals(x.getAddress()))
-              .filter(x -> x.getBroadcast() != null && x.getAddress() instanceof Inet4Address)
-              .map(x -> new NamedInterfaceAddress(x.getAddress().getHostName(), x))
+    for (final NamedInterfaceAddress i : interfaceSet) {
+      final String name = i.getName().toLowerCase(Locale.ENGLISH).trim();
+      if (name.contains("(e") || name.contains("(w") || name.contains("(b")) {
+        result = i;
+      }
+    }
+
+    return Optional.ofNullable(result);
+  }
+
+  public static String removeInterfaceNameIfFound(final String hostName) {
+    if (hostName.startsWith("(")) {
+      int closing = hostName.indexOf(") ", 1);
+      if (closing >= 0) {
+        return hostName.substring(closing + 1).trim();
+      }
+    }
+    return hostName;
+  }
+
+  public static List<NamedInterfaceAddress> findAllIp4NetworkInterfacesWithBroadcast() {
+    try {
+      return NetworkInterface.networkInterfaces()
+              .flatMap(x -> x.getInterfaceAddresses().stream().map(p -> Pair.of(x, p)))
+              .filter(x -> (x.getRight().getAddress().isLoopbackAddress() && x.getRight().getAddress() instanceof Inet4Address) || (x.getRight().getBroadcast() != null && x.getRight().getAddress() instanceof Inet4Address))
+              .map(x -> new NamedInterfaceAddress(String.format("(%s) %s", x.getLeft().getName(), x.getRight().getAddress().getHostName()), x.getRight()))
               .sorted()
-              .collect(Collectors.toUnmodifiableList());
-      return Stream.concat(NetworkInterface.networkInterfaces()
-                              .flatMap(x -> x.getInterfaceAddresses().stream())
-                              .filter(x -> loopback.equals(x.getAddress()))
-                              .findFirst().map(x -> new NamedInterfaceAddress("localhost", x)).stream(),
-                      allInterfaces.stream())
               .collect(Collectors.toUnmodifiableList());
     } catch (Exception ex) {
       try {
@@ -115,7 +129,9 @@ public final class NetUtils {
 
     @Override
     public int compareTo(final NamedInterfaceAddress that) {
-      return this.address.getAddress().isLoopbackAddress() ? -1 : this.name.compareTo(that.name);
+      if (this.name.contains("127.0.0.1") || this.name.contains("localhost")) return -1;
+      if (that.name.contains("127.0.0.1") || that.name.contains("localhost")) return 1;
+      return this.name.compareTo(that.name);
     }
   }
 
