@@ -118,7 +118,7 @@ public class BattleShips {
           System.exit(1);
         }
       } catch (TimeoutException ex) {
-        LOGGER.log(Level.SEVERE, "Timeout during server and opponent wait", ex);
+        LOGGER.log(Level.SEVERE, "Timeout during wait of game server or opponent!", ex);
         JOptionPane.showMessageDialog(null, "Timeout for opponent and server wait!", "Timeout", JOptionPane.WARNING_MESSAGE);
         System.exit(2233);
       }

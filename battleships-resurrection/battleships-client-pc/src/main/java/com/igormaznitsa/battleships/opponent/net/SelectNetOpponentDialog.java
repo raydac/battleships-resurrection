@@ -50,6 +50,7 @@ public class SelectNetOpponentDialog extends JDialog {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public SelectNetOpponentDialog(final StartOptions startOptions, final String uid, final InterfaceAddress address, final int port) throws Exception {
     super((JFrame) null, "BattleShips: Choose opponent for network game", true, startOptions.getGraphicsConfiguration().orElse(null));
+    this.setModalityType(ModalityType.TOOLKIT_MODAL);
     this.setIconImage(startOptions.getGameIcon().orElse(null));
 
     this.interfaceAddress = address;

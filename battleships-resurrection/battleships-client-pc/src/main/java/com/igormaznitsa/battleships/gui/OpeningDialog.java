@@ -52,6 +52,7 @@ public class OpeningDialog extends JDialog {
             startOptions.getGraphicsConfiguration().orElse(
                     getLocalGraphicsEnvironment().getDefaultScreenDevice()
                             .getDefaultConfiguration()));
+    this.setModalityType(ModalityType.TOOLKIT_MODAL);
 
     this.networkInterfaces = NetUtils.findAllIp4NetworkInterfacesWithBroadcast();
 
