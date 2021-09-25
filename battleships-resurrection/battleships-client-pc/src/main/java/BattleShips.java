@@ -62,6 +62,7 @@ public class BattleShips {
       final int chosenPort = selectedData.getHostPort().orElse(30000);
       final BattleshipsPlayer selectedOpponent;
       if (selectedData.isMultiPlayer()) {
+        GfxUtils.setApplicationTaskbarTitle(startOptions.getGameIcon().orElse(null), "Network");
         switch (selectedData.getMultiPlayerMode()) {
           case GFX_PLAYROOM: {
             InetAddress address = null;
@@ -94,6 +95,7 @@ public class BattleShips {
             throw new Error("Unexpected multi-player mode");
         }
       } else {
+        GfxUtils.setApplicationTaskbarTitle(startOptions.getGameIcon().orElse(null), null);
         selectedOpponent = new AiBattleshipsSingleSessionBot().startPlayer();
       }
 
