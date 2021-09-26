@@ -1,0 +1,26 @@
+- 1.1.0 (26-sep-2021)
+ - __PC: added serverless LAN network game mode__
+ - PC: embedded JDK updated to 17+35
+ - PC: improved send of fire request through network in the end of fire animation
+ - PC: refactoring
+
+- 1.0.3 (23-may-2021)
+ - PC: mproved select of start frame for ships
+ - PC: fixed ratio of morse2 sound
+ - PC: improved select of firing ship to make better probability for air-carrier and dreadnoughts
+
+- 1.0.2 (25-mar-2021)
+
+ - PC: updated embedded OpenJDK to 16+36
+ - PC: updated Launch4J starter
+ - PC: minor improvements and fixes of form title show under different host-OS  
+ - PC: fixed show of game cursor under MacOS
+ - PC: minor refactoring
+
+- 1.0.1 (27-feb-2021)
+ - PC: reworked cursor sprite to image
+ - PC: improvements and fixes in full screen processing
+ - PC: added version for MacOS Aarch64 
+
+- 1.0.0 (31-jan-2021)
+ - initial release of restored version with old GFX play-room server support
