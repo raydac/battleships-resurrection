@@ -42,9 +42,6 @@ months and was successfully completed in time. For me the project is remarkable 
 experience in J2ME world (a year later I took a part in a big mobile project for a Finnish company to produce 20 mobile
 games in two months).
 
-The restored PC client has been written entirely in Java 11 without any 3-th side library, and it can be used as some
-example of Java programming for casual desktop games.
-
 # Screen-cast
 
 There is short screen-cast of a game session including GFX-compatible server, restored PC-client and emulated Motorola
