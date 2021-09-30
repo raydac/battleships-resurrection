@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.igormaznitsa</groupId>
         <artifactId>battleships-resurrection</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>battleships-client-pc</artifactId>
@@ -213,66 +213,6 @@
                                     <addModules>
                                         <module>jdk.crypto.ec</module>
                                     </addModules>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                        <artifactId>launch4j-maven-plugin</artifactId>
-                        <configuration>
-                            <headerType>gui</headerType>
-                            <downloadUrl>https://bell-sw.com/pages/downloads/#/java-11-lts</downloadUrl>
-                            <jar>battleships-resurrection.jar</jar>
-                            <classPath>
-                                <mainClass>BattleShips</mainClass>
-                                <addDependencies>false</addDependencies>
-                            </classPath>
-                            <icon>src/assembly/windows/appico.ico</icon>
-                            <jre>
-                                <minVersion>11</minVersion>
-                                <jdkPreference>preferJre</jdkPreference>
-                                <initialHeapSize>512</initialHeapSize>
-                                <maxHeapSize>1024</maxHeapSize>
-                                <opts>
-                                    <opt>-server</opt>
-                                    <opt>-Dsun.rmi.transport.tcp.maxConnectionThreads=0</opt>
-                                    <opt>-XX:+DisableAttachMechanism</opt>
-                                    <opt>-Dsun.java2d.d3d=true</opt>
-                                    <opt>-Dsun.java2d.ddoffscreen=true</opt>
-                                    <opt>-Dsun.java2d.ddforcevram=true</opt>
-                                    <opt>-Dsun.java2d.ddscale=true</opt>
-                                    <opt>-Dsun.java2d.accthreshold=0</opt>
-                                    <opt>-Djava.library.path=%EXEDIR%</opt>
-                                </opts>
-                            </jre>
-                            <versionInfo>
-                                <fileVersion>1.1.0.0</fileVersion>
-                                <txtFileVersion>1.1.0.0</txtFileVersion>
-                                <fileDescription>battleship</fileDescription>
-                                <copyright>Copyright &#169; 2001</copyright>
-                                <productVersion>1.1.0.0</productVersion>
-                                <txtProductVersion>1.1.0.0</txtProductVersion>
-                                <productName>RuSoft BattleShip game</productName>
-                                <companyName>RuSoft</companyName>
-                                <internalName>${project.name}</internalName>
-                                <originalFilename>battleships_resurrection_${project.version}.exe</originalFilename>
-                            </versionInfo>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>l4j-only-starter</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>launch4j</goal>
-                                </goals>
-                                <configuration>
-                                    <outfile>${project.build.directory}${file.separator}battleships-resurrection.exe
-                                    </outfile>
-                                    <dontWrapJar>true</dontWrapJar>
-                                    <jre>
-                                        <path>%EXEDIR%\jre</path>
-                                    </jre>
                                 </configuration>
                             </execution>
                         </executions>

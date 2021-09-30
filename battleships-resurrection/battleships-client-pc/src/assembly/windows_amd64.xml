@@ -30,11 +30,6 @@
             <destName>battleships-resurrection.jar</destName>
             <outputDirectory>${project.build.finalName}${file.separator}</outputDirectory>
         </file>
-        <file>
-            <source>${project.build.directory}${file.separator}battleships-resurrection.exe</source>
-            <destName>battleships-resurrection.exe</destName>
-            <outputDirectory>${project.build.finalName}${file.separator}</outputDirectory>
-        </file>
     </files>
     <fileSets>
         <fileSet>
