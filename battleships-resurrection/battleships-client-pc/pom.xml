@@ -24,6 +24,15 @@
                 <embedded.jdk.type>jdk</embedded.jdk.type>
                 <embedded.jdk.version>17+35</embedded.jdk.version>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.igormaznitsa</groupId>
+                    <artifactId>battleships-pc-win-launcher</artifactId>
+                    <version>${project.version}</version>
+                    <type>mvn-golang</type>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>

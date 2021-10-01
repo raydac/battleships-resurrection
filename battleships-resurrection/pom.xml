@@ -54,6 +54,12 @@
                 <module>battleships-client-a008</module>
             </modules>
         </profile>
+        <profile>
+            <id>publish</id>
+            <modules>
+                <module>battleships-pc-win-launcher</module>
+            </modules>
+        </profile>
     </profiles>
 
     <modules>
