@@ -1,6 +1,7 @@
 target/
 .idea
 *.iml
+*.syso
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
