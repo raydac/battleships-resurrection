@@ -30,7 +30,7 @@
                     <artifactId>battleships-pc-win-launcher</artifactId>
                     <version>${project.version}</version>
                     <type>mvn-golang</type>
-                    <scope>runtime</scope>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
             <build>
