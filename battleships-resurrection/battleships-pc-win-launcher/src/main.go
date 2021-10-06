@@ -58,12 +58,12 @@ func main() {
 	if err == nil {
 		base_folder := filepath.Dir(path)
 		cmd := exec.Command(base_folder+JDK_PATH, "-Dsun.java2d.opengl=true", "-jar", base_folder+JAR_FILE)
-		fmt.Printf("Starting the game...\n")
+		fmt.Printf("Application starting...\n")
 		err = cmd.Start()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("Waiting session end...\n")
+		fmt.Printf("Waiting application completion...\n")
 		err = cmd.Wait()
 		if err != nil {
 			fmt.Printf("Application completed with status: %v", err)
