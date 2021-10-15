@@ -140,11 +140,7 @@ with `mvn`, if you want build cross-platform result images then use maven profil
 
 ### GFX play-room
 
-It is the original minimalistic GFX-compatible standalone play-room server which was prepared by me for E3 2001 in april
-
-2001. I have no changes in its sources, and it contains all my one-year experience Java coding (I hope that after 20
-      years of Java programming my skills in programming a bit better). The server also formed as maven project and even
-      can be started directly through `exec:java`.
+It is the original minimalistic GFX-compatible standalone play-room server which was prepared by me for E3 2001 in april 2001. I have no changes in found sources, and it contains all my one-year experience Java coding and errors. The server also formed as maven project and even can be started directly through `exec:java`.
 
 I could not find either documents or presentations about the GFX platform on my disks. As I recall, the real
 production-ready GFX server was delivered as a module for BEA WebLogic server. The standalone solution is not fully
