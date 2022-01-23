@@ -22,7 +22,7 @@
             <properties>
                 <embedded.jdk.provider>BELLSOFT</embedded.jdk.provider>
                 <embedded.jdk.type>jdk</embedded.jdk.type>
-                <embedded.jdk.version>17+35</embedded.jdk.version>
+                <embedded.jdk.version>17.0.2+9</embedded.jdk.version>
             </properties>
             <dependencies>
                 <dependency>
