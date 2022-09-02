@@ -16,8 +16,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <mvn.golang.go.version>1.17.6</mvn.golang.go.version>
-    <mvn.golang.wrapper.version>2.3.9</mvn.golang.wrapper.version>
+    <mvn.golang.go.version>1.19</mvn.golang.go.version>
+    <mvn.golang.wrapper.version>2.3.10</mvn.golang.wrapper.version>
     <maven.test.skip>true</maven.test.skip>
     <target.name>battleships-resurrection</target.name>
     <final.extension>.exe</final.extension>
@@ -73,7 +73,7 @@
             <id>default-build</id>
             <configuration>
               <targetOs>windows</targetOs>
-              <targetArch>386</targetArch>
+              <targetArch>amd64</targetArch>
               <ldFlags>
                 <flag>-H=windowsgui</flag>
               </ldFlags>
