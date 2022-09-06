@@ -36,6 +36,36 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>de.perdian.maven.plugins</groupId>
+                        <artifactId>macosappbundler-maven-plugin</artifactId>
+                        <version>1.18.0</version>
+                        <configuration>
+                            <plist>
+                                <CFBundleIconFile>appico.icns</CFBundleIconFile>
+                                <CFBundleDisplayName>Battleships</CFBundleDisplayName>
+                                <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+                                <CFBundleURLTypes>
+                                    <string>msa</string>
+                                </CFBundleURLTypes>
+                                <JVMVersion>11+</JVMVersion>
+                                <JVMMainClassName>BattleShips</JVMMainClassName>
+                            </plist>
+                            <dmg>
+                                <generate>true</generate>
+                                <autoFallback>true</autoFallback>
+                            </dmg>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-macos-bundle</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>bundle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>com.igormaznitsa</groupId>
                         <artifactId>mvn-jlink-wrapper</artifactId>
                         <executions>
