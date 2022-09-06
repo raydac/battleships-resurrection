@@ -53,6 +53,8 @@
                             <dmg>
                                 <generate>true</generate>
                                 <autoFallback>true</autoFallback>
+                                <appendVersion>false</appendVersion>
+                                <dmgFileName>${project.build.finalName}-macos</dmgFileName>
                             </dmg>
                         </configuration>
                         <executions>
