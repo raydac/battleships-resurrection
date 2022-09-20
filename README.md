@@ -9,7 +9,7 @@
 
 # Changelog
 
-## 1.1.1 (20-sep-2021)
+## 1.1.1 (20-sep-2022)
  - __PC: windows launcher moved from i386 to amd64 to prevent antivirus false positive detection__
  - PC: embedded JDK updated to 17.0.4.1+1
 
