@@ -9,18 +9,16 @@
 
 # Changelog
 
+## 1.1.1 (20-sep-2021)
+ - __PC: windows launcher moved from i386 to amd64 to prevent antivirus false positive detection__
+ - PC: embedded JDK updated to 17.0.4.1+1
+
 ## 1.1.0 (26-sep-2021)
 
 - __PC: added serverless LAN network game mode__
 - PC: embedded JDK updated to 17+35
 - PC: improved send of fire request through network in the end of fire animation
 - PC: refactoring
-
-## 1.0.3 (23-may-2021)
-
-- PC: mproved select of start frame for ships
-- PC: fixed ratio of morse2 sound
-- PC: improved select of firing ship to make better probability for air-carrier and dreadnoughts
 
 [Full changelog](changelog.txt)
 
@@ -53,13 +51,13 @@ A008 client.
 
 | OS                                           |  Download link                                                                                                                                                                                | 
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Windows](assets/icons/win64x64.png)        | __[Game client for Windows amd64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/battleships-resurrection-1.1.0-windows-jdk-amd64.zip)__             |
-| ![OSX](assets/icons/macos64x64.png)          | __[Game client for OSX amd64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/battleships-resurrection-1.1.0-macos-jdk-amd64.zip)__                   |
-| ![OSX Arm64](assets/icons/macosarm64x64.png) | __[Game client for OSX aarch64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/battleships-resurrection-1.1.0-macos-jdk-aarch64.zip)__               |
-| ![Linux](assets/icons/linux64x64.png)        | __[Game client for Linux amd64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/battleships-resurrection-1.1.0-linux-jdk-amd64.tar.gz)__              |
-| ![Java](assets/icons/java64x64.png)          | __[Game client, cross-platform JAR file](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/battleships-resurrection-1.1.0.jar)__                                     | 
-| ![Java](assets/icons/java64x64.png)          | _[pre-built GFX-compatible server (only JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/gfx-playroom-server-1.1.0.jar)_                                      |
-| ![Java](assets/icons/java64x64.png)          | _[pre-built J2ME midlet for Motorola A008 (zipped JAD+JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.0/BattleShip_A008.zip)_                                  |
+| ![Windows](assets/icons/win64x64.png)        | __[Game client for Windows amd64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/battleships-resurrection-1.1.1-windows-jdk-amd64.zip)__             |
+| ![OSX](assets/icons/macos64x64.png)          | __[Game client for OSX amd64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/battleships-resurrection-1.1.1-macos-jdk-amd64.zip)__                   |
+| ![OSX Arm64](assets/icons/macosarm64x64.png) | __[Game client for OSX aarch64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/battleships-resurrection-1.1.1-macos-jdk-aarch64.zip)__               |
+| ![Linux](assets/icons/linux64x64.png)        | __[Game client for Linux amd64 (JRE included)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/battleships-resurrection-1.1.1-linux-jdk-amd64.tar.gz)__              |
+| ![Java](assets/icons/java64x64.png)          | __[Game client, cross-platform JAR file](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/battleships-resurrection-1.1.1.jar)__                                     | 
+| ![Java](assets/icons/java64x64.png)          | _[pre-built GFX-compatible server (only JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/gfx-playroom-server-1.1.1.jar)_                                      |
+| ![Java](assets/icons/java64x64.png)          | _[pre-built J2ME midlet for Motorola A008 (zipped JAD+JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.1/BattleShip_A008.zip)_                                  |
 
 # Short historical review
 

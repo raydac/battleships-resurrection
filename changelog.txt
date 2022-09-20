@@ -1,3 +1,7 @@
+- 1.1.1 (20-sep-2021)
+ - PC: windows launcher moved from i386 to amd64 to prevent antivirus false positive detection
+ - PC: embedded JDK updated to 17.0.4.1+1
+
 - 1.1.0 (26-sep-2021)
  - __PC: added serverless LAN network game mode__
  - PC: embedded JDK updated to 17+35
@@ -5,7 +9,7 @@
  - PC: refactoring
 
 - 1.0.3 (23-may-2021)
- - PC: mproved select of start frame for ships
+ - PC: improved select of start frame for ships
  - PC: fixed ratio of morse2 sound
  - PC: improved select of firing ship to make better probability for air-carrier and dreadnoughts
 
