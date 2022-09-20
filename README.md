@@ -12,6 +12,8 @@
 ## 1.1.1 (20-sep-2022)
  - __PC: windows launcher moved from i386 to amd64 to prevent antivirus false positive detection__
  - PC: embedded JDK updated to 17.0.4.1+1
+ - PC: updated GoSDK for launcher to 1.19.1
+ - PC: added MacOS DMG bundle for PC client
 
 ## 1.1.0 (26-sep-2021)
 
