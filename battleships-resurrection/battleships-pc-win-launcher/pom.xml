@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.igormaznitsa</groupId>
     <artifactId>battleships-resurrection</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>battleships-pc-win-launcher</artifactId>
