@@ -38,7 +38,6 @@
                     <plugin>
                         <groupId>de.perdian.maven.plugins</groupId>
                         <artifactId>macosappbundler-maven-plugin</artifactId>
-                        <version>1.18.0</version>
                         <configuration>
                             <plist>
                                 <CFBundleIconFile>appico.icns</CFBundleIconFile>
@@ -64,6 +63,51 @@
                                 <goals>
                                     <goal>bundle</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                        <artifactId>launch4j-maven-plugin</artifactId>
+                        <version>2.2.0</version>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>${project.build.directory}/${app.name}.exe</outfile>
+                            <downloadUrl>https://bell-sw.com/pages/downloads/#/java-19-current</downloadUrl>
+                            <classPath>
+                                <mainClass>BattleShips</mainClass>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <icon>
+                                ${basedir}/src/assembly/windows/appico.ico
+                            </icon>
+                            <versionInfo>
+                                <fileVersion>1.1.2.0</fileVersion>
+                                <productVersion>1.1.2.0</productVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileDescription>BattleShips Resurrection PC client</fileDescription>
+                                <copyright>2001-2022 Igor Maznitsa</copyright>
+                                <txtProductVersion>${project.version}</txtProductVersion>
+                                <productName>${project.name}</productName>
+                                <companyName>igormaznitsa.com</companyName>
+                                <internalName>${project.name}</internalName>
+                                <originalFilename>${project.build.finalName}.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>l4j-pack</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>launch4j</goal>
+                                </goals>
+                                <configuration>
+                                    <outfile>${project.build.directory}${file.separator}${project.build.finalName}.exe</outfile>
+                                    <jre>
+                                        <minVersion>11</minVersion>
+                                        <path>%VAR%</path>
+                                    </jre>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
