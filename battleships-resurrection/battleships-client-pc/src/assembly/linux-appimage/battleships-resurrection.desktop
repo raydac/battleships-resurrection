@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.1
+Type=Application
+Name=Battleships
+GenericName=BattleShip
+Icon=icon
+Comment=RuSoft BattleShip game
+Categories=Game;
+Keywords=battleships;game;
+Terminal=false
+StartupWMClass=battleships-resurrection-pc

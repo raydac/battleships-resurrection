@@ -102,7 +102,8 @@
                                     <goal>launch4j</goal>
                                 </goals>
                                 <configuration>
-                                    <outfile>${project.build.directory}${file.separator}${project.build.finalName}.exe</outfile>
+                                    <outfile>${project.build.directory}${file.separator}${project.build.finalName}.exe
+                                    </outfile>
                                     <jre>
                                         <minVersion>11</minVersion>
                                         <path>%VAR%</path>
@@ -316,7 +317,8 @@
                                     <appendAssemblyId>false</appendAssemblyId>
                                     <finalName>${project.build.finalName}-linux-jdk-amd64</finalName>
                                     <descriptors>
-                                        <descriptor>src${file.separator}assembly${file.separator}linux_amd64.xml</descriptor>
+                                        <descriptor>src${file.separator}assembly${file.separator}linux_amd64.xml
+                                        </descriptor>
                                     </descriptors>
                                 </configuration>
                             </execution>
@@ -345,7 +347,8 @@
                                     <appendAssemblyId>false</appendAssemblyId>
                                     <finalName>${project.build.finalName}-macos-jdk-amd64</finalName>
                                     <descriptors>
-                                        <descriptor>src${file.separator}assembly${file.separator}mac_amd64.xml</descriptor>
+                                        <descriptor>src${file.separator}assembly${file.separator}mac_amd64.xml
+                                        </descriptor>
                                     </descriptors>
                                 </configuration>
                             </execution>
@@ -461,6 +464,106 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>appimage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>prepare-appimage-folder</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}${file.separator}${project.build.finalName}-x86_64</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}${file.separator}jre_linux_amd64</directory>
+                                            <targetPath>jre</targetPath>
+                                            <filtering>false</filtering>
+                                            <excludes>
+                                                <exclude>**/ASSEMBLY_EXCEPTION</exclude>
+                                                <exclude>**/ADDITIONAL_LICENSE_INFO</exclude>
+                                                <exclude>**/LICENSE</exclude>
+                                            </excludes>
+                                        </resource>
+                                        <resource>
+                                            <directory>${project.basedir}${file.separator}src${file.separator}assembly${file.separator}linux-appimage</directory>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                        <resource>
+                                            <directory>${project.build.directory}</directory>
+                                            <includes>
+                                                <include>${project.build.finalName}.jar</include>
+                                            </includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>permissions-in-appimage-folder-apprun</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>chmod</executable>
+                                    <arguments>
+                                        <arg>0755</arg>
+                                        <arg>AppRun</arg>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>permissions-in-appimage-folder-java</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>chmod</executable>
+                                    <arguments>
+                                        <arg>0755</arg>
+                                        <arg>jre${file.separator}bin${file.separator}java</arg>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>make-appimage-linux-amd64</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                    <executable>appimagetool</executable>
+                                    <arguments>
+                                        <arg>.${file.separator}${project.build.finalName}-x86_64</arg>
+                                        <arg>${project.build.finalName}-x86_64.AppImage</arg>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <workingDirectory>
+                                ${project.build.directory}${file.separator}${project.build.finalName}-x86_64
+                            </workingDirectory>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
