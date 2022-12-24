@@ -61,6 +61,7 @@ A008 client.
 | ![Java](assets/icons/java64x64.png)          | __[Game client, cross-platform JAR file](https://github.com/raydac/battleships-resurrection/releases/download/1.1.2/battleships-resurrection-1.1.2.jar)__                                     | 
 | ![Java](assets/icons/java64x64.png)          | _[pre-built GFX-compatible server (only JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.2/gfx-playroom-server-1.1.2.jar)_                                      |
 | ![Java](assets/icons/java64x64.png)          | _[pre-built J2ME midlet for Motorola A008 (zipped JAD+JAR)](https://github.com/raydac/battleships-resurrection/releases/download/1.1.2/BattleShip_A008.zip)_                                  |
+
 __[Full set of pre-built components and clients on the latesr release page](https://github.com/raydac/battleships-resurrection/releases/latest)__   
 
 # Short historical review
