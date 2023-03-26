@@ -1,3 +1,8 @@
+- 1.1.3 (SNAPSHOT)
+ - PC: updated Launch4j to 2.3.3
+ - PC: embedded JDK updated to 20+37
+ - PC: updated GoSDK for launcher to 1.20.2
+
 - 1.1.2 (24-dec-2022)
  - PC: added AppImage PC client version for amd64
  - PC: added Launch4j wraqpped PC client version (without embedded JDK)
