@@ -170,6 +170,11 @@ public final class ShipSprite extends FieldSprite {
     this.frame = 0;
   }
 
+  private void initAnimationWithRandomStartFrame(final Animation animation) {
+    this.animation = animation;
+    this.frame = RND.nextInt(animation.getLength());
+  }
+
   @Override
   public void nextFrame() {
     this.frame++;
@@ -295,8 +300,11 @@ public final class ShipSprite extends FieldSprite {
   public boolean processHit() {
     if (this.activeCells > 0) {
       this.activeCells--;
-      this.initAnimation(this.activeCells == 0 ? this.animationDestroyed :
-              this.animationNormal[this.activeCells - 1]);
+      if (this.activeCells == 0) {
+        this.initAnimationWithRandomStartFrame(this.animationDestroyed);
+      } else {
+        this.initAnimation(this.animationNormal[this.activeCells - 1]);
+      }
     }
     return this.activeCells == 0;
   }

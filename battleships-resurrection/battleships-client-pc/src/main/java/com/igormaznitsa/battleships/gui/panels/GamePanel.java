@@ -739,8 +739,6 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                       new Point(enemyShoot.getX(), enemyShoot.getY()), Optional.empty(),
                       Animation.SPLASH);
               Sound.WATER_SPLASH01.play();
-              this.animatedSpriteField.add(this.fieldWaterEffect);
-              Collections.sort(this.animatedSpriteField);
             } else {
               enemyMayTurn = true;
               if (hitShip.isDestroyed()) {
@@ -762,10 +760,12 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
               this.fieldWaterEffect = new OneTimeWaterEffectSprite(
                       hitShip.getActionCell(), Optional.of(hitShip), Animation.EXPLODE);
               Sound.EXPLODE01.play();
-              this.animatedSpriteField.add(this.fieldWaterEffect);
-              Collections.sort(this.animatedSpriteField);
             }
+
+            this.animatedSpriteField.add(this.fieldWaterEffect);
+            Collections.sort(this.animatedSpriteField);
             this.fireEventToOpponent(enemyTurnResultEvent);
+
             if (enemyMayTurn) {
               this.fireEventToOpponent(new BsGameEvent(EVENT_DO_TURN, 0, 0));
             }
