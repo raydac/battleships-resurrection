@@ -458,7 +458,7 @@ public final class AiBattleshipsSingleSessionBot implements BattleshipsPlayer {
           throw new Error("Can't place event: " + event);
         }
       } catch (InterruptedException ex) {
-        throw new Error("Can't place data into queue for long time: " + event);
+        Thread.currentThread().interrupt();
       }
     }
   }

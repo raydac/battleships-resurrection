@@ -92,7 +92,7 @@ public class BattleShips {
           }
           break;
           default:
-            throw new Error("Unexpected multi-player mode");
+            throw new IllegalArgumentException("Unexpected multi-player mode: " + selectedData.getMultiPlayerMode());
         }
       } else {
         GfxUtils.setApplicationTaskbarTitle(startOptions.getGameIcon().orElse(null), null);

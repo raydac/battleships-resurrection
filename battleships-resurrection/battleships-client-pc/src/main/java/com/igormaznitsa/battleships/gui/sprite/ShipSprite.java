@@ -64,7 +64,7 @@ public final class ShipSprite extends FieldSprite {
         this.firingSound = Sound.AIRPLANE_OUT;
         break;
       default:
-        throw new Error("Unexpected ship: " + cells.size());
+        throw new IllegalStateException("Unexpected ship: " + cells.size());
     }
 
     if (this.shipType == ShipType.U_BOAT) {
@@ -147,7 +147,7 @@ public final class ShipSprite extends FieldSprite {
       }
       break;
       default:
-        throw new Error("Unknown ship: " + this.shipType);
+        throw new IllegalStateException("Unknown ship: " + this.shipType);
     }
     this.fire = false;
     this.animation = this.animationNormal[this.activeCells - 1];
@@ -244,7 +244,7 @@ public final class ShipSprite extends FieldSprite {
             }
           }
         } else {
-          throw new Error("Unexpected ship spriteType: " + this.shipType);
+          throw new IllegalStateException("Unexpected ship spriteType: " + this.shipType);
         }
       }
       break;
@@ -281,7 +281,7 @@ public final class ShipSprite extends FieldSprite {
           }
           break;
           default:
-            throw new Error("Unexpected ship for extended animation: " + this.shipType);
+            throw new IllegalStateException("Unexpected ship for extended animation: " + this.shipType);
         }
       }
       break;

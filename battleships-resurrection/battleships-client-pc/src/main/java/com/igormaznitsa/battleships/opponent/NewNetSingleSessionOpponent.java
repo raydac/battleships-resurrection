@@ -50,7 +50,7 @@ public class NewNetSingleSessionOpponent implements BattleshipsPlayer {
       if (opponentLink != null) {
         LOGGER.info("created link with " + opponentLink.getOpponentRecord().getUid());
         if (!this.opponentLink.compareAndSet(null, opponentLink)) {
-          throw new Error("Unexpected already existing opponent link");
+          throw new IllegalStateException("Unexpected already existing opponent link");
         }
         opponentLink.start();
         return this;

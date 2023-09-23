@@ -43,7 +43,7 @@ public final class SoundClip implements AutoCloseable {
       });
       this.clip.open(audioStream);
     } catch (Exception ex) {
-      throw new Error(ex);
+      throw new RuntimeException("Error during load and init sound clip: " + resource, ex);
     }
   }
 
@@ -74,11 +74,10 @@ public final class SoundClip implements AutoCloseable {
   }
 
   public synchronized SoundClip stop() {
-    if (this.playing.compareAndSet(true, false)) {
-      if (this.clip.isActive()) {
+    if (this.playing.compareAndSet(true, false)
+            && this.clip.isActive()) {
         this.clip.stop();
       }
-    }
     return this;
   }
 

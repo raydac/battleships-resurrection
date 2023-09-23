@@ -340,7 +340,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
             }
             break;
             default: {
-              throw new Error("Unexpected cell state in placement mode: " + field.getState(x, y));
+              throw new IllegalStateException("Unexpected cell state in placement mode: " + field.getState(x, y));
             }
           }
         } else {
@@ -370,7 +370,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
             }
             break;
             default: {
-              throw new Error("Unexpected cell state in placement mode: " + field.getState(x, y));
+              throw new IllegalStateException("Unexpected cell state in placement mode: " + field.getState(x, y));
             }
           }
         }
@@ -398,7 +398,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   private void fireEventToOpponent(final BsGameEvent event) {
     if (!this.queueToOpponent.offer(Objects.requireNonNull(event))) {
-      throw new Error(
+      throw new IllegalStateException(
               "Can't queue output game event: " + event + " (size=" + this.queueToOpponent.size() + ')');
     }
   }
@@ -510,7 +510,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
             .filter(x -> !x.isDestroyed())
             .collect(Collectors.toCollection(ArrayList::new));
     if (foundAliveShips.isEmpty()) {
-      throw new Error("Unexpected fire request without alive ships");
+      throw new IllegalStateException("Unexpected fire request without alive ships");
     } else {
       foundAliveShips.stream().filter(x -> x.getShipType() == ShipType.DREADNOUGHT)
               .findFirst().ifPresent(dreadnought -> {
@@ -676,7 +676,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
                   if (removedShip.isEmpty()) {
                     this.fireEventToOpponent(
                             new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
-                    throw new Error("Can't remove killed enemy ship from map: " + e);
+                    throw new IllegalStateException("Can't remove killed enemy ship from map: " + e);
                   } else {
                     removedShip
                             .forEach(c -> this.gameField.setState(c.x, c.y, GameField.CellState.KILL));
@@ -793,16 +793,13 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       }
       break;
       default: {
-        throw new Error("Unexpected stage: " + this.currentStage);
+        throw new IllegalStateException("Unexpected stage: " + this.currentStage);
       }
     }
     this.refreshUi();
   }
 
   private void processUnexpectedEvent(final BsGameEvent unexpectedEvent) {
-    if (unexpectedEvent == null) {
-      throw new NullPointerException("Unexpected event is null");
-    }
     switch (unexpectedEvent.getType()) {
       case EVENT_FAILURE: {
         this.fireSignal(SIGNAL_SYSTEM_FAILURE);
@@ -814,7 +811,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       }
       break;
       default: {
-        throw new Error("Non-processed unexpected event: " + unexpectedEvent);
+        throw new IllegalArgumentException("Non-processed unexpected event: " + unexpectedEvent);
       }
     }
   }
@@ -942,7 +939,7 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
       }
       break;
       default: {
-        throw new Error("Unexpected stage: " + this.currentStage);
+        throw new IllegalStateException("Unexpected stage: " + this.currentStage);
       }
     }
 
@@ -1018,11 +1015,9 @@ public class GamePanel extends BasePanel implements BattleshipsPlayer {
 
   @Override
   public void onGameKeyEvent(final KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-      if (this.currentStage == Stage.PLACING) {
+    if (e.getKeyCode() == KeyEvent.VK_SPACE && this.currentStage == Stage.PLACING) {
         this.gameField.reset();
         refreshUi();
-      }
     }
   }
 

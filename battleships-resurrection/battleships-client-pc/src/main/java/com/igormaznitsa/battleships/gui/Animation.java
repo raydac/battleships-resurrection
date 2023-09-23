@@ -126,7 +126,7 @@ public enum Animation {
   private static String makeFileName(final String prefix, final int index) {
     final int postfixIndex = prefix.indexOf('$');
     if (postfixIndex < 0) {
-      throw new Error("Unexpected prefix: " + prefix);
+      throw new IllegalArgumentException("Unexpected prefix: " + prefix);
     }
     final int numOfPostfixDigits = prefix.length() - postfixIndex;
 
@@ -170,7 +170,7 @@ public enum Animation {
       }
       frameList.trimToSize();
       if (frameList.isEmpty()) {
-        throw new Error("Can't find any frame prefixed: " + this.animationFileNameTemplate);
+        throw new IllegalArgumentException("Can't find any frame prefixed: " + this.animationFileNameTemplate);
       } else {
         this.frames = Collections.unmodifiableList(frameList);
       }

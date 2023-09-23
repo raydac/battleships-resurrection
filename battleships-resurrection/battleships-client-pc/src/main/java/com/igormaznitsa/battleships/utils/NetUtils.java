@@ -77,7 +77,7 @@ public final class NetUtils {
                 .findFirst().orElseThrow(() -> new Error("Can't find loopback interface"));
         return List.of(new NamedInterfaceAddress(loopback.getAddress().getHostName(), loopback));
       } catch (Exception exx) {
-        throw new Error("Unexpectedly can't find localhost", exx);
+        throw new RuntimeException("Unexpectedly can't find localhost", exx);
       }
     }
   }

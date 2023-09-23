@@ -125,12 +125,10 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
       connection.setRequestProperty("playerID", Integer.toString(playerId));
       sessionId.ifPresent(s -> connection.setRequestProperty("sessionID", s));
       return connection;
+    } catch (IOException ex) {
+      throw ex;
     } catch (Exception ex) {
-      if (ex instanceof IOException) {
-        throw (IOException) ex;
-      } else {
-        throw new IOException(ex);
-      }
+      throw new IOException(ex);
     }
   }
 
@@ -382,7 +380,7 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
 
   private void pushIntoOutput(final BsGameEvent event) {
     if (!this.queueOut.offer(event)) {
-      throw new Error("Can't queue out-coming event: " + event);
+      throw new IllegalStateException("Can't queue out-coming event: " + event);
     }
   }
 
@@ -552,10 +550,10 @@ public class OldGfxBattleshipSingleSessionBot implements BattleshipsPlayer {
       try {
         if (!this.queueIn.offer(event, 5, TimeUnit.SECONDS)) {
           this.placeEventIntoInQueue(new BsGameEvent(GameEventType.EVENT_FAILURE, 0, 0));
-          throw new Error("Can't place event: " + event);
+          throw new IllegalStateException("Can't place event: " + event);
         }
       } catch (InterruptedException ex) {
-        throw new Error("Can't place data into queue for long time: " + event);
+        Thread.currentThread().interrupt();
       }
     }
   }

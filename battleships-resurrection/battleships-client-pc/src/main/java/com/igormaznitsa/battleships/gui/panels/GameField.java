@@ -130,7 +130,7 @@ public final class GameField {
             .boxed()
             .collect(Collectors.toCollection(ArrayList::new));
         if (freeCells.isEmpty()) {
-          throw new Error("Can't find any free position for ship: " + shipType);
+          throw new IllegalStateException("Can't find any free position for ship: " + shipType);
         }
 
         shuffle(freeCells, RND);
@@ -143,7 +143,7 @@ public final class GameField {
               .findFirst();
           if (foundPosition.isEmpty()) {
             if (freeCells.isEmpty()) {
-              throw new Error("Can't auto-place ship: " + shipType);
+              throw new IllegalStateException("Can't auto-place ship: " + shipType);
             }
           } else {
             break;

@@ -128,7 +128,7 @@ public final class GfxUtils {
             "Can't find resource: " + fileName)) {
       return readPngStream(stream);
     } catch (IOException ex) {
-      throw new Error("Detected error during load: " + fileName, ex);
+      throw new RuntimeException("Detected error during load: " + fileName, ex);
     }
   }
 
@@ -208,7 +208,7 @@ public final class GfxUtils {
         return scaleImage(image, imageType, scale, scale, true);
       }
     } catch (IOException ex) {
-      throw new Error("Detected error during load: " + fileName, ex);
+      throw new RuntimeException("Detected error during load: " + fileName, ex);
     }
   }
 }
