@@ -1,4 +1,4 @@
-module github.com/raydac/battleships-resurrection
+module github.com/raydac/ravikoodi-server
 
         go 1.20
 

@@ -22,14 +22,14 @@
             <properties>
                 <embedded.jdk.provider>BELLSOFT</embedded.jdk.provider>
                 <embedded.jdk.type>jdk</embedded.jdk.type>
-                <embedded.jdk.version>23+38</embedded.jdk.version>
+                <embedded.jdk.version>24.0.1+11</embedded.jdk.version>
             </properties>
             <dependencies>
                 <dependency>
                     <groupId>com.igormaznitsa</groupId>
                     <artifactId>battleships-pc-win-launcher</artifactId>
                     <version>${project.version}</version>
-                    <type>mvn-golang</type>
+                    <type>pom</type>
                     <scope>provided</scope>
                 </dependency>
             </dependencies>
@@ -85,7 +85,7 @@
                                 <productVersion>1.1.3.0</productVersion>
                                 <txtFileVersion>${project.version}</txtFileVersion>
                                 <fileDescription>BattleShips Resurrection PC client</fileDescription>
-                                <copyright>2001-2024 Igor Maznitsa</copyright>
+                                <copyright>2001-2025 Igor Maznitsa</copyright>
                                 <txtProductVersion>${project.version}</txtProductVersion>
                                 <productName>${project.name}</productName>
                                 <companyName>igormaznitsa.com</companyName>
@@ -105,7 +105,7 @@
                                     </outfile>
                                     <jre>
                                         <minVersion>11</minVersion>
-                                        <path>%VAR%</path>
+                                        <jdkPreference>preferJdk</jdkPreference>
                                     </jre>
                                 </configuration>
                             </execution>

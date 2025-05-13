@@ -15,8 +15,8 @@ import (
 const (
 	ERROR_ALREADY_EXISTS = 183
 	JDK_PATH             = "\\jre\\bin\\javaw.exe"
-	JAR_FILE             = "\\battleships-resurrection.jar"
-	MUTEX                = "battleships-resurrection"
+	JAR_FILE             = "\\ravikoodi.jar"
+	MUTEX                = "ravikoodi-app"
 )
 
 var (
@@ -57,7 +57,10 @@ func main() {
 	path, err := os.Executable()
 	if err == nil {
 		base_folder := filepath.Dir(path)
-		cmd := exec.Command(base_folder+JDK_PATH, "-Dsun.java2d.opengl=true", "-jar", base_folder+JAR_FILE)
+		cmd := exec.Command(base_folder+JDK_PATH,
+			"-server",
+			"-Xverify:none",
+			"-jar", base_folder+JAR_FILE)
 		fmt.Printf("Application starting...\n")
 		err = cmd.Start()
 		if err != nil {
