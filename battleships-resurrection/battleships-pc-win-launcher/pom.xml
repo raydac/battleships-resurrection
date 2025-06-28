@@ -16,7 +16,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <mvn.golang.go.version>1.24.2</mvn.golang.go.version>
+    <mvn.golang.go.version>1.24.4</mvn.golang.go.version>
     <go.plugin.version>1.0.4</go.plugin.version>
     <go.target.folder>${project.basedir}${file.separator}bin</go.target.folder>
     <go.source.folder>${project.basedir}${file.separator}src</go.source.folder>
@@ -147,7 +147,7 @@
               </env>
               <args>
                 <arg>build</arg>
-                <arg>-ldflags=-s -w</arg>
+                <arg>-ldflags=-s -w -H=windowsgui</arg>
                 <arg>-o</arg>
                 <arg>${go.target.folder}${file.separator}${project.build.finalName}</arg>
               </args>
