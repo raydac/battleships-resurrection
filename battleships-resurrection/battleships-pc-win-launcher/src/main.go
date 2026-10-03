@@ -59,7 +59,6 @@ func main() {
 		base_folder := filepath.Dir(path)
 		cmd := exec.Command(base_folder+JDK_PATH,
 			"-server",
-			"-Xverify:none",
 			"-jar", base_folder+JAR_FILE)
 		fmt.Printf("Application starting...\n")
 		err = cmd.Start()
